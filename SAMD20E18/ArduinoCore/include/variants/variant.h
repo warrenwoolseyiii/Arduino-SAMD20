@@ -53,11 +53,19 @@ extern "C"
  *----------------------------------------------------------------------------*/
 
 // Number of pins defined in PinDescription array
+#if defined(__SAMD20E18__)
 #define PINS_COUNT           (22u)
 #define NUM_DIGITAL_PINS     (16u)
 #define NUM_ANALOG_INPUTS    (6u)
 #define NUM_ANALOG_OUTPUTS   (1u)
 #define analogInputToDigitalPin(p)  ((p < 6u) ? (p) + 14u : -1)
+#elif defined(__SAMD20J18__)
+#define PINS_COUNT           (26u)
+#define NUM_DIGITAL_PINS     (20u)
+#define NUM_ANALOG_INPUTS    (6u)
+#define NUM_ANALOG_OUTPUTS   (1u)
+#define analogInputToDigitalPin(p)  ((p < 6u) ? (p) + 14u : -1)
+#endif
 
 #define digitalPinToPort(P)        ( &(PORT->Group[g_APinDescription[P].ulPort]) )
 #define digitalPinToBitMask(P)     ( 1 << g_APinDescription[P].ulPin )
@@ -76,18 +84,16 @@ extern "C"
  */
 // #define digitalPinToTimer(P)
 
-/* LEDs - No LEDS
-#define PIN_LED_13           (13u)
-#define PIN_LED_RXL          (25u)
-#define PIN_LED_TXL          (26u)
+#if defined(__SAMD20J18__)
+#define PIN_LED_13           (25u)
 #define PIN_LED              PIN_LED_13
-#define PIN_LED2             PIN_LED_RXL
-#define PIN_LED3             PIN_LED_TXL
-#define LED_BUILTIN          PIN_LED_13*/
+#define LED_BUILTIN          PIN_LED_13
+#endif 
 
 /*
  * Analog pins
  */
+#if defined(__SAMD20E18__)
 #define PIN_A0               (16ul)
 #define PIN_A1               (17ul)
 #define PIN_A2               (18ul)
@@ -95,6 +101,15 @@ extern "C"
 #define PIN_A4               (21ul)
 #define PIN_A5               (22ul)
 #define PIN_DAC0             (16ul)
+#elif defined(__SAMD20J18__)
+#define PIN_A0               (14ul)
+#define PIN_A1               (15ul)
+#define PIN_A2               (16ul)
+#define PIN_A3               (17ul)
+#define PIN_A4               (18ul)
+#define PIN_A5               (19ul)
+#define PIN_DAC0             (18ul)
+#endif
 
 static const uint8_t A0  = PIN_A0;
 static const uint8_t A1  = PIN_A1;
@@ -112,21 +127,29 @@ static const uint8_t ATN = PIN_ATN;*/
 /*
  * Serial interfaces
  */
-// Serial (EDBG)
+#if defined(__SAMD20E18__)
+// Serial
 #define PIN_SERIAL_RX       (0ul)
 #define PIN_SERIAL_TX       (1ul)
 #define PAD_SERIAL_TX       (UART_TX_PAD_2)
 #define PAD_SERIAL_RX       (SERCOM_RX_PAD_3)
-
-/* Serial1 - No Serial1
+#elif defined(__SAMD20J18__)
+// Serial (EDBG)
+#define PIN_SERIAL_RX       (26ul)
+#define PIN_SERIAL_TX       (27ul)
+#define PAD_SERIAL_TX       (0x2)
+#define PAD_SERIAL_RX       (0x3)
+// Serial1
 #define PIN_SERIAL1_RX       (0ul)
 #define PIN_SERIAL1_TX       (1ul)
-#define PAD_SERIAL1_TX       (UART_TX_PAD_2)
-#define PAD_SERIAL1_RX       (SERCOM_RX_PAD_3)*/
+#define PAD_SERIAL1_TX       (0x0)
+#define PAD_SERIAL1_RX       (0x1)
+#endif
 
 /*
  * SPI Interfaces
  */
+#if defined(__SAMD20E18__)
 #define SPI_INTERFACES_COUNT 1
 
 #define PIN_SPI_MISO         (8ul)
@@ -140,10 +163,26 @@ static const uint8_t SS	  = (7ul);	// SERCOM4 last PAD is present on A2 but HW S
 static const uint8_t MOSI = PIN_SPI_MOSI ;
 static const uint8_t MISO = PIN_SPI_MISO ;
 static const uint8_t SCK  = PIN_SPI_SCK ;
+#elif defined(__SAMD20J18__)
+#define SPI_INTERFACES_COUNT 1
+
+#define PIN_SPI_MISO         (22u)
+#define PIN_SPI_MOSI         (23u)
+#define PIN_SPI_SCK          (24u)
+#define PERIPH_SPI           sercom0
+#define PAD_SPI_TX           SPI_PAD_2_SCK_3
+#define PAD_SPI_RX           SERCOM_RX_PAD_0
+
+static const uint8_t SS	  = PIN_A2 ;	// SERCOM4 last PAD is present on A2 but HW SS isn't used. Set here only for reference.
+static const uint8_t MOSI = PIN_SPI_MOSI ;
+static const uint8_t MISO = PIN_SPI_MISO ;
+static const uint8_t SCK  = PIN_SPI_SCK ;
+#endif 
 
 /*
  * Wire Interfaces
  */
+#if defined(__SAMD20E18__)
 #define WIRE_INTERFACES_COUNT 1
 
 #define PIN_WIRE_SDA         (14ul)
@@ -153,22 +192,17 @@ static const uint8_t SCK  = PIN_SPI_SCK ;
 
 static const uint8_t SDA = PIN_WIRE_SDA;
 static const uint8_t SCL = PIN_WIRE_SCL;
+#elif defined(__SAMD20J18__)
+#define WIRE_INTERFACES_COUNT 1
 
-/*
- * USB - No USB
-#define PIN_USB_HOST_ENABLE (27ul)
-#define PIN_USB_DM          (28ul)
-#define PIN_USB_DP          (29ul)*/
+#define PIN_WIRE_SDA         (20ul)
+#define PIN_WIRE_SCL         (21ul)
+#define PERIPH_WIRE          sercom2
+#define WIRE_IT_HANDLER      SERCOM2_Handler
 
-/*
- * I2S Interfaces - No I2S
-#define I2S_INTERFACES_COUNT 1
-
-#define I2S_DEVICE          0
-#define I2S_CLOCK_GENERATOR 3
-#define PIN_I2S_SD          (9u)
-#define PIN_I2S_SCK         (1u)
-#define PIN_I2S_FS          (0u)*/
+static const uint8_t SDA = PIN_WIRE_SDA;
+static const uint8_t SCL = PIN_WIRE_SCL;
+#endif
 
 #ifdef __cplusplus
 }
@@ -184,15 +218,21 @@ static const uint8_t SCL = PIN_WIRE_SCL;
  *	===== SERCOM DEFINITION
  *	=========================
 */
+#if (defined(__SAMD20E18__) || defined(__SAMD20J18__))
 extern SERCOM sercom0;
 extern SERCOM sercom1;
 extern SERCOM sercom2;
 extern SERCOM sercom3;
+#if defined(__SAMD20J18__)
 extern SERCOM sercom4;
 extern SERCOM sercom5;
+#endif
+#endif
 
 extern Uart Serial;
-//extern Uart Serial1;
+#if defined(__SAMD20J18__)
+extern Uart Serial1;
+#endif
 
 #endif
 
@@ -214,8 +254,10 @@ extern Uart Serial;
 // #define SERIAL_PORT_USBVIRTUAL      SerialUSB
 #define SERIAL_PORT_MONITOR         Serial
 // Serial has no physical pins broken out, so it's not listed as HARDWARE port
-// #define SERIAL_PORT_HARDWARE        Serial1
-// #define SERIAL_PORT_HARDWARE_OPEN   Serial1
+#if defined(__SAMD20J18__)
+#define SERIAL_PORT_HARDWARE        Serial1
+#define SERIAL_PORT_HARDWARE_OPEN   Serial1
+#endif
 
 #endif /* _VARIANT_ARDUINO_E_ */
 
