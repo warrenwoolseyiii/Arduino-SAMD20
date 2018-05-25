@@ -102,7 +102,7 @@
 					<Attribute>template</Attribute>
 					<Category>source</Category>
 					<Condition>C Exe</Condition>
-					<FileContentHash>NwATVz9EE+3l0buatynxbA==</FileContentHash>
+					<FileContentHash>nU+WlKcYaWh0AWBBS+WVpA==</FileContentHash>
 					<FileVersion></FileVersion>
 					<Name>samd20/templates/main.cpp</Name>
 					<SelectString>Main file (.cpp)</SelectString>
@@ -131,24 +131,24 @@
 					<SourcePath></SourcePath>
 				</d4p1:anyType>
 				<d4p1:anyType i:type="FileInfo">
-					<AbsolutePath>C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\SAMD20_DFP\1.2.91\samd20\gcc\gcc\samd20e18_flash.ld</AbsolutePath>
+					<AbsolutePath>C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\SAMD20_DFP\1.2.91\samd20\gcc\gcc\samd20j18_flash.ld</AbsolutePath>
 					<Attribute>config</Attribute>
 					<Category>linkerScript</Category>
 					<Condition>GCC Exe</Condition>
-					<FileContentHash>xeunbiOjRPHCqNPUWNEERA==</FileContentHash>
+					<FileContentHash>wO8r9DzSu3o69mJm7eYu+A==</FileContentHash>
 					<FileVersion></FileVersion>
-					<Name>samd20/gcc/gcc/samd20e18_flash.ld</Name>
+					<Name>samd20/gcc/gcc/samd20j18_flash.ld</Name>
 					<SelectString></SelectString>
 					<SourcePath></SourcePath>
 				</d4p1:anyType>
 				<d4p1:anyType i:type="FileInfo">
-					<AbsolutePath>C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\SAMD20_DFP\1.2.91\samd20\gcc\gcc\samd20e18_sram.ld</AbsolutePath>
+					<AbsolutePath>C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\SAMD20_DFP\1.2.91\samd20\gcc\gcc\samd20j18_sram.ld</AbsolutePath>
 					<Attribute>config</Attribute>
 					<Category>other</Category>
 					<Condition>GCC Exe</Condition>
-					<FileContentHash>qTl/bxn6NLMUORUHZvwORw==</FileContentHash>
+					<FileContentHash>LoTE9DtsrqCCM4EWHiIdkA==</FileContentHash>
 					<FileVersion></FileVersion>
-					<Name>samd20/gcc/gcc/samd20e18_sram.ld</Name>
+					<Name>samd20/gcc/gcc/samd20j18_sram.ld</Name>
 					<SelectString></SelectString>
 					<SourcePath></SourcePath>
 				</d4p1:anyType>
@@ -157,7 +157,7 @@
 			<PackPath>C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/SAMD20_DFP/1.2.91/Atmel.SAMD20_DFP.pdsc</PackPath>
 			<PackVersion>1.2.91</PackVersion>
 			<PresentInProject>true</PresentInProject>
-			<ReferenceConditionId>ATSAMD20E18</ReferenceConditionId>
+			<ReferenceConditionId>ATSAMD20J18</ReferenceConditionId>
 			<RteComponents xmlns:d4p1="http://schemas.microsoft.com/2003/10/Serialization/Arrays">
 				<d4p1:string></d4p1:string>
 			</RteComponents>

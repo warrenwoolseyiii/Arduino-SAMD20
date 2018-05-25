@@ -137,13 +137,13 @@ static const uint8_t ATN = PIN_ATN;*/
 // Serial (EDBG)
 #define PIN_SERIAL_RX       (26ul)
 #define PIN_SERIAL_TX       (27ul)
-#define PAD_SERIAL_TX       (0x2)
-#define PAD_SERIAL_RX       (0x3)
+#define PAD_SERIAL_TX       (UART_TX_PAD_2)
+#define PAD_SERIAL_RX       (SERCOM_RX_PAD_3)
 // Serial1
 #define PIN_SERIAL1_RX       (0ul)
 #define PIN_SERIAL1_TX       (1ul)
-#define PAD_SERIAL1_TX       (0x0)
-#define PAD_SERIAL1_RX       (0x1)
+#define PAD_SERIAL1_TX       (UART_TX_PAD_0)
+#define PAD_SERIAL1_RX       (SERCOM_RX_PAD_1)
 #endif
 
 /*
