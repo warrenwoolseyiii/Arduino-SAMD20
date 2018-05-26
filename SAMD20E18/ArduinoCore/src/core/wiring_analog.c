@@ -247,10 +247,17 @@ void analogWrite(uint32_t pin, uint32_t value)
       tcEnabled[tcNum] = true;
 
       uint16_t GCLK_CLKCTRL_IDs[] = {
+#ifndef SAMD20
         GCLK_CLKCTRL_ID(GCM_TCC0_TCC1), // TCC0
         GCLK_CLKCTRL_ID(GCM_TCC0_TCC1), // TCC1
         GCLK_CLKCTRL_ID(GCM_TCC2_TC3),  // TCC2
         GCLK_CLKCTRL_ID(GCM_TCC2_TC3),  // TC3
+#else
+        GCLK_CLKCTRL_ID(GCM_TC0_TC1),   // TC0
+        GCLK_CLKCTRL_ID(GCM_TC0_TC1),   // TC1
+        GCLK_CLKCTRL_ID(GCM_TC2_TC3),   // TC2
+        GCLK_CLKCTRL_ID(GCM_TC2_TC3),   // TC3
+#endif /* SAMD20 */
         GCLK_CLKCTRL_ID(GCM_TC4_TC5),   // TC4
         GCLK_CLKCTRL_ID(GCM_TC4_TC5),   // TC5
         GCLK_CLKCTRL_ID(GCM_TC6_TC7),   // TC6

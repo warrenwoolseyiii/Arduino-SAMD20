@@ -1,26 +1,14 @@
-/*Begining of Auto generated code by Atmel studio */
 #include <Arduino.h>
 
-/*End of auto generated code by Atmel studio */
-
-#include <Wire.h>
-#include <SPI.h>
-//Beginning of Auto generated function prototypes by Atmel Studio
-//End of Auto generated function prototypes by Atmel Studio
-
-
-
 void setup() {
-  // put your setup code here, to run once:
+  pinMode(LED_BUILTIN, OUTPUT);
   Serial.begin(9600);
-  SPI.begin();
-  Wire.begin();
-
 }
 
+uint8_t gLevel = 0x1;
 void loop() {
-  // put your main code here, to run repeatedly:
-  uint32_t time = millis();
-  Serial.print(time);
+  digitalWrite(LED_BUILTIN, gLevel);
+  gLevel ^= 0x1;
   delay(500);
+  Serial.print(millis());
 }

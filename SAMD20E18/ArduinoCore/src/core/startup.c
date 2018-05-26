@@ -125,7 +125,7 @@ void SystemInit( void )
    */
   GCLK->CLKCTRL.reg = GCLK_CLKCTRL_ID( GENERIC_CLOCK_MULTIPLEXER_DFLL48M ) | // Generic Clock Multiplexer 0
                       GCLK_CLKCTRL_GEN_GCLK1 | // Generic Clock Generator 1 is source
-                      GCLK_CLKCTRL_CLKEN ;
+                      GCLK_CLKCTRL_CLKEN ; // Enables
 
   while ( GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY )
   {

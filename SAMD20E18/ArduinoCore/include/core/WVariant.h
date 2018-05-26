@@ -214,6 +214,7 @@ typedef struct _PinDescription
 extern const PinDescription g_APinDescription[] ;
 
 /* Generic Clock Multiplexer IDs */
+#ifndef SAMD20
 #define GCM_DFLL48M_REF           (0x00U)
 #define GCM_FDPLL96M_INPUT        (0x01U)
 #define GCM_FDPLL96M_32K          (0x02U)
@@ -251,6 +252,38 @@ extern const PinDescription g_APinDescription[] ;
 #define GCM_PTC                   (0x22U)
 #define GCM_I2S_0                 (0x23U)
 #define GCM_I2S_1                 (0x24U)
+#else
+#if (defined(__SAMD20E18__) || defined(__SAMD20J18__))
+#define GCM_DFLL48M_REF           (0x00U)
+#define GCM_WDT                   (0x01U)
+#define GCM_RTC                   (0x02U)
+#define GCM_EIC                   (0x03U)
+#define GCM_EVSYS_CHANNEL_0       (0x04U)
+#define GCM_EVSYS_CHANNEL_1       (0x05U)
+#define GCM_EVSYS_CHANNEL_2       (0x06U)
+#define GCM_EVSYS_CHANNEL_3       (0x07U)
+#define GCM_EVSYS_CHANNEL_4       (0x08U)
+#define GCM_EVSYS_CHANNEL_5       (0x09U)
+#define GCM_EVSYS_CHANNEL_6       (0x0AU)
+#define GCM_EVSYS_CHANNEL_7       (0x0BU)
+#define GCM_SERCOMx_SLOW          (0x0CU)
+#define GCM_SERCOM0_CORE          (0x0DU)
+#define GCM_SERCOM1_CORE          (0x0EU)
+#define GCM_SERCOM2_CORE          (0x0FU)
+#define GCM_SERCOM3_CORE          (0x10U)
+#define GCM_SERCOM4_CORE          (0x11U)
+#define GCM_SERCOM5_CORE          (0x12U)
+#define GCM_TC0_TC1               (0x13U)
+#define GCM_TC2_TC3               (0x14U)
+#define GCM_TC4_TC5               (0x15U)
+#define GCM_TC6_TC7               (0x16U)
+#define GCM_ADC                   (0x17U)
+#define GCM_AC_DIG                (0x18U)
+#define GCM_AC_ANA                (0x19U)
+#define GCM_DAC                   (0x1AU)
+#define GCM_PTC                   (0x1BU)
+#endif
+#endif
 
 #ifdef __cplusplus
 } // extern "C"
