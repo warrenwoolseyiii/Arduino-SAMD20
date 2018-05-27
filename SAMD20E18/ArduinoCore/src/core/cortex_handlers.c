@@ -28,9 +28,9 @@ extern int sysTickHook(void);
 /* Default empty handler */
 void Dummy_Handler(void)
 {
-#if defined DEBUG
+  #if defined DEBUG
   __BKPT(3);
-#endif
+  #endif
   for (;;) { }
 }
 
@@ -49,7 +49,7 @@ void WDT_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler")));
 void RTC_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler")));
 void EIC_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler")));
 void NVMCTRL_Handler  (void) __attribute__ ((weak, alias("Dummy_Handler")));
-#ifndef SMAD20
+#ifndef SAMD20
 void DMAC_Handler     (void) __attribute__ ((weak, alias("Dummy_Handler")));
 void USB_Handler      (void) __attribute__ ((weak));
 #endif
@@ -101,7 +101,7 @@ __attribute__ ((section(".isr_vector"))) const DeviceVectors exception_table =
   (void*) Reset_Handler,
   (void*) NMI_Handler,
   (void*) HardFault_Handler,
-  (void*) (0UL), /* Reserved */
+  (void*) (0UL), /* Reserved */   
   (void*) (0UL), /* Reserved */
   (void*) (0UL), /* Reserved */
   (void*) (0UL), /* Reserved */
@@ -121,7 +121,7 @@ __attribute__ ((section(".isr_vector"))) const DeviceVectors exception_table =
   (void*) RTC_Handler,            /*  3 Real-Time Counter */
   (void*) EIC_Handler,            /*  4 External Interrupt Controller */
   (void*) NVMCTRL_Handler,        /*  5 Non-Volatile Memory Controller */
-#ifndef SMAD20
+#ifndef SAMD20
   (void*) DMAC_Handler,           /*  6 Direct Memory Access Controller */
   (void*) USB_Handler,            /*  7 Universal Serial Bus */
 #endif
@@ -132,17 +132,17 @@ __attribute__ ((section(".isr_vector"))) const DeviceVectors exception_table =
   (void*) SERCOM3_Handler,        /* 12 Serial Communication Interface 3 */
   (void*) SERCOM4_Handler,        /* 13 Serial Communication Interface 4 */
   (void*) SERCOM5_Handler,        /* 14 Serial Communication Interface 5 */
-  #ifndef SAMD20
+#ifndef SAMD20
   (void*) TCC0_Handler,           /* 15 Timer Counter Control 0 */
   (void*) TCC1_Handler,           /* 16 Timer Counter Control 1 */
   (void*) TCC2_Handler,           /* 17 Timer Counter Control 2 */
-  #else
-  #if (defined(__SAMD20E18__) || defined(__SAMD20J18__))
+#else
+#if (defined(__SAMD20E18__) || defined(__SAMD20J18__))
   (void*) TC0_Handler,
   (void*) TC1_Handler,
   (void*) TC2_Handler,
-  #endif
-  #endif
+#endif
+#endif
   (void*) TC3_Handler,            /* 18 Basic Timer Counter 0 */
   (void*) TC4_Handler,            /* 19 Basic Timer Counter 1 */
   (void*) TC5_Handler,            /* 20 Basic Timer Counter 2 */
@@ -152,10 +152,10 @@ __attribute__ ((section(".isr_vector"))) const DeviceVectors exception_table =
   (void*) AC_Handler,             /* 24 Analog Comparators */
   (void*) DAC_Handler,            /* 25 Digital Analog Converter */
   (void*) PTC_Handler,            /* 26 Peripheral Touch Controller */
-  #ifndef SAMD20
+#ifndef SAMD20
   (void*) I2S_Handler,            /* 27 Inter-IC Sound Interface */
-  #endif
   (void*) (0UL),                  /* Reserved */
+#endif
 };
 
 extern int main(void);
