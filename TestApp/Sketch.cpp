@@ -10,5 +10,5 @@ void loop() {
   digitalWrite(LED_BUILTIN, gLevel);
   gLevel ^= 0x1;
   delay(500);
-  Serial.print(millis());
+  Serial.println(millis());
 }

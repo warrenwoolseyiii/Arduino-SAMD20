@@ -57,26 +57,25 @@ void SERCOM::initUART(SercomUartMode mode, SercomUartSampleRate sampleRate, uint
   {
     uint16_t sampleRateValue;
 
-#ifndef SAMD20
     if (sampleRate == SAMPLE_RATE_x16) {
       sampleRateValue = 16;
     } else {
       sampleRateValue = 8;
     }
-#else
-    sampleRateValue = 8;
-#endif /* SAMD20 */
 
+#ifndef SAMD20
     // Asynchronous fractional mode (Table 24-2 in datasheet)
     //   BAUD = fref / (sampleRateValue * fbaud)
     // (multiply by 8, to calculate fractional piece)
     uint32_t baudTimes8 = (SystemCoreClock * 8) / (sampleRateValue * baudrate);
 
-#ifndef SAMD20
     sercom->USART.BAUD.FRAC.FP   = (baudTimes8 % 8);
     sercom->USART.BAUD.FRAC.BAUD = (baudTimes8 / 8);
 #else
-    sercom->USART.BAUD.reg = (baudTimes8 / 8);
+    float baudF = (float)baudrate;
+    float ratio = (baudF / (float)SystemCoreClock);
+    float baudReg = 65536.0 * (1.0 - (16.0 * ratio));
+    sercom->USART.BAUD.reg = (uint16_t) baudReg;
 #endif /* SAMD20 */
   }
 }
