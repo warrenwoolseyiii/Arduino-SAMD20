@@ -28,6 +28,222 @@ extern int sysTickHook(void);
 /* Default empty handler */
 void Dummy_Handler(void)
 {
+#if defined DEBUG
+  __BKPT(3);
+#endif
+  for (;;) { }
+}
+
+void Dummy_Handler0(void)
+{
+  #if defined DEBUG
+  __BKPT(3);
+  #endif
+  for (;;) { }
+}
+
+void Dummy_Handler1(void)
+{
+  #if defined DEBUG
+  __BKPT(3);
+  #endif
+  for (;;) { }
+}
+
+void Dummy_Handler2(void)
+{
+  #if defined DEBUG
+  __BKPT(3);
+  #endif
+  for (;;) { }
+}
+
+void Dummy_Handler3(void)
+{
+  #if defined DEBUG
+  __BKPT(3);
+  #endif
+  for (;;) { }
+}
+
+void Dummy_Handler4(void)
+{
+  #if defined DEBUG
+  __BKPT(3);
+  #endif
+  for (;;) { }
+}
+
+void Dummy_Handler5(void)
+{
+  #if defined DEBUG
+  __BKPT(3);
+  #endif
+  for (;;) { }
+}
+
+void Dummy_Handler6(void)
+{
+  #if defined DEBUG
+  __BKPT(3);
+  #endif
+  for (;;) { }
+}
+
+void Dummy_Handler7(void)
+{
+  #if defined DEBUG
+  __BKPT(3);
+  #endif
+  for (;;) { }
+}
+
+void Dummy_Handler8(void)
+{
+  #if defined DEBUG
+  __BKPT(3);
+  #endif
+  for (;;) { }
+}
+
+void Dummy_Handler9(void)
+{
+  #if defined DEBUG
+  __BKPT(3);
+  #endif
+  for (;;) { }
+}
+
+void Dummy_Handler10(void)
+{
+  #if defined DEBUG
+  __BKPT(3);
+  #endif
+  for (;;) { }
+}
+
+void Dummy_Handler11(void)
+{
+  #if defined DEBUG
+  __BKPT(3);
+  #endif
+  for (;;) { }
+}
+
+void Dummy_Handler12(void)
+{
+  #if defined DEBUG
+  __BKPT(3);
+  #endif
+  for (;;) { }
+}
+
+void Dummy_Handler13(void)
+{
+  #if defined DEBUG
+  __BKPT(3);
+  #endif
+  for (;;) { }
+}
+
+void Dummy_Handler14(void)
+{
+  #if defined DEBUG
+  __BKPT(3);
+  #endif
+  for (;;) { }
+}
+
+void Dummy_Handler15(void)
+{
+  #if defined DEBUG
+  __BKPT(3);
+  #endif
+  for (;;) { }
+}
+
+void Dummy_Handler16(void)
+{
+  #if defined DEBUG
+  __BKPT(3);
+  #endif
+  for (;;) { }
+}
+
+void Dummy_Handler17(void)
+{
+  #if defined DEBUG
+  __BKPT(3);
+  #endif
+  for (;;) { }
+}
+
+void Dummy_Handler18(void)
+{
+  #if defined DEBUG
+  __BKPT(3);
+  #endif
+  for (;;) { }
+}
+
+void Dummy_Handler19(void)
+{
+  #if defined DEBUG
+  __BKPT(3);
+  #endif
+  for (;;) { }
+}
+
+void Dummy_Handler20(void)
+{
+  #if defined DEBUG
+  __BKPT(3);
+  #endif
+  for (;;) { }
+}
+
+void Dummy_Handler21(void)
+{
+  #if defined DEBUG
+  __BKPT(3);
+  #endif
+  for (;;) { }
+}
+
+void Dummy_Handler22(void)
+{
+  #if defined DEBUG
+  __BKPT(3);
+  #endif
+  for (;;) { }
+}
+
+void Dummy_Handler23(void)
+{
+  #if defined DEBUG
+  __BKPT(3);
+  #endif
+  for (;;) { }
+}
+
+void Dummy_Handler24(void)
+{
+  #if defined DEBUG
+  __BKPT(3);
+  #endif
+  for (;;) { }
+}
+
+void Dummy_Handler25(void)
+{
+  #if defined DEBUG
+  __BKPT(3);
+  #endif
+  for (;;) { }
+}
+
+void Dummy_Handler26(void)
+{
   #if defined DEBUG
   __BKPT(3);
   #endif
@@ -35,51 +251,51 @@ void Dummy_Handler(void)
 }
 
 /* Cortex-M0+ core handlers */
-void HardFault_Handler(void) __attribute__ ((weak, alias("Dummy_Handler")));
+void HardFault_Handler(void) __attribute__ ((weak, alias("Dummy_Handler0")));
 void Reset_Handler    (void);
-void NMI_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler")));
-void SVC_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler")));
-void PendSV_Handler   (void) __attribute__ ((weak, alias("Dummy_Handler")));
+void NMI_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler1")));
+void SVC_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler2")));
+void PendSV_Handler   (void) __attribute__ ((weak, alias("Dummy_Handler3")));
 void SysTick_Handler  (void);
 
 /* Peripherals handlers */
-void PM_Handler       (void) __attribute__ ((weak, alias("Dummy_Handler")));
-void SYSCTRL_Handler  (void) __attribute__ ((weak, alias("Dummy_Handler")));
-void WDT_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler")));
-void RTC_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler")));
-void EIC_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler")));
-void NVMCTRL_Handler  (void) __attribute__ ((weak, alias("Dummy_Handler")));
+void PM_Handler       (void) __attribute__ ((weak, alias("Dummy_Handler4")));
+void SYSCTRL_Handler  (void) __attribute__ ((weak, alias("Dummy_Handler5")));
+void WDT_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler6")));
+void RTC_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler7")));
+void EIC_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler8")));
+void NVMCTRL_Handler  (void) __attribute__ ((weak, alias("Dummy_Handler9")));
 #ifndef SAMD20
 void DMAC_Handler     (void) __attribute__ ((weak, alias("Dummy_Handler")));
 void USB_Handler      (void) __attribute__ ((weak));
 #endif
-void EVSYS_Handler    (void) __attribute__ ((weak, alias("Dummy_Handler")));
-void SERCOM0_Handler  (void) __attribute__ ((weak, alias("Dummy_Handler")));
-void SERCOM1_Handler  (void) __attribute__ ((weak, alias("Dummy_Handler")));
-void SERCOM2_Handler  (void) __attribute__ ((weak, alias("Dummy_Handler")));
+void EVSYS_Handler    (void) __attribute__ ((weak, alias("Dummy_Handler10")));
+void SERCOM0_Handler  (void) __attribute__ ((weak, alias("Dummy_Handler11")));
+void SERCOM1_Handler  (void) __attribute__ ((weak, alias("Dummy_Handler12")));
+void SERCOM2_Handler  (void) __attribute__ ((weak, alias("Dummy_Handler13")));
 void SERCOM3_Handler  (void) __attribute__ ((weak, alias("Dummy_Handler")));
-void SERCOM4_Handler  (void) __attribute__ ((weak, alias("Dummy_Handler")));
-void SERCOM5_Handler  (void) __attribute__ ((weak, alias("Dummy_Handler")));
+void SERCOM4_Handler  (void) __attribute__ ((weak, alias("Dummy_Handler14")));
+void SERCOM5_Handler  (void) __attribute__ ((weak, alias("Dummy_Handler15")));
 #ifndef SAMD20
 void TCC0_Handler     (void) __attribute__ ((weak, alias("Dummy_Handler")));
 void TCC1_Handler     (void) __attribute__ ((weak, alias("Dummy_Handler")));
 void TCC2_Handler     (void) __attribute__ ((weak, alias("Dummy_Handler")));
 #else
 #if (defined(__SAMD20E18__) || defined(__SAMD20J18__))
-void TC0_Handler     (void) __attribute__ ((weak, alias("Dummy_Handler")));
-void TC1_Handler     (void) __attribute__ ((weak, alias("Dummy_Handler")));
-void TC2_Handler     (void) __attribute__ ((weak, alias("Dummy_Handler")));
+void TC0_Handler     (void) __attribute__ ((weak, alias("Dummy_Handler16")));
+void TC1_Handler     (void) __attribute__ ((weak, alias("Dummy_Handler17")));
+void TC2_Handler     (void) __attribute__ ((weak, alias("Dummy_Handler18")));
 #endif
 #endif
-void TC3_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler")));
-void TC4_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler")));
+void TC3_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler19")));
+void TC4_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler20")));
 void TC5_Handler      (void) __attribute__ ((weak)); // Used in Tone.cpp
-void TC6_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler")));
-void TC7_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler")));
-void ADC_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler")));
-void AC_Handler       (void) __attribute__ ((weak, alias("Dummy_Handler")));
-void DAC_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler")));
-void PTC_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler")));
+void TC6_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler21")));
+void TC7_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler22")));
+void ADC_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler23")));
+void AC_Handler       (void) __attribute__ ((weak, alias("Dummy_Handler24")));
+void DAC_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler25")));
+void PTC_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler26")));
 #ifndef SAMD20
 void I2S_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler")));
 #endif
