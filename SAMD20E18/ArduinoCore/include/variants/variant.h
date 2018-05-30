@@ -94,13 +94,13 @@ extern "C"
  * Analog pins
  */
 #if defined(__SAMD20E18__)
-#define PIN_A0               (16ul)
-#define PIN_A1               (17ul)
-#define PIN_A2               (18ul)
-#define PIN_A3               (19ul)
-#define PIN_A4               (21ul)
-#define PIN_A5               (22ul)
-#define PIN_DAC0             (16ul)
+#define PIN_A0               (13ul)
+#define PIN_A1               (14ul)
+#define PIN_A2               (15ul)
+#define PIN_A3               (16ul)
+#define PIN_A4               (17ul)
+#define PIN_A5               (18ul)
+#define PIN_DAC0             (25ul)
 #elif defined(__SAMD20J18__)
 #define PIN_A0               (14ul)
 #define PIN_A1               (15ul)
@@ -152,9 +152,9 @@ static const uint8_t ATN = PIN_ATN;*/
 #if defined(__SAMD20E18__)
 #define SPI_INTERFACES_COUNT 1
 
-#define PIN_SPI_MISO         (8ul)
-#define PIN_SPI_MOSI         (5ul)
-#define PIN_SPI_SCK          (6ul)
+#define PIN_SPI_MISO         (21ul)
+#define PIN_SPI_MOSI         (22ul)
+#define PIN_SPI_SCK          (23ul)
 #define PERIPH_SPI           sercom1
 #define PAD_SPI_TX           SPI_PAD_2_SCK_3
 #define PAD_SPI_RX           SERCOM_RX_PAD_3
@@ -185,8 +185,8 @@ static const uint8_t SCK  = PIN_SPI_SCK ;
 #if defined(__SAMD20E18__)
 #define WIRE_INTERFACES_COUNT 1
 
-#define PIN_WIRE_SDA         (14ul)
-#define PIN_WIRE_SCL         (15ul)
+#define PIN_WIRE_SDA         (19ul)
+#define PIN_WIRE_SCL         (20ul)
 #define PERIPH_WIRE          sercom0
 #define WIRE_IT_HANDLER      SERCOM0_Handler
 
