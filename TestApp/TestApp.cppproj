@@ -30,15 +30,15 @@
     <EraseKey />
     <AsfFrameworkConfig>
       <framework-data>
-  <options />
-  <configurations />
-  <files />
-  <documentation help="" />
-  <offline-documentation help="" />
-  <dependencies>
-    <content-extension eid="atmel.asf" uuidref="Atmel.ASF" version="3.26.0" />
-  </dependencies>
-</framework-data>
+        <options />
+        <configurations />
+        <files />
+        <documentation help="" />
+        <offline-documentation help="" />
+        <dependencies>
+          <content-extension eid="atmel.asf" uuidref="Atmel.ASF" version="3.26.0" />
+        </dependencies>
+      </framework-data>
     </AsfFrameworkConfig>
     <avrtool>com.atmel.avrdbg.tool.edbg</avrtool>
     <avrtoolserialnumber>ATML1873060200018244</avrtoolserialnumber>
@@ -123,102 +123,101 @@
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <ToolchainSettings>
       <ArmGccCpp>
-        <armgcc.common.outputfiles.hex>True</armgcc.common.outputfiles.hex>
-        <armgcc.common.outputfiles.lss>True</armgcc.common.outputfiles.lss>
-        <armgcc.common.outputfiles.eep>True</armgcc.common.outputfiles.eep>
-        <armgcc.common.outputfiles.bin>True</armgcc.common.outputfiles.bin>
-        <armgcc.common.outputfiles.srec>True</armgcc.common.outputfiles.srec>
-        <armgcc.compiler.symbols.DefSymbols>
-          <ListValues>
-            <Value>DEBUG</Value>
-            <Value>F_CPU=48000000L</Value>
-            <Value>ARDUINO_ARCH_SAMD</Value>
-          </ListValues>
-        </armgcc.compiler.symbols.DefSymbols>
-        <armgcc.compiler.directories.IncludePaths>
-          <ListValues>
-            <Value>../../SAMD20E18/ArduinoCore/include/core</Value>
-            <Value>../../SAMD20E18/ArduinoCore/include/core/avr</Value>
-            <Value>../../SAMD20E18/ArduinoCore/include/core/samd20</Value>
-            <Value>../../SAMD20E18/ArduinoCore/include/core/samd20/include</Value>
-            <Value>../../SAMD20E18/ArduinoCore/include/core/samd20/include/component</Value>
-            <Value>../../SAMD20E18/ArduinoCore/include/core/samd20/include/instance</Value>
-            <Value>../../SAMD20E18/ArduinoCore/include/core/samd20/include/pio</Value>
-            <Value>../../SAMD20E18/ArduinoCore/include/libraries</Value>
-            <Value>../../SAMD20E18/ArduinoCore/include/libraries/spi</Value>
-            <Value>../../SAMD20E18/ArduinoCore/include/libraries/wire</Value>
-            <Value>../../SAMD20E18/ArduinoCore/include/variants</Value>
-            <Value>%24(PackRepoDir)\arm\cmsis\5.0.1\CMSIS\Include\</Value>
-            <Value>%24(PackRepoDir)\atmel\SAMD20_DFP\1.2.91\samd20\include</Value>
-          </ListValues>
-        </armgcc.compiler.directories.IncludePaths>
-        <armgcc.compiler.optimization.level>Optimize (-O1)</armgcc.compiler.optimization.level>
-        <armgcc.compiler.optimization.PrepareFunctionsForGarbageCollection>True</armgcc.compiler.optimization.PrepareFunctionsForGarbageCollection>
-        <armgcc.compiler.optimization.DebugLevel>Maximum (-g3)</armgcc.compiler.optimization.DebugLevel>
-        <armgcc.compiler.warnings.AllWarnings>True</armgcc.compiler.warnings.AllWarnings>
-        <armgcccpp.compiler.symbols.DefSymbols>
-          <ListValues>
-            <Value>DEBUG</Value>
-            <Value>F_CPU=48000000L</Value>
-            <Value>ARDUINO_ARCH_SAMD</Value>
-          </ListValues>
-        </armgcccpp.compiler.symbols.DefSymbols>
-        <armgcccpp.compiler.directories.IncludePaths>
-          <ListValues>
-            <Value>../../SAMD20E18/ArduinoCore/include/core</Value>
-            <Value>../../SAMD20E18/ArduinoCore/include/core/avr</Value>
-            <Value>../../SAMD20E18/ArduinoCore/include/core/samd20</Value>
-            <Value>../../SAMD20E18/ArduinoCore/include/core/samd20/include</Value>
-            <Value>../../SAMD20E18/ArduinoCore/include/core/samd20/include/component</Value>
-            <Value>../../SAMD20E18/ArduinoCore/include/core/samd20/include/instance</Value>
-            <Value>../../SAMD20E18/ArduinoCore/include/core/samd20/include/pio</Value>
-            <Value>../../SAMD20E18/ArduinoCore/include/libraries</Value>
-            <Value>../../SAMD20E18/ArduinoCore/include/libraries/spi</Value>
-            <Value>../../SAMD20E18/ArduinoCore/include/libraries/wire</Value>
-            <Value>../../SAMD20E18/ArduinoCore/include/variants</Value>
-            <Value>%24(PackRepoDir)\arm\cmsis\5.0.1\CMSIS\Include\</Value>
-            <Value>%24(PackRepoDir)\atmel\SAMD20_DFP\1.2.91\samd20\include</Value>
-          </ListValues>
-        </armgcccpp.compiler.directories.IncludePaths>
-        <armgcccpp.compiler.optimization.level>Optimize (-O1)</armgcccpp.compiler.optimization.level>
-        <armgcccpp.compiler.optimization.PrepareFunctionsForGarbageCollection>True</armgcccpp.compiler.optimization.PrepareFunctionsForGarbageCollection>
-        <armgcccpp.compiler.optimization.DebugLevel>Maximum (-g3)</armgcccpp.compiler.optimization.DebugLevel>
-        <armgcccpp.compiler.warnings.AllWarnings>True</armgcccpp.compiler.warnings.AllWarnings>
-        <armgcccpp.linker.libraries.Libraries>
-          <ListValues>
-            <Value>libm</Value>
-          </ListValues>
-        </armgcccpp.linker.libraries.Libraries>
-        <armgcccpp.linker.libraries.LibrarySearchPaths>
-          <ListValues>
-            <Value>%24(ProjectDir)\Device_Startup</Value>
-          </ListValues>
-        </armgcccpp.linker.libraries.LibrarySearchPaths>
-        <armgcccpp.linker.optimization.GarbageCollectUnusedSections>True</armgcccpp.linker.optimization.GarbageCollectUnusedSections>
-        <armgcccpp.linker.memorysettings.ExternalRAM />
-        <armgcccpp.linker.miscellaneous.LinkerFlags>-Tsamd20j18_flash.ld</armgcccpp.linker.miscellaneous.LinkerFlags>
-        <armgcccpp.assembler.general.IncludePaths>
-          <ListValues>
-            <Value>%24(PackRepoDir)\arm\cmsis\5.0.1\CMSIS\Include\</Value>
-            <Value>%24(PackRepoDir)\atmel\SAMD20_DFP\1.2.91\samd20\include</Value>
-          </ListValues>
-        </armgcccpp.assembler.general.IncludePaths>
-        <armgcccpp.assembler.debugging.DebugLevel>Default (-g)</armgcccpp.assembler.debugging.DebugLevel>
-        <armgcccpp.preprocessingassembler.general.IncludePaths>
-          <ListValues>
-            <Value>%24(PackRepoDir)\arm\cmsis\5.0.1\CMSIS\Include\</Value>
-            <Value>%24(PackRepoDir)\atmel\SAMD20_DFP\1.2.91\samd20\include</Value>
-          </ListValues>
-        </armgcccpp.preprocessingassembler.general.IncludePaths>
-        <armgcccpp.preprocessingassembler.debugging.DebugLevel>Default (-Wa,-g)</armgcccpp.preprocessingassembler.debugging.DebugLevel>
-      </ArmGccCpp>
+  <armgcc.common.outputfiles.hex>True</armgcc.common.outputfiles.hex>
+  <armgcc.common.outputfiles.lss>True</armgcc.common.outputfiles.lss>
+  <armgcc.common.outputfiles.eep>True</armgcc.common.outputfiles.eep>
+  <armgcc.common.outputfiles.bin>True</armgcc.common.outputfiles.bin>
+  <armgcc.common.outputfiles.srec>True</armgcc.common.outputfiles.srec>
+  <armgcc.compiler.symbols.DefSymbols>
+    <ListValues>
+      <Value>DEBUG</Value>
+      <Value>F_CPU=48000000L</Value>
+      <Value>ARDUINO_ARCH_SAMD</Value>
+      <Value>SAMD20</Value>
+    </ListValues>
+  </armgcc.compiler.symbols.DefSymbols>
+  <armgcc.compiler.directories.IncludePaths>
+    <ListValues>
+      <Value>../../SAMD20E18/ArduinoCore/include/core</Value>
+      <Value>../../SAMD20E18/ArduinoCore/include/core/avr</Value>
+      <Value>../../SAMD20E18/ArduinoCore/include/core/samd20</Value>
+      <Value>../../SAMD20E18/ArduinoCore/include/core/samd20/include</Value>
+      <Value>../../SAMD20E18/ArduinoCore/include/core/samd20/include/component</Value>
+      <Value>../../SAMD20E18/ArduinoCore/include/core/samd20/include/instance</Value>
+      <Value>../../SAMD20E18/ArduinoCore/include/core/samd20/include/pio</Value>
+      <Value>../../SAMD20E18/ArduinoCore/include/libraries</Value>
+      <Value>../../SAMD20E18/ArduinoCore/include/libraries/spi</Value>
+      <Value>../../SAMD20E18/ArduinoCore/include/libraries/wire</Value>
+      <Value>../../SAMD20E18/ArduinoCore/include/variants</Value>
+      <Value>../../../Flume/Flume_AMR</Value>
+      <Value>%24(PackRepoDir)\arm\cmsis\5.0.1\CMSIS\Include\</Value>
+      <Value>%24(PackRepoDir)\atmel\SAMD20_DFP\1.2.91\samd20\include</Value>
+    </ListValues>
+  </armgcc.compiler.directories.IncludePaths>
+  <armgcc.compiler.optimization.level>Optimize (-O1)</armgcc.compiler.optimization.level>
+  <armgcc.compiler.optimization.PrepareFunctionsForGarbageCollection>True</armgcc.compiler.optimization.PrepareFunctionsForGarbageCollection>
+  <armgcc.compiler.optimization.DebugLevel>Maximum (-g3)</armgcc.compiler.optimization.DebugLevel>
+  <armgcc.compiler.warnings.AllWarnings>True</armgcc.compiler.warnings.AllWarnings>
+  <armgcccpp.compiler.symbols.DefSymbols>
+    <ListValues>
+      <Value>DEBUG</Value>
+      <Value>F_CPU=48000000L</Value>
+      <Value>ARDUINO_ARCH_SAMD</Value>
+      <Value>SAMD20</Value>
+    </ListValues>
+  </armgcccpp.compiler.symbols.DefSymbols>
+  <armgcccpp.compiler.directories.IncludePaths>
+    <ListValues>
+      <Value>../../SAMD20E18/ArduinoCore/include/core</Value>
+      <Value>../../SAMD20E18/ArduinoCore/include/core/avr</Value>
+      <Value>../../SAMD20E18/ArduinoCore/include/core/samd20</Value>
+      <Value>../../SAMD20E18/ArduinoCore/include/core/samd20/include</Value>
+      <Value>../../SAMD20E18/ArduinoCore/include/core/samd20/include/component</Value>
+      <Value>../../SAMD20E18/ArduinoCore/include/core/samd20/include/instance</Value>
+      <Value>../../SAMD20E18/ArduinoCore/include/core/samd20/include/pio</Value>
+      <Value>../../SAMD20E18/ArduinoCore/include/libraries</Value>
+      <Value>../../SAMD20E18/ArduinoCore/include/libraries/spi</Value>
+      <Value>../../SAMD20E18/ArduinoCore/include/libraries/wire</Value>
+      <Value>../../SAMD20E18/ArduinoCore/include/variants</Value>
+      <Value>../../../Flume/Flume_AMR</Value>
+      <Value>%24(PackRepoDir)\arm\cmsis\5.0.1\CMSIS\Include\</Value>
+      <Value>%24(PackRepoDir)\atmel\SAMD20_DFP\1.2.91\samd20\include</Value>
+    </ListValues>
+  </armgcccpp.compiler.directories.IncludePaths>
+  <armgcccpp.compiler.optimization.level>Optimize (-O1)</armgcccpp.compiler.optimization.level>
+  <armgcccpp.compiler.optimization.PrepareFunctionsForGarbageCollection>True</armgcccpp.compiler.optimization.PrepareFunctionsForGarbageCollection>
+  <armgcccpp.compiler.optimization.DebugLevel>Maximum (-g3)</armgcccpp.compiler.optimization.DebugLevel>
+  <armgcccpp.compiler.warnings.AllWarnings>True</armgcccpp.compiler.warnings.AllWarnings>
+  <armgcccpp.linker.libraries.Libraries>
+    <ListValues>
+      <Value>libm</Value>
+    </ListValues>
+  </armgcccpp.linker.libraries.Libraries>
+  <armgcccpp.linker.libraries.LibrarySearchPaths>
+    <ListValues>
+      <Value>%24(ProjectDir)\Device_Startup</Value>
+    </ListValues>
+  </armgcccpp.linker.libraries.LibrarySearchPaths>
+  <armgcccpp.linker.optimization.GarbageCollectUnusedSections>True</armgcccpp.linker.optimization.GarbageCollectUnusedSections>
+  <armgcccpp.linker.memorysettings.ExternalRAM />
+  <armgcccpp.linker.miscellaneous.LinkerFlags>-Tsamd20j18_flash.ld</armgcccpp.linker.miscellaneous.LinkerFlags>
+  <armgcccpp.assembler.general.IncludePaths>
+    <ListValues>
+      <Value>%24(PackRepoDir)\arm\cmsis\5.0.1\CMSIS\Include\</Value>
+      <Value>%24(PackRepoDir)\atmel\SAMD20_DFP\1.2.91\samd20\include</Value>
+    </ListValues>
+  </armgcccpp.assembler.general.IncludePaths>
+  <armgcccpp.assembler.debugging.DebugLevel>Default (-g)</armgcccpp.assembler.debugging.DebugLevel>
+  <armgcccpp.preprocessingassembler.general.IncludePaths>
+    <ListValues>
+      <Value>%24(PackRepoDir)\arm\cmsis\5.0.1\CMSIS\Include\</Value>
+      <Value>%24(PackRepoDir)\atmel\SAMD20_DFP\1.2.91\samd20\include</Value>
+    </ListValues>
+  </armgcccpp.preprocessingassembler.general.IncludePaths>
+  <armgcccpp.preprocessingassembler.debugging.DebugLevel>Default (-Wa,-g)</armgcccpp.preprocessingassembler.debugging.DebugLevel>
+</ArmGccCpp>
     </ToolchainSettings>
   </PropertyGroup>
-  <ItemGroup>
-    <Compile Include="Sketch.cpp">
-      <SubType>compile</SubType>
-    </Compile>
-  </ItemGroup>
   <ItemGroup>
     <Folder Include="Device_Startup\" />
   </ItemGroup>
@@ -236,6 +235,19 @@
     <None Include="Device_Startup\samd20j18_sram.ld">
       <SubType>compile</SubType>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\Flume\Flume_AMR\lib\SPIFlash\SPIFlash.cpp">
+      <SubType>compile</SubType>
+      <Link>SPIFlash.cpp</Link>
+    </Compile>
+    <Compile Include="..\..\Flume\Flume_AMR\lib\SPIFlash\SPIFlash.h">
+      <SubType>compile</SubType>
+      <Link>SPIFlash.h</Link>
+    </Compile>
+    <Compile Include="Sketch.cpp">
+      <SubType>compile</SubType>
+    </Compile>
   </ItemGroup>
   <Import Project="$(AVRSTUDIO_EXE_PATH)\\Vs\\Compiler.targets" />
 </Project>
