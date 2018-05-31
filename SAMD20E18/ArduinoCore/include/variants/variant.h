@@ -156,7 +156,7 @@ static const uint8_t ATN = PIN_ATN;*/
 #define PIN_SPI_MOSI         (22ul)
 #define PIN_SPI_SCK          (23ul)
 #define PERIPH_SPI           sercom1
-#define PAD_SPI_TX           SPI_PAD_2_SCK_3
+#define PAD_SPI_TX           SPI_PAD_0_SCK_1
 #define PAD_SPI_RX           SERCOM_RX_PAD_3
 
 static const uint8_t SS	  = (7ul);	// SERCOM4 last PAD is present on A2 but HW SS isn't used. Set here only for reference.
