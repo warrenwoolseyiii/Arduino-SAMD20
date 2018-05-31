@@ -268,14 +268,16 @@ void NVMCTRL_Handler  (void) __attribute__ ((weak, alias("Dummy_Handler9")));
 #ifndef SAMD20
 void DMAC_Handler     (void) __attribute__ ((weak, alias("Dummy_Handler")));
 void USB_Handler      (void) __attribute__ ((weak));
-#endif
+#endif /* SAMD20 */
 void EVSYS_Handler    (void) __attribute__ ((weak, alias("Dummy_Handler10")));
 void SERCOM0_Handler  (void) __attribute__ ((weak, alias("Dummy_Handler11")));
 void SERCOM1_Handler  (void) __attribute__ ((weak, alias("Dummy_Handler12")));
 void SERCOM2_Handler  (void) __attribute__ ((weak, alias("Dummy_Handler13")));
 void SERCOM3_Handler  (void) __attribute__ ((weak, alias("Dummy_Handler")));
+#ifndef __SAMD20E18__
 void SERCOM4_Handler  (void) __attribute__ ((weak, alias("Dummy_Handler14")));
 void SERCOM5_Handler  (void) __attribute__ ((weak, alias("Dummy_Handler15")));
+#endif /* __SAMD20E18__ */
 #ifndef SAMD20
 void TCC0_Handler     (void) __attribute__ ((weak, alias("Dummy_Handler")));
 void TCC1_Handler     (void) __attribute__ ((weak, alias("Dummy_Handler")));
@@ -285,22 +287,22 @@ void TCC2_Handler     (void) __attribute__ ((weak, alias("Dummy_Handler")));
 void TC0_Handler     (void) __attribute__ ((weak, alias("Dummy_Handler16")));
 void TC1_Handler     (void) __attribute__ ((weak, alias("Dummy_Handler17")));
 void TC2_Handler     (void) __attribute__ ((weak, alias("Dummy_Handler18")));
-#endif
-#endif
+#endif /* (defined(__SAMD20E18__) || defined(__SAMD20J18__)) */
+#endif /* SAMD20 */
 void TC3_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler19")));
 void TC4_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler20")));
 void TC5_Handler      (void) __attribute__ ((weak)); // Used in Tone.cpp
-#if defined(__SAMD20J18__)
+#ifndef __SAMD20E18__
 void TC6_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler21")));
 void TC7_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler22")));
-#endif
+#endif /* __SAMD20E18__ */
 void ADC_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler23")));
 void AC_Handler       (void) __attribute__ ((weak, alias("Dummy_Handler24")));
 void DAC_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler25")));
 void PTC_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler26")));
 #ifndef SAMD20
 void I2S_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler")));
-#endif
+#endif /* SAMD20 */
 
 /* Initialize segments */
 extern uint32_t __etext;
@@ -342,14 +344,19 @@ __attribute__ ((section(".isr_vector"))) const DeviceVectors exception_table =
 #ifndef SAMD20
   (void*) DMAC_Handler,           /*  6 Direct Memory Access Controller */
   (void*) USB_Handler,            /*  7 Universal Serial Bus */
-#endif
+#endif /* SAMD20 */
   (void*) EVSYS_Handler,          /*  8 Event System Interface */
   (void*) SERCOM0_Handler,        /*  9 Serial Communication Interface 0 */
   (void*) SERCOM1_Handler,        /* 10 Serial Communication Interface 1 */
   (void*) SERCOM2_Handler,        /* 11 Serial Communication Interface 2 */
   (void*) SERCOM3_Handler,        /* 12 Serial Communication Interface 3 */
+#ifndef __SAMD20E18__
   (void*) SERCOM4_Handler,        /* 13 Serial Communication Interface 4 */
   (void*) SERCOM5_Handler,        /* 14 Serial Communication Interface 5 */
+#else 
+  (void*) (0UL), /* Reserved */   
+  (void*) (0UL), /* Reserved */   
+#endif /* __SAMD20E18__ */
 #ifndef SAMD20
   (void*) TCC0_Handler,           /* 15 Timer Counter Control 0 */
   (void*) TCC1_Handler,           /* 16 Timer Counter Control 1 */
@@ -359,15 +366,18 @@ __attribute__ ((section(".isr_vector"))) const DeviceVectors exception_table =
   (void*) TC0_Handler,
   (void*) TC1_Handler,
   (void*) TC2_Handler,
-#endif
-#endif
+#endif /* (defined(__SAMD20E18__) || defined(__SAMD20J18__)) */
+#endif /* SAMD20 */
   (void*) TC3_Handler,            /* 18 Basic Timer Counter 0 */
   (void*) TC4_Handler,            /* 19 Basic Timer Counter 1 */
   (void*) TC5_Handler,            /* 20 Basic Timer Counter 2 */
-#if defined(__SAMD20J18__)
+#ifndef __SAMD20E18__
   (void*) TC6_Handler,            /* 21 Basic Timer Counter 3 */
   (void*) TC7_Handler,            /* 22 Basic Timer Counter 4 */
-#endif
+#else
+  (void*) (0UL), /* Reserved */   
+  (void*) (0UL), /* Reserved */   
+#endif /* __SAMD20E18__ */
   (void*) ADC_Handler,            /* 23 Analog Digital Converter */
   (void*) AC_Handler,             /* 24 Analog Comparators */
   (void*) DAC_Handler,            /* 25 Digital Analog Converter */
@@ -375,7 +385,7 @@ __attribute__ ((section(".isr_vector"))) const DeviceVectors exception_table =
 #ifndef SAMD20
   (void*) I2S_Handler,            /* 27 Inter-IC Sound Interface */
   (void*) (0UL),                  /* Reserved */
-#endif
+#endif /* SAMD20 */
 };
 
 extern int main(void);
@@ -431,6 +441,6 @@ void USB_SetHandler(void (*new_usb_isr)(void))
 {
   usb_isr = new_usb_isr;
 }
-#endif
+#endif /* SAMD20 */
 
 
