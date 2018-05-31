@@ -5,7 +5,7 @@
     <ProjectVersion>7.0</ProjectVersion>
     <ToolchainName>com.Atmel.ARMGCC.CPP</ToolchainName>
     <ProjectGuid>016014d1-f9bf-4234-a4e2-6b9378353220</ProjectGuid>
-    <avrdevice>ATSAMD20J18</avrdevice>
+    <avrdevice>ATSAMD20E18</avrdevice>
     <avrdeviceseries>none</avrdeviceseries>
     <OutputType>StaticLibrary</OutputType>
     <Language>CPP</Language>
