@@ -27,6 +27,7 @@ MEMORY
 {
   FLASH (rx) : ORIGIN = 0x00000000, LENGTH = 0x00040000
   RAM (rwx) : ORIGIN = 0x20000000, LENGTH = 0x00008000
+  USER (r) : ORIGIN = 0x00804000, LENGTH = 0x00000040
 }
 
 /* Linker script to place sections and symbol values. Should be used together
@@ -211,4 +212,8 @@ SECTIONS
 
 	/* Check if data + heap + stack exceeds RAM limit */
 	ASSERT(__StackLimit >= __HeapLimit, "region RAM overflowed with stack")
+
+  .user_word :
+  {
+  } > USER
 }

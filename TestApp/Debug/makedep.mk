@@ -4,5 +4,7 @@
 
 ..\..\Flume\Flume_AMR\lib\SPIFlash\SPIFlash.cpp
 
+fuses.c
+
 Sketch.cpp
 

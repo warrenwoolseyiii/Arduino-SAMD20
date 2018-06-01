@@ -270,6 +270,9 @@
       <SubType>compile</SubType>
       <Link>SPIFlash.h</Link>
     </Compile>
+    <Compile Include="fuses.c">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="Sketch.cpp">
       <SubType>compile</SubType>
     </Compile>
