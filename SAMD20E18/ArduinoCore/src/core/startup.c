@@ -59,7 +59,7 @@ void SystemInit( void )
    * 1) Enable OSC32K clock (Internal 32.768Hz oscillator)
    */
 
-  uint32_t calib = (*((uint32_t *) FUSES_OSC32K_CAL_ADDR) & FUSES_OSC32K_CAL_Msk) >> FUSES_OSC32K_CAL_Pos;
+  uint32_t calib = 0x1E02000; //(*((uint32_t *) FUSES_OSC32K_CAL_ADDR) & FUSES_OSC32K_CAL_Msk) >> FUSES_OSC32K_CAL_Pos;
 
   SYSCTRL->OSC32K.reg = SYSCTRL_OSC32K_CALIB(calib) |
                         SYSCTRL_OSC32K_STARTUP( 0x6u ) | // cf table 15.10 of product datasheet in chapter 15.8.6
@@ -183,10 +183,12 @@ void SystemInit( void )
     /* Wait for synchronization */
   }
 
+#ifndef SAMD20
   SYSCTRL->DFLLCTRL.reg =  SYSCTRL_DFLLCTRL_MODE |
                            SYSCTRL_DFLLCTRL_CCDIS |
                            SYSCTRL_DFLLCTRL_USBCRM | /* USB correction */
                            SYSCTRL_DFLLCTRL_BPLCKC;
+#endif
 
   while ( (SYSCTRL->PCLKSR.reg & SYSCTRL_PCLKSR_DFLLRDY) == 0 )
   {
