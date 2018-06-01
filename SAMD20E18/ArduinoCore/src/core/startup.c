@@ -59,7 +59,7 @@ void SystemInit( void )
    * 1) Enable OSC32K clock (Internal 32.768Hz oscillator)
    */
 
-  uint32_t calib = 0x1E02000; //(*((uint32_t *) FUSES_OSC32K_CAL_ADDR) & FUSES_OSC32K_CAL_Msk) >> FUSES_OSC32K_CAL_Pos;
+  uint32_t calib = 0x1E02000; // TODO set these adresses properly! (*((uint32_t *) FUSES_OSC32K_CAL_ADDR) & FUSES_OSC32K_CAL_Msk) >> FUSES_OSC32K_CAL_Pos;
 
   SYSCTRL->OSC32K.reg = SYSCTRL_OSC32K_CALIB(calib) |
                         SYSCTRL_OSC32K_STARTUP( 0x6u ) | // cf table 15.10 of product datasheet in chapter 15.8.6

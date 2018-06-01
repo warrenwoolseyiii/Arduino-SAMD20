@@ -2,6 +2,8 @@
 # Automatically-generated file. Do not edit or delete the file
 ################################################################################
 
+..\..\Flume\Flume_AMR\lib\Flume\FlumeID.cpp
+
 ..\..\Flume\Flume_AMR\lib\SPIFlash\SPIFlash.cpp
 
 Sketch.cpp
