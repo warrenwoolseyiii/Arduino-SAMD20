@@ -1,33 +1,37 @@
 #include <Arduino.h>
-#include <lib/include/Debug.h>
-#include <lib/SPIFlash/SPIFlash.h>
+#include <Debug.h>
+#include <FXOS8700.h>
+#include <PacketBuilder.h>
 
-uint8_t gLevel = 0x1;
-uint32_t gAddr = 0;
-SPIFlash Flash(FLASH_SS);
+uint8_t gLEDLevels = 0x1;
+
+// PacketBuilder / Parser
+Buffer_t gTxBuff, gRxBuff;
+uint8_t gTypeFlags = 0;
+uint32_t    gSendPeaksGlobal;
+const char *baked_sha20 = "12345678901234567890";
 
 void setup() {
-  pinMode(LED1, OUTPUT);
-  pinMode(RFM_SS, OUTPUT);
-  digitalWrite(RFM_SS, HIGH);
-  digitalWrite(LED1, HIGH);
-  
-  Flash.initialize();
-  Flash.blockErase32K(gAddr);
-  
-  DEBUGbegin(SERIAL_BAUD);
+    DEBUGbegin( SERIAL_BAUD );
+    
+    pinMode( LED1, OUTPUT );
+    pinMode( LED2, OUTPUT );
+    
+    pinMode( RFM_SS, OUTPUT );
+    pinMode( FLASH_SS, OUTPUT );
+    
+    PacketBuilder::InitPacketBuilder( &gTypeFlags, &gTxBuff );
 }
 
 void loop() {
-  digitalWrite(LED1, gLevel);
-  delay(500);
-  uint32_t ms = millis();
-  DEBUGln(ms);
-  Flash.writeBytes(gAddr, &ms, sizeof(ms));
-  
-  uint32_t test = 0;
-  Flash.readBytes(gAddr, &test, sizeof(test));
-  if( test == ms ) 
-    gLevel ^= 0x1;
-  gAddr += sizeof(uint32_t);
+    // Blink this so I know it's alive
+    delay( 250 );
+    digitalWrite( LED1, gLEDLevels );
+    digitalWrite( LED2, gLEDLevels );
+    
+    if( fxos.initialize() )
+        gLEDLevels ^= 0x1;
+        
+    PacketBuilder::GeneratePacket( gTypeFlags );
+    gTxBuff.Flush();
 }
