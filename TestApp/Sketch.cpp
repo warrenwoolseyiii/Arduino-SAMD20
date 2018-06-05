@@ -32,6 +32,13 @@ void loop() {
     if( fxos.initialize() )
         gLEDLevels ^= 0x1;
         
+    DEBUG_( "Time : " );
+    DEBUGln( millis() );    
+    DEBUG_( "Temp : " );
+    DEBUGln( fxos.getTemperature() );
+    
+    fxos.start();
+    
     PacketBuilder::GeneratePacket( gTypeFlags );
     gTxBuff.Flush();
 }
