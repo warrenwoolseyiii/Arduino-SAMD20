@@ -3,8 +3,9 @@
 #include <FXOS8700.h>
 #include <PacketBuilder.h>
 #include <SPIFlash.h>
+#include <AMRConfigTable.h>
 
-uint8_t gLEDLevels = 0x1;
+uint8_t gLEDLevels = 0x0;
 
 // PacketBuilder / Parser
 Buffer_t gTxBuff, gRxBuff;
@@ -14,7 +15,9 @@ const char *baked_sha20 = "12345678901234567890";
 
 // SPIFlash
 SPIFlash flash(FLASH_SS);
-NetInfo infoWrite, infoRead;
+
+// Config table
+AMRConfigTable configTable;
 
 void setup() {
     DEBUGbegin( SERIAL_BAUD );
@@ -28,19 +31,16 @@ void setup() {
     
     PacketBuilder::InitPacketBuilder( &gTypeFlags, &gTxBuff );
     
-    // Test this
-    flash.initialize();
-    
-    //NetInfo infoWrite;
-    infoWrite.erase();
-    infoWrite.awake = 69;
-    infoWrite.fastUpdates = 1;
-    infoWrite.network = 0xF165;
-    for( uint8_t i = 0; i < 16; i++ ) infoWrite.key[i] = i;
-    infoWrite.save();
-    
-    //NetInfo infoRead;
-    infoRead.load();
+    NetInfo_t netInfo;
+    configTable.loadItem( config_item_net_info, &netInfo );
+    if( netInfo.network != 0x6969 ) {
+        netInfo.network = 0x6969;
+        netInfo.awake = 1;
+        netInfo.fastUpdates = 1;
+        for( uint8_t i = 0; i < 16; i++ ) 
+            netInfo.key[i] = i;
+        configTable.writeItem( config_item_net_info, &netInfo );
+    }
 }
 
 void loop() {
@@ -50,9 +50,6 @@ void loop() {
     digitalWrite( LED2, gLEDLevels );
     
     fxos.initialize();
-    
-    if( infoRead.network == infoWrite.network )
-        gLEDLevels ^= 0x1;
         
     DEBUG_( "Time : " );
     DEBUGln( millis() );    
