@@ -259,5 +259,9 @@ extern Uart Serial1;
 #define SERIAL_PORT_HARDWARE_OPEN   Serial1
 #endif
 
+uint32_t __disableGlobalISR();
+void __enableGlobalISR( uint32_t ISER );
+
+
 #endif /* _VARIANT_ARDUINO_E_ */
 

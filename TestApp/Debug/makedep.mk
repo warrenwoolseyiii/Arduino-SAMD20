@@ -2,6 +2,8 @@
 # Automatically-generated file. Do not edit or delete the file
 ################################################################################
 
+..\..\Flume\Flume_AMR\lib\Commands\CmdImp.cpp
+
 ..\..\Flume\Flume_AMR\lib\Flume\FlumeID.cpp
 
 ..\..\Flume\Flume_AMR\lib\FXOS8700\filter.cpp

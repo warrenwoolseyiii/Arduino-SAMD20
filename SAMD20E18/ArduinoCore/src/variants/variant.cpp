@@ -338,4 +338,19 @@ void SERCOM3_Handler()
 
 #endif
 
+/*
+ * Interrupts
+ */
+uint32_t __disableGlobalISR()
+{
+    volatile uint32_t ISER = *(NVIC->ISER);
+    *(NVIC->ICER) = ISER;
+    return ISER;
+}
+
+void __enableGlobalISR( uint32_t ISER )
+{
+    *(NVIC->ISER) = ISER;
+}
+
 

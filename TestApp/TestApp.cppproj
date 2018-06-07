@@ -170,6 +170,7 @@
       <Value>../../../Flume/Flume_AMR/lib/Flume</Value>
       <Value>../../../Flume/Flume_AMR/lib/FXOS8700</Value>
       <Value>../../../Flume/Flume_AMR/lib/SPIFlash</Value>
+      <Value>../../../Flume/Flume_AMR/lib/Commands</Value>
       <Value>%24(PackRepoDir)\atmel\SAMD20_DFP\1.2.91\samd20\include</Value>
       <Value>%24(PackRepoDir)\arm\cmsis\5.0.1\CMSIS\Include\</Value>
     </ListValues>
@@ -208,6 +209,7 @@
       <Value>../../../Flume/Flume_AMR/lib/Flume</Value>
       <Value>../../../Flume/Flume_AMR/lib/FXOS8700</Value>
       <Value>../../../Flume/Flume_AMR/lib/SPIFlash</Value>
+      <Value>../../../Flume/Flume_AMR/lib/Commands</Value>
       <Value>%24(PackRepoDir)\atmel\SAMD20_DFP\1.2.91\samd20\include</Value>
       <Value>%24(PackRepoDir)\arm\cmsis\5.0.1\CMSIS\Include\</Value>
     </ListValues>
@@ -266,6 +268,14 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\Flume\Flume_AMR\lib\Commands\CmdImp.cpp">
+      <SubType>compile</SubType>
+      <Link>CmdImp.cpp</Link>
+    </Compile>
+    <Compile Include="..\..\Flume\Flume_AMR\lib\Commands\CmdImp.h">
+      <SubType>compile</SubType>
+      <Link>CmdImp.h</Link>
+    </Compile>
     <Compile Include="..\..\Flume\Flume_AMR\lib\Flume\Buffer.h">
       <SubType>compile</SubType>
       <Link>Buffer.h</Link>
