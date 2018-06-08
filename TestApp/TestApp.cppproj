@@ -147,9 +147,10 @@
       <Value>ARDUINO_ARCH_SAMD</Value>
       <Value>SAMD20</Value>
       <Value>FLUME_BUILD_TYPE=1</Value>
-      <Value>SERIAL_EN=1</Value>
+      <Value>SERIAL_EN=1 -DINT_DEBUG_EN=0</Value>
       <Value>UUID_BINLEN=8</Value>
       <Value>FXOS_EN=1 -DFXOS_I2C_ADDR=0x1E -DFXOS_ODR=ODR_200HZ -DFXOS_OSR=MOSR_6 -DFXOS_SLEEP_OSR=MSOSR_4 -DFXOS_STREAMING=0 -DRX_NO_PROCESSES=0</Value>
+      <Value>FLASH_EN=1</Value>
     </ListValues>
   </armgcc.compiler.symbols.DefSymbols>
   <armgcc.compiler.directories.IncludePaths>
@@ -171,6 +172,7 @@
       <Value>../../../Flume/Flume_AMR/lib/FXOS8700</Value>
       <Value>../../../Flume/Flume_AMR/lib/SPIFlash</Value>
       <Value>../../../Flume/Flume_AMR/lib/Commands</Value>
+      <Value>../../../Flume/Flume_AMR/lib/CurrentValueTable</Value>
       <Value>%24(PackRepoDir)\atmel\SAMD20_DFP\1.2.91\samd20\include</Value>
       <Value>%24(PackRepoDir)\arm\cmsis\5.0.1\CMSIS\Include\</Value>
     </ListValues>
@@ -186,9 +188,10 @@
       <Value>ARDUINO_ARCH_SAMD</Value>
       <Value>SAMD20</Value>
       <Value>FLUME_BUILD_TYPE=1</Value>
-      <Value>SERIAL_EN=1</Value>
+      <Value>SERIAL_EN=1 -DINT_DEBUG_EN=0</Value>
       <Value>UUID_BINLEN=8</Value>
       <Value>FXOS_EN=1 -DFXOS_I2C_ADDR=0x1E -DFXOS_ODR=ODR_200HZ -DFXOS_OSR=MOSR_6 -DFXOS_SLEEP_OSR=MSOSR_4 -DFXOS_STREAMING=0 -DRX_NO_PROCESSES=0</Value>
+      <Value>FLASH_EN=1</Value>
     </ListValues>
   </armgcccpp.compiler.symbols.DefSymbols>
   <armgcccpp.compiler.directories.IncludePaths>
@@ -210,6 +213,7 @@
       <Value>../../../Flume/Flume_AMR/lib/FXOS8700</Value>
       <Value>../../../Flume/Flume_AMR/lib/SPIFlash</Value>
       <Value>../../../Flume/Flume_AMR/lib/Commands</Value>
+      <Value>../../../Flume/Flume_AMR/lib/CurrentValueTable</Value>
       <Value>%24(PackRepoDir)\atmel\SAMD20_DFP\1.2.91\samd20\include</Value>
       <Value>%24(PackRepoDir)\arm\cmsis\5.0.1\CMSIS\Include\</Value>
     </ListValues>
@@ -275,6 +279,14 @@
     <Compile Include="..\..\Flume\Flume_AMR\lib\Commands\CmdImp.h">
       <SubType>compile</SubType>
       <Link>CmdImp.h</Link>
+    </Compile>
+    <Compile Include="..\..\Flume\Flume_AMR\lib\CurrentValueTable\CVT.cpp">
+      <SubType>compile</SubType>
+      <Link>CVT.cpp</Link>
+    </Compile>
+    <Compile Include="..\..\Flume\Flume_AMR\lib\CurrentValueTable\CVT.h">
+      <SubType>compile</SubType>
+      <Link>CVT.h</Link>
     </Compile>
     <Compile Include="..\..\Flume\Flume_AMR\lib\Flume\Buffer.h">
       <SubType>compile</SubType>
@@ -360,8 +372,9 @@
       <SubType>compile</SubType>
       <Link>SPIFlashMemMap.h</Link>
     </Compile>
-    <Compile Include="Sketch.cpp">
+    <Compile Include="..\..\Flume\Flume_AMR\src\Flume_AMR.cpp">
       <SubType>compile</SubType>
+      <Link>Flume_AMR.cpp</Link>
     </Compile>
   </ItemGroup>
   <Import Project="$(AVRSTUDIO_EXE_PATH)\\Vs\\Compiler.targets" />
