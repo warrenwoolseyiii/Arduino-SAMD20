@@ -147,7 +147,7 @@
       <Value>ARDUINO_ARCH_SAMD</Value>
       <Value>SAMD20</Value>
       <Value>FLUME_BUILD_TYPE=1</Value>
-      <Value>SERIAL_EN=1 -DINT_DEBUG_EN=0</Value>
+      <Value>SERIAL_EN=1 -DINT_DEBUG_EN=0 -DDEBUG_CONSOLE_EN=1</Value>
       <Value>UUID_BINLEN=8</Value>
       <Value>FXOS_EN=1 -DFXOS_I2C_ADDR=0x1E -DFXOS_ODR=ODR_200HZ -DFXOS_OSR=MOSR_6 -DFXOS_SLEEP_OSR=MSOSR_4 -DFXOS_STREAMING=0 -DRX_NO_PROCESSES=0</Value>
       <Value>FLASH_EN=1</Value>
@@ -188,7 +188,7 @@
       <Value>ARDUINO_ARCH_SAMD</Value>
       <Value>SAMD20</Value>
       <Value>FLUME_BUILD_TYPE=1</Value>
-      <Value>SERIAL_EN=1 -DINT_DEBUG_EN=0</Value>
+      <Value>SERIAL_EN=1 -DINT_DEBUG_EN=0 -DDEBUG_CONSOLE_EN=1</Value>
       <Value>UUID_BINLEN=8</Value>
       <Value>FXOS_EN=1 -DFXOS_I2C_ADDR=0x1E -DFXOS_ODR=ODR_200HZ -DFXOS_OSR=MOSR_6 -DFXOS_SLEEP_OSR=MSOSR_4 -DFXOS_STREAMING=0 -DRX_NO_PROCESSES=0</Value>
       <Value>FLASH_EN=1</Value>
@@ -355,6 +355,10 @@
     <Compile Include="..\..\Flume\Flume_AMR\lib\include\Debug.h">
       <SubType>compile</SubType>
       <Link>Debug.h</Link>
+    </Compile>
+    <Compile Include="..\..\Flume\Flume_AMR\lib\include\SerialConsole.h">
+      <SubType>compile</SubType>
+      <Link>SerialConsole.h</Link>
     </Compile>
     <Compile Include="..\..\Flume\Flume_AMR\lib\SPIFlash\AMRConfigTable.h">
       <SubType>compile</SubType>
