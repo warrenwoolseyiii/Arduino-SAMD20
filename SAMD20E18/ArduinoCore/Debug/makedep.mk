@@ -36,6 +36,8 @@ src\core\startup.c
 
 src\core\Stream.cpp
 
+src\core\TimerCounter.cpp
+
 src\core\Tone.cpp
 
 src\core\Uart.cpp

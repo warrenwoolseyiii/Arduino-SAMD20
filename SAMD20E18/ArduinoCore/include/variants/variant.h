@@ -204,6 +204,19 @@ static const uint8_t SDA = PIN_WIRE_SDA;
 static const uint8_t SCL = PIN_WIRE_SCL;
 #endif
 
+/*
+ * Timer Counter Interfaces
+ */
+#if (defined(__SAMD20E18__) || defined(__SAMD20J18__))
+#define TC_INTERFACES_COUNT 2
+
+#define TC_INTERFACE_0 timerCounter3
+#define TC_INTERFACE_0_HANDLER TC3_Handler
+
+#define TC_INTERFACE_1 timerCounter4
+#define TC_INTERFACE_4_HANDLER TC4_Handler
+#endif
+
 #ifdef __cplusplus
 }
 #endif
@@ -223,6 +236,8 @@ extern SERCOM sercom0;
 extern SERCOM sercom1;
 extern SERCOM sercom2;
 extern SERCOM sercom3;
+extern TimerCounter timerCounter3;
+extern TimerCounter timerCounter4;
 #if defined(__SAMD20J18__)
 extern SERCOM sercom4;
 extern SERCOM sercom5;

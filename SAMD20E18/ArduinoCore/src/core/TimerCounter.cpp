@@ -16,18 +16,35 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef TIMERCOUNTER_H_
-#define TIMERCOUNTER_H_
+#include "TimerCounter.h"
+#include "variant.h"
 
-class TimerCounter 
+TimerCounter::TimerCounter( Tc* timerCounter )
 {
-public:
-  TimerCounter( Tc* timerCounter );
-  void initTimerCounter( uint32_t frequency, int8_t outputPin = -1 );
-  void registerISR( void *isr() );
-  void deregisterISR();
-  void begin();
-  void end();
-};
 
-#endif /* TIMERCOUNTER_H_ */
+}
+
+void TimerCounter::initTimerCounter( uint32_t frequency, int8_t outputPin = -1 )
+{
+
+}
+
+void TimerCounter::registerISR( void *isr() )
+{
+
+}
+
+void TimerCounter::deregisterISR()
+{
+
+}
+
+void TimerCounter::begin()
+{
+
+}
+
+void TimerCounter::end()
+{
+
+}
