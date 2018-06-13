@@ -34,6 +34,7 @@ void Dummy_Handler(void)
   for (;;) { }
 }
 
+// TODO: Get rid of all these handlers
 void Dummy_Handler0(void)
 {
   #if defined DEBUG
