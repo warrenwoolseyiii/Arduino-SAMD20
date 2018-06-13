@@ -335,8 +335,9 @@ void SERCOM3_Handler()
 {
   Serial.IrqHandler();
 }
-
 #endif
+
+// TimerCounters
 
 /*
  * Interrupts
