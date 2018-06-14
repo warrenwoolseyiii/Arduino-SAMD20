@@ -19,15 +19,31 @@
 #ifndef TIMERCOUNTER_H_
 #define TIMERCOUNTER_H_
 
+#include <stdint.h>
+#include "sam.h"
+
+typedef enum
+{
+  tc_mode_8_bit,
+  tc_mode_16_bit,
+  tc_mode_32_bit
+}TCMode_t;
+
 class TimerCounter 
 {
 public:
-  TimerCounter( Tc* timerCounter );
-  void initTimerCounter( uint32_t frequency, int8_t outputPin = -1 );
-  void registerISR( void *isr() );
+  TimerCounter( Tc* timerCounter, IRQn_Type irqNum );
+  void registerISR( void (*isr)() );
   void deregisterISR();
-  void begin();
+  void begin( uint32_t frequency, int8_t outputPin = -1, TCMode_t mode = tc_mode_32_bit );
   void end();
+  void IrqHandler();
+private:
+  IRQn_Type _irqNum;
+  uint32_t _maxFreq;
+  Tc *_timerCounter;
+  void (*isrPtr)();
+  uint32_t setDividerAndCC( uint32_t freq, uint32_t maxCC );
 };
 
 #endif /* TIMERCOUNTER_H_ */

@@ -41,6 +41,7 @@
 #ifdef __cplusplus
 #include "SERCOM.h"
 #include "Uart.h"
+#include "TimerCounter.h"
 #endif // __cplusplus
 
 #ifdef __cplusplus
@@ -236,14 +237,14 @@ extern SERCOM sercom0;
 extern SERCOM sercom1;
 extern SERCOM sercom2;
 extern SERCOM sercom3;
-extern TimerCounter timerCounter3;
-extern TimerCounter timerCounter4;
 #if defined(__SAMD20J18__)
 extern SERCOM sercom4;
 extern SERCOM sercom5;
 #endif
 #endif
 
+extern TimerCounter Timer;
+extern TimerCounter Timer1;
 extern Uart Serial;
 #if defined(__SAMD20J18__)
 extern Uart Serial1;

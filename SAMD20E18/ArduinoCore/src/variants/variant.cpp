@@ -338,6 +338,20 @@ void SERCOM3_Handler()
 #endif
 
 // TimerCounters
+#if (defined(__SAMD20E18__) || defined(__SAMD20J18__))
+TimerCounter Timer( TC3, TC3_IRQn );
+TimerCounter Timer1( TC4, TC4_IRQn );
+
+void TC3_Handler()
+{
+  Timer.IrqHandler();
+}
+
+void TC4_Handler()
+{
+  Timer1.IrqHandler();
+}
+#endif /* (defined(__SAMD20E18__) || (defined(__SAMD20J18__)) */
 
 /*
  * Interrupts
