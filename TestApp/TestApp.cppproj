@@ -378,6 +378,10 @@
       <SubType>compile</SubType>
       <Link>SerialConsole.h</Link>
     </Compile>
+    <Compile Include="..\..\Flume\Flume_AMR\lib\Utils\TimerTest.cpp">
+      <SubType>compile</SubType>
+      <Link>TimerTest.cpp</Link>
+    </Compile>
     <Compile Include="..\..\Flume\Flume_AMR\lib\Utils\TimerTest.h">
       <SubType>compile</SubType>
       <Link>TimerTest.h</Link>

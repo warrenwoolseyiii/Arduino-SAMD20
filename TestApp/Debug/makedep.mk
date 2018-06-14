@@ -14,5 +14,7 @@
 
 ..\..\Flume\Flume_AMR\lib\SPIFlash\SPIFlash.cpp
 
+..\..\Flume\Flume_AMR\lib\Utils\TimerTest.cpp
+
 ..\..\Flume\Flume_AMR\src\Flume_AMR.cpp
 
