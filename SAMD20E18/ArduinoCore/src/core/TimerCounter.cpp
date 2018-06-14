@@ -22,9 +22,8 @@
 
 #define CC_8_BIT_MAX  0xFF
 #define CC_16_BIT_MAX 0xFFFF
-#define CC_32_BIT_MAX 0xFFFFFFFF
 
-#define WAIT_TC_REGS_SYNC( x ) while( x->COUNT32.STATUS.bit.SYNCBUSY );
+#define WAIT_TC_REGS_SYNC( x ) while( x->COUNT16.STATUS.bit.SYNCBUSY );
 
 TimerCounter::TimerCounter( Tc* timerCounter, IRQn_Type irqNum )
 {
@@ -56,34 +55,31 @@ void TimerCounter::begin( uint32_t frequency, int8_t outputPin, TCMode_t mode)
   while( GCLK->STATUS.bit.SYNCBUSY );
 
   // SWRST
-  _timerCounter->COUNT32.CTRLA.reg = TC_CTRLA_SWRST;
+  _timerCounter->COUNT16.CTRLA.reg = TC_CTRLA_SWRST;
   WAIT_TC_REGS_SYNC( _timerCounter )
-  while ( _timerCounter->COUNT32.CTRLA.bit.SWRST );
+  while ( _timerCounter->COUNT16.CTRLA.bit.SWRST );
 
   // Configure clock pre-scaler and compare capture value
+  uint32_t ctrlABits = 0;
   switch( mode ) {
     case tc_mode_8_bit: 
-    _timerCounter->COUNT8.CTRLA.bit.MODE = TC_CTRLA_MODE_COUNT8_Val;
-    _timerCounter->COUNT8.CC[0].reg = (uint8_t)setDividerAndCC( frequency, CC_8_BIT_MAX );
+    ctrlABits |= TC_CTRLA_MODE_COUNT8;
+    _timerCounter->COUNT8.CC[0].reg = (uint8_t)setDividerAndCC( frequency, CC_8_BIT_MAX, ctrlABits );
     break;
     case tc_mode_16_bit: 
-    _timerCounter->COUNT16.CTRLA.bit.MODE = TC_CTRLA_MODE_COUNT16_Val;
-    _timerCounter->COUNT16.CC[0].reg = (uint16_t)setDividerAndCC( frequency, CC_16_BIT_MAX );
-    break;
-    case tc_mode_32_bit: 
-    _timerCounter->COUNT32.CTRLA.bit.MODE = TC_CTRLA_MODE_COUNT32_Val;
-    _timerCounter->COUNT32.CC[0].reg = setDividerAndCC( frequency, CC_32_BIT_MAX );
+    ctrlABits |= TC_CTRLA_MODE_COUNT16;
+    _timerCounter->COUNT16.CC[0].reg = (uint16_t)setDividerAndCC( frequency, CC_16_BIT_MAX, ctrlABits );
     break;
     default:
       return;
   }
-  WAIT_TC_REGS_SYNC( _timerCounter );
+  WAIT_TC_REGS_SYNC( _timerCounter )
 
-  _timerCounter->COUNT32.INTENSET.bit.MC0 = 1; // Enable compare capture interrupt 0
+  _timerCounter->COUNT16.INTENSET.bit.MC0 = 1; // Enable compare capture interrupt 0
 
   // Enable the module and interrupts
-  _timerCounter->COUNT32.CTRLA.bit.ENABLE = 1;
-  WAIT_TC_REGS_SYNC( _timerCounter );
+  _timerCounter->COUNT16.CTRLA.bit.ENABLE = 1;
+  WAIT_TC_REGS_SYNC( _timerCounter )
   NVIC_EnableIRQ( _irqNum );
 }
 
@@ -93,7 +89,7 @@ void TimerCounter::end()
   NVIC_DisableIRQ( _irqNum );
   NVIC_ClearPendingIRQ( _irqNum );
   
-  _timerCounter->COUNT32.CTRLA.bit.ENABLE = 0;
+  _timerCounter->COUNT16.CTRLA.bit.ENABLE = 0;
   WAIT_TC_REGS_SYNC( _timerCounter )
 }
 
@@ -104,7 +100,7 @@ void TimerCounter::IrqHandler()
     isrPtr();
 }
 
-uint32_t TimerCounter::setDividerAndCC( uint32_t freq, uint32_t maxCC )
+uint32_t TimerCounter::setDividerAndCC( uint32_t freq, uint16_t maxCC, uint32_t ctrlA )
 {
   /* _timerCounter type Tc is a union between TcCount8, TcCount16, TcCount32. 
    * Each struct points to the same memory locations except for COUNT and CC.
@@ -112,31 +108,38 @@ uint32_t TimerCounter::setDividerAndCC( uint32_t freq, uint32_t maxCC )
    * or in the definition in tc.h
    */
   uint32_t ccValue;
+  uint32_t preScaleBits = 0;
 
+  ctrlA |= TC_CTRLA_WAVEGEN_MFRQ; // Toggle mode
+  
   ccValue = _maxFreq / freq - 1;
-  _timerCounter->COUNT32.CTRLA.bit.PRESCALER = TC_CTRLA_PRESCALER_DIV1;
+  preScaleBits = TC_CTRLA_PRESCALER_DIV1;
   
   uint8_t i = 0;
   
-  while( ccValue > maxCC ) {
+  while( i <= 9 ) {
     ccValue = _maxFreq / freq / ( 2 << i ) - 1;
+    if( ccValue < maxCC )
+      break;
     i++;
     if( i == 4 || i == 6 || i == 8 ) //DIV32 DIV128 and DIV512 are not available
       i++;
   }
   
-  switch( i - 1 ) {
-    case 0: _timerCounter->COUNT32.CTRLA.bit.PRESCALER = TC_CTRLA_PRESCALER_DIV2_Val; break;
-    case 1: _timerCounter->COUNT32.CTRLA.bit.PRESCALER = TC_CTRLA_PRESCALER_DIV4_Val; break;
-    case 2: _timerCounter->COUNT32.CTRLA.bit.PRESCALER = TC_CTRLA_PRESCALER_DIV8_Val; break;
-    case 3: _timerCounter->COUNT32.CTRLA.bit.PRESCALER = TC_CTRLA_PRESCALER_DIV16_Val; break;
-    case 5: _timerCounter->COUNT32.CTRLA.bit.PRESCALER = TC_CTRLA_PRESCALER_DIV64_Val; break;
-    case 7: _timerCounter->COUNT32.CTRLA.bit.PRESCALER = TC_CTRLA_PRESCALER_DIV256_Val; break;
-    case 9: _timerCounter->COUNT32.CTRLA.bit.PRESCALER = TC_CTRLA_PRESCALER_DIV1024_Val; break;
+  switch( i ) {
+    case 0: preScaleBits = TC_CTRLA_PRESCALER_DIV2; break;
+    case 1: preScaleBits = TC_CTRLA_PRESCALER_DIV4; break;
+    case 2: preScaleBits = TC_CTRLA_PRESCALER_DIV8; break;
+    case 3: preScaleBits = TC_CTRLA_PRESCALER_DIV16; break;
+    case 5: preScaleBits = TC_CTRLA_PRESCALER_DIV64; break;
+    case 7: preScaleBits = TC_CTRLA_PRESCALER_DIV256; break;
+    case 9: preScaleBits = TC_CTRLA_PRESCALER_DIV1024; break;
     default: break;
   }
 
-  _timerCounter->COUNT32.CTRLA.bit.WAVEGEN = TC_CTRLA_WAVEGEN_MFRQ; // Toggle mode
+  ctrlA |= preScaleBits;
+  _timerCounter->COUNT16.CTRLA.reg |= ctrlA;
+  WAIT_TC_REGS_SYNC( _timerCounter );
 
   return ccValue;
 }

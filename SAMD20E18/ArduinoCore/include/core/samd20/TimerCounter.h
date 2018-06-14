@@ -25,8 +25,7 @@
 typedef enum
 {
   tc_mode_8_bit,
-  tc_mode_16_bit,
-  tc_mode_32_bit
+  tc_mode_16_bit
 }TCMode_t;
 
 class TimerCounter 
@@ -35,7 +34,7 @@ public:
   TimerCounter( Tc* timerCounter, IRQn_Type irqNum );
   void registerISR( void (*isr)() );
   void deregisterISR();
-  void begin( uint32_t frequency, int8_t outputPin = -1, TCMode_t mode = tc_mode_32_bit );
+  void begin( uint32_t frequency, int8_t outputPin = -1, TCMode_t mode = tc_mode_16_bit );
   void end();
   void IrqHandler();
 private:
@@ -43,7 +42,7 @@ private:
   uint32_t _maxFreq;
   Tc *_timerCounter;
   void (*isrPtr)();
-  uint32_t setDividerAndCC( uint32_t freq, uint32_t maxCC );
+  uint32_t setDividerAndCC( uint32_t freq, uint16_t maxCC, uint32_t ctrlA );
 };
 
 #endif /* TIMERCOUNTER_H_ */
