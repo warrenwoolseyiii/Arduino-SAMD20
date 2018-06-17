@@ -216,7 +216,7 @@ static const uint8_t SCL = PIN_WIRE_SCL;
 
 #define TC_INTERFACE_1 timerCounter4
 #define TC_INTERFACE_4_HANDLER TC4_Handler
-#endif
+#endif // __SAMD20E18__ || __SAMD20J18__
 
 #ifdef __cplusplus
 }
@@ -240,15 +240,15 @@ extern SERCOM sercom3;
 #if defined(__SAMD20J18__)
 extern SERCOM sercom4;
 extern SERCOM sercom5;
-#endif
-#endif
+#endif // __SAMD20J18__
+#endif // __SAMD20E18__ || __SAMD20J18__
 
 extern TimerCounter Timer;
 extern TimerCounter Timer1;
 extern Uart Serial;
 #if defined(__SAMD20J18__)
 extern Uart Serial1;
-#endif
+#endif // __SAMD20J18__
 
 #endif
 
@@ -275,8 +275,10 @@ extern Uart Serial1;
 #define SERIAL_PORT_HARDWARE_OPEN   Serial1
 #endif
 
+#ifdef SAMD20
 uint32_t __disableGlobalISR();
 void __enableGlobalISR( uint32_t ISER );
+#endif // SAMD20
 
 
 #endif /* _VARIANT_ARDUINO_E_ */

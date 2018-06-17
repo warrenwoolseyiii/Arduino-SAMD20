@@ -305,7 +305,6 @@ const void* g_apTCInstances[TC_INST_NUM]={ TC0, TC1, TC2, TC3, TC4, TC5, TC6, TC
 #endif
 
 // Multi-serial objects instantiation
-#if (defined(__SAMD20E18__) || defined(__SAMD20J18__))
 SERCOM sercom0( SERCOM0 ) ;
 SERCOM sercom1( SERCOM1 ) ;
 SERCOM sercom2( SERCOM2 ) ;
@@ -313,8 +312,7 @@ SERCOM sercom3( SERCOM3 ) ;
 #if defined(__SAMD20J18__)
 SERCOM sercom4( SERCOM4 ) ;
 SERCOM sercom5( SERCOM5 ) ;
-#endif /* __SAMD20J18__ */
-#endif 
+#endif // __SAMD20J18__
 
 #if defined(__SAMD20E18__)
 Uart Serial( &sercom3, PIN_SERIAL_RX, PIN_SERIAL_TX, PAD_SERIAL_RX, PAD_SERIAL_TX ) ;
@@ -356,6 +354,7 @@ void TC4_Handler()
 /*
  * Interrupts
  */
+#ifdef SAMD20
 uint32_t __disableGlobalISR()
 {
     volatile uint32_t ISER = *(NVIC->ISER);
@@ -367,5 +366,5 @@ void __enableGlobalISR( uint32_t ISER )
 {
     *(NVIC->ISER) = ISER;
 }
-
+#endif /* SAMD20 */
 
