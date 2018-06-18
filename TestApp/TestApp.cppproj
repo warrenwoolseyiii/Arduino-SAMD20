@@ -152,6 +152,7 @@
       <Value>FXOS_EN=1 -DFXOS_I2C_ADDR=0x1E -DFXOS_ODR=ODR_200HZ -DFXOS_OSR=MOSR_6 -DFXOS_SLEEP_OSR=MSOSR_4 -DFXOS_STREAMING=0 -DRX_NO_PROCESSES=0</Value>
       <Value>FLASH_EN=1</Value>
       <Value>LED_EN=1</Value>
+      <Value>POWER_MANAGER_EN=1</Value>
     </ListValues>
   </armgcc.compiler.symbols.DefSymbols>
   <armgcc.compiler.directories.IncludePaths>
@@ -194,6 +195,7 @@
       <Value>FXOS_EN=1 -DFXOS_I2C_ADDR=0x1E -DFXOS_ODR=ODR_200HZ -DFXOS_OSR=MOSR_6 -DFXOS_SLEEP_OSR=MSOSR_4 -DFXOS_STREAMING=0 -DRX_NO_PROCESSES=0</Value>
       <Value>FLASH_EN=1</Value>
       <Value>LED_EN=1</Value>
+      <Value>POWER_MANAGER_EN=1</Value>
     </ListValues>
   </armgcccpp.compiler.symbols.DefSymbols>
   <armgcccpp.compiler.directories.IncludePaths>
@@ -357,6 +359,14 @@
     <Compile Include="..\..\Flume\Flume_AMR\lib\include\Debug.h">
       <SubType>compile</SubType>
       <Link>Debug.h</Link>
+    </Compile>
+    <Compile Include="..\..\Flume\Flume_AMR\lib\PowerManagement\PowerManager.cpp">
+      <SubType>compile</SubType>
+      <Link>PowerManager.cpp</Link>
+    </Compile>
+    <Compile Include="..\..\Flume\Flume_AMR\lib\PowerManagement\PowerManager.h">
+      <SubType>compile</SubType>
+      <Link>PowerManager.h</Link>
     </Compile>
     <Compile Include="..\..\Flume\Flume_AMR\lib\SPIFlash\AMRConfigTable.h">
       <SubType>compile</SubType>

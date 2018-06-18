@@ -12,6 +12,8 @@
 
 ..\..\Flume\Flume_AMR\lib\FXOS8700\FXOS8700.cpp
 
+..\..\Flume\Flume_AMR\lib\PowerManagement\PowerManager.cpp
+
 ..\..\Flume\Flume_AMR\lib\SPIFlash\SPIFlash.cpp
 
 ..\..\Flume\Flume_AMR\lib\Utils\TimerTest.cpp

@@ -171,6 +171,7 @@ __attribute__ ((section(".isr_vector"))) const DeviceVectors exception_table =
 };
 
 extern int main(void);
+uint8_t gRCause = 0;
 
 /* This is called on processor reset to initialize the device and call main() */
 void Reset_Handler(void)
@@ -191,6 +192,9 @@ void Reset_Handler(void)
     for (pDest = &__bss_start__; pDest < &__bss_end__; pDest++)
       *pDest = 0;
   }
+
+  /* Get the reset cause flag, made available by externalizing gRCause */
+  gRCause = PM->RCAUSE.reg;
 
   SystemInit();
 
