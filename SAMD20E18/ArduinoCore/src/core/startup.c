@@ -582,4 +582,24 @@ void LowPowerSysInit( void )
    * 9) Disable automatic NVM write operations
    */
   NVMCTRL->CTRLB.bit.MANW = 1;
+
+  /*
+   * 10) Configure the RTC
+   */
+  GCLK->CLKCTRL.reg = GCLK_CLKCTRL_ID( GCM_RTC ) |
+  GCLK_CLKCTRL_GEN_GCLK2 | // Generic Clock Generator 2 is source
+  GCLK_CLKCTRL_CLKEN ;
+
+  while ( GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY )
+  {
+    /* Wait for synchronization */
+  }
+
+  RTC->MODE0.CTRL.bit.ENABLE = 0;
+  while( RTC->MODE0.STATUS.bit.SYNCBUSY )
+  {
+    /* Wait for synchronization */
+  }
+
+  // TODO: Configure the RTC for 32 bit counter mode
 }
