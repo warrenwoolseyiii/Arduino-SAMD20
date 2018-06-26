@@ -36,6 +36,7 @@ extern "C" {
 
 typedef void (*voidFuncPtr)(void);
 
+void interruptlowPowerMode( bool enable );
 /*
  * \brief Specifies a named Interrupt Service Routine (ISR) to call when an interrupt occurs.
  *        Replaces any previous function that was attached to the interrupt.

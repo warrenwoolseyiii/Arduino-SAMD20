@@ -24,6 +24,7 @@
 static voidFuncPtr ISRcallback[EXTERNAL_NUM_INTERRUPTS];
 static uint32_t    ISRlist[EXTERNAL_NUM_INTERRUPTS];
 static uint32_t    nints; // Stores total number of attached interrupts
+static int enabled = 0;
 
 
 /* Configure I/O interrupt sources */
@@ -40,12 +41,42 @@ static void __initialize()
 
   // Enable GCLK for IEC (External Interrupt Controller)
   GCLK->CLKCTRL.reg = (uint16_t) (GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN_GCLK0 | GCLK_CLKCTRL_ID(GCM_EIC));
+  while( GCLK->STATUS.bit.SYNCBUSY );
 
-/* Shall we do that?
+
   // Do a software reset on EIC
-  EIC->CTRL.SWRST.bit = 1 ;
-  while ((EIC->CTRL.SWRST.bit == 1) && (EIC->STATUS.SYNCBUSY.bit == 1)) { }
-*/
+  EIC->CTRL.bit.SWRST = 1 ;
+  while ((EIC->CTRL.bit.SWRST) && (EIC->STATUS.bit.SYNCBUSY == 1)) { }
+
+  // Enable EIC
+  EIC->CTRL.bit.ENABLE = 1;
+  while (EIC->STATUS.bit.SYNCBUSY == 1) { }
+}
+
+/* Changes the clock source of the EIC from the main CPU clock to the 
+ * External 32 kHz clock 
+ */
+void interruptlowPowerMode( bool en )
+{
+  if (!enabled) {
+    __initialize();
+    enabled = 1;
+  }
+
+  NVIC_DisableIRQ(EIC_IRQn);
+  NVIC_ClearPendingIRQ(EIC_IRQn);
+  NVIC_SetPriority(EIC_IRQn, 0);
+  NVIC_EnableIRQ(EIC_IRQn);
+
+  // Disable EIC
+  EIC->CTRL.bit.ENABLE = 0;
+  while (EIC->STATUS.bit.SYNCBUSY == 1) { }
+
+  if( en )
+    GCLK->CLKCTRL.reg = (uint16_t) (GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN_GCLK1 | GCLK_CLKCTRL_ID(GCM_EIC));
+  else
+    GCLK->CLKCTRL.reg = (uint16_t) (GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN_GCLK0 | GCLK_CLKCTRL_ID(GCM_EIC));
+  while( GCLK->STATUS.bit.SYNCBUSY );
 
   // Enable EIC
   EIC->CTRL.bit.ENABLE = 1;
@@ -58,7 +89,6 @@ static void __initialize()
  */
 void attachInterrupt(uint32_t pin, voidFuncPtr callback, uint32_t mode)
 {
-  static int enabled = 0;
   uint32_t config;
   uint32_t pos;
 
