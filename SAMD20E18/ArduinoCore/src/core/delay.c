@@ -59,6 +59,14 @@ void disableRTC()
   NVIC_DisableIRQ( RTC_IRQn );
 }
 
+uint32_t millisRTC()
+{
+  RTC->MODE1.READREQ.bit.RREQ = 1;
+  RTC_WAIT_SYNC;
+  uint16_t ticks = RTC->MODE1.COUNT.reg;
+  return ( _rtcSec << 10 ) | ticks;
+}
+
 uint32_t secondsRTC()
 {
   return _rtcSec;

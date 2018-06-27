@@ -29,6 +29,7 @@ extern "C" {
 void initRTC();
 void disableRTC();
 uint32_t secondsRTC();
+uint32_t millisRTC();
 
 /**
  * \brief Returns the number of milliseconds since the Arduino board began running the current program.
