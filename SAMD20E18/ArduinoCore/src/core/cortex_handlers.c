@@ -46,7 +46,7 @@ void SysTick_Handler  (void);
 void PM_Handler       (void) __attribute__ ((weak, alias("Dummy_Handler")));
 void SYSCTRL_Handler  (void) __attribute__ ((weak, alias("Dummy_Handler")));
 void WDT_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler")));
-void RTC_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler")));
+void RTC_Handler      (void);
 void EIC_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler")));
 void NVMCTRL_Handler  (void) __attribute__ ((weak, alias("Dummy_Handler")));
 #ifndef SAMD20
@@ -215,6 +215,13 @@ void SysTick_Handler(void)
   if (sysTickHook())
     return;
   SysTick_DefaultHandler();
+}
+
+extern void RTC_DefaultHandler(void);
+
+void RTC_Handler(void)
+{
+  RTC_DefaultHandler();
 }
 
 #ifndef SAMD20
