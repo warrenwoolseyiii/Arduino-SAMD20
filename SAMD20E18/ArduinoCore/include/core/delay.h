@@ -26,6 +26,11 @@
 extern "C" {
 #endif
 
+extern void initRTC();
+extern uint32_t millisRTC();
+extern void disableRTC();
+
+
 /**
  * \brief Returns the number of milliseconds since the Arduino board began running the current program.
  *

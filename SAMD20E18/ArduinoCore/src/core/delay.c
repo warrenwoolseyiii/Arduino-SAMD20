@@ -25,6 +25,37 @@ extern "C" {
 
 /** Tick Counter united by ms */
 static volatile uint32_t _ulTickCount=0 ;
+static volatile uint32_t _ulRTCTickCount=0 ;
+
+void initRTC()
+{
+    GCLK->CLKCTRL.reg = GCLK_CLKCTRL_ID( GCM_RTC ) |
+    GCLK_CLKCTRL_GEN_GCLK2 |
+    GCLK_CLKCTRL_CLKEN;
+
+    while ( GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY );
+
+    RTC->MODE0.CTRL.bit.SWRST = 1;
+    while( RTC->MODE0.STATUS.bit.SYNCBUSY || RTC->MODE0.CTRL.bit.SWRST );
+
+    // Enable the RTC in 32 bit counter mode
+    RTC->MODE0.CTRL.bit.ENABLE = 1;
+    while( RTC->MODE0.STATUS.bit.SYNCBUSY );
+}
+
+volatile uint32_t millisRTC()
+{
+    RTC->MODE0.READREQ.bit.RREQ = 1;
+    while( RTC->MODE0.STATUS.bit.SYNCBUSY );
+    _ulRTCTickCount = RTC->MODE0.COUNT.reg;
+    return _ulRTCTickCount;
+}
+
+void disableRTC()
+{
+    RTC->MODE0.CTRL.bit.SWRST = 1;
+    while( RTC->MODE0.STATUS.bit.SYNCBUSY || RTC->MODE0.CTRL.bit.SWRST );
+}
 
 unsigned long millis( void )
 {
