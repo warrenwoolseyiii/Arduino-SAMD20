@@ -31,14 +31,14 @@ typedef enum
 class TimerCounter 
 {
 public:
-  TimerCounter( Tc* timerCounter, IRQn_Type irqNum );
+  TimerCounter( Tc* timerCounter );
   void registerISR( void (*isr)() );
   void deregisterISR();
   void begin( uint32_t frequency, int8_t outputPin = -1, TCMode_t mode = tc_mode_16_bit );
+  void reset();
   void end();
   void IrqHandler();
 private:
-  IRQn_Type _irqNum;
   uint32_t _maxFreq;
   Tc *_timerCounter;
   void (*isrPtr)();

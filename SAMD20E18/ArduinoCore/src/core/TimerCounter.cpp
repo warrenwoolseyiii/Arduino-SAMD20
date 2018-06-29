@@ -19,16 +19,17 @@
 #include "TimerCounter.h"
 #include <stddef.h>
 #include "WVariant.h"
+#include "wiring.h"
 
 #define CC_8_BIT_MAX  0xFF
 #define CC_16_BIT_MAX 0xFFFF
 
+#define TIMER_NVIC_PRIORITY ((1<<__NVIC_PRIO_BITS) - 1)
 #define WAIT_TC_REGS_SYNC( x ) while( x->COUNT16.STATUS.bit.SYNCBUSY );
 
-TimerCounter::TimerCounter( Tc* timerCounter, IRQn_Type irqNum )
+TimerCounter::TimerCounter( Tc* timerCounter )
 {
   _timerCounter = timerCounter;
-  _irqNum = irqNum;
   isrPtr = NULL;
 }
 
@@ -45,14 +46,8 @@ void TimerCounter::deregisterISR()
 
 void TimerCounter::begin( uint32_t frequency, int8_t outputPin, TCMode_t mode)
 {
-  end();
-
   _maxFreq = SystemCoreClock / 2;
-
-  // Enable GCLK
-  uint16_t gcmSrc = ( ( _irqNum == TC3_IRQn ) ?  GCM_TC2_TC3 : GCM_TC4_TC5 );
-  GCLK->CLKCTRL.reg = (uint16_t) (GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN_GCLK0 | GCLK_CLKCTRL_ID( gcmSrc ));
-  while( GCLK->STATUS.bit.SYNCBUSY );
+  enableClockNVIC( (uint32_t *)_timerCounter, GCLK_CLKCTRL_GEN_GCLK0, TIMER_NVIC_PRIORITY );
 
   // SWRST
   _timerCounter->COUNT16.CTRLA.reg = TC_CTRLA_SWRST;
@@ -80,17 +75,18 @@ void TimerCounter::begin( uint32_t frequency, int8_t outputPin, TCMode_t mode)
   // Enable the module and interrupts
   _timerCounter->COUNT16.CTRLA.bit.ENABLE = 1;
   WAIT_TC_REGS_SYNC( _timerCounter )
-  NVIC_EnableIRQ( _irqNum );
+}
+
+void TimerCounter::reset()
+{
+  _timerCounter->COUNT16.CTRLA.reg = TC_CTRLA_SWRST;
+  while( _timerCounter->COUNT16.CTRLA.bit.SWRST );
 }
 
 void TimerCounter::end()
 {
-  // Clear IRQ
-  NVIC_DisableIRQ( _irqNum );
-  NVIC_ClearPendingIRQ( _irqNum );
-  
-  _timerCounter->COUNT16.CTRLA.bit.ENABLE = 0;
-  WAIT_TC_REGS_SYNC( _timerCounter )
+  reset();
+  disableClockNVIC( (uint32_t *)_timerCounter );
 }
 
 void TimerCounter::IrqHandler()

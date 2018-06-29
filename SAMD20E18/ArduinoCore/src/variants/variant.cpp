@@ -337,8 +337,8 @@ void SERCOM3_Handler()
 
 // TimerCounters
 #if (defined(__SAMD20E18__) || defined(__SAMD20J18__))
-TimerCounter Timer( TC3, TC3_IRQn );
-TimerCounter Timer1( TC4, TC4_IRQn );
+TimerCounter Timer( TC3 );
+TimerCounter Timer1( TC4 );
 
 void TC3_Handler()
 {

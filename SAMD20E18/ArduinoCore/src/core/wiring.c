@@ -30,11 +30,13 @@ uint32_t SystemCoreClock=1000000ul ;
 
 #define WAIT_GCLK_SYNC while ( GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY )
 
-void enableClockNVIC( uint32_t *periph, uint32_t genClk, uint32_t prio )
+void enableClockNVIC( uint32_t *periph, uint32_t genClk, int32_t prio )
 {
   uint8_t clockId = 0;
   IRQn_Type IdNvic;
-  uint32_t APBMask = 0;
+  int32_t APBAMask = -1;
+  int32_t APBBMask = -1;
+  int32_t APBCMask = -1;
 
   // Make sure the clock source is valid
   if( genClk < GCLK_CLKCTRL_GEN_GCLK0 || genClk > GCLK_CLKCTRL_GEN_GCLK7 )
@@ -43,22 +45,57 @@ void enableClockNVIC( uint32_t *periph, uint32_t genClk, uint32_t prio )
   if( periph == SERCOM0 ) {
     clockId = GCM_SERCOM0_CORE;
     IdNvic = SERCOM0_IRQn;
-    APBMask = PM_APBCMASK_SERCOM0;
+    APBCMask = PM_APBCMASK_SERCOM0;
   }
   else if( periph == SERCOM1 ) {
     clockId = GCM_SERCOM1_CORE;
     IdNvic = SERCOM1_IRQn;
-    APBMask = PM_APBCMASK_SERCOM1;
+    APBCMask = PM_APBCMASK_SERCOM1;
   }
   else if( periph == SERCOM2 ) {
     clockId = GCM_SERCOM2_CORE;
     IdNvic = SERCOM2_IRQn;
-    APBMask = PM_APBCMASK_SERCOM2;
+    APBCMask = PM_APBCMASK_SERCOM2;
   }
   else if( periph == SERCOM3 ) {
     clockId = GCM_SERCOM3_CORE;
     IdNvic = SERCOM3_IRQn;
-    APBMask = PM_APBCMASK_SERCOM3;
+    APBCMask = PM_APBCMASK_SERCOM3;
+  }
+  else if( periph == TC0 ) {
+    clockId = GCM_TC0_TC1;
+    IdNvic = TC0_IRQn;
+    APBCMask = PM_APBCMASK_TC0;
+  }
+  else if( periph == TC1 ) {
+    clockId = GCM_TC0_TC1;
+    IdNvic = TC1_IRQn;
+    APBCMask = PM_APBCMASK_TC1;
+  }
+  else if( periph == TC2 ) {
+    clockId = GCM_TC2_TC3;
+    IdNvic = TC2_IRQn;
+    APBCMask = PM_APBCMASK_TC2;
+  }
+  else if( periph == TC3 ) {
+    clockId = GCM_TC2_TC3;
+    IdNvic = TC3_IRQn;
+    APBCMask = PM_APBCMASK_TC3;
+  }
+  else if( periph == TC4 ) {
+    clockId = GCM_TC4_TC5;
+    IdNvic = TC4_IRQn;
+    APBCMask = PM_APBCMASK_TC4;
+  }
+  else if( periph == TC5 ) {
+    clockId = GCM_TC4_TC5;
+    IdNvic = TC5_IRQn;
+    APBCMask = PM_APBCMASK_TC5;
+  }
+  else if( periph == WDT ) {
+    clockId = GCM_WDT;
+    IdNvic = WDT_IRQn;
+    APBAMask = PM_APBAMASK_WDT;
   }
   else {
     return;
@@ -66,40 +103,83 @@ void enableClockNVIC( uint32_t *periph, uint32_t genClk, uint32_t prio )
 
   // Interrupt priority
   NVIC_EnableIRQ( IdNvic );
-  NVIC_SetPriority( IdNvic, prio );
+  if( prio != -1 )
+    NVIC_SetPriority( IdNvic, prio );
 
   // Setting clock
   GCLK->CLKCTRL.reg = ( GCLK_CLKCTRL_ID( clockId ) | genClk | GCLK_CLKCTRL_CLKEN );
   WAIT_GCLK_SYNC;
 
-  PM->APBCMASK.reg |= APBMask;
+  if( APBAMask != -1 )
+    PM->APBAMASK.reg |= APBAMask;
+  if( APBBMask != -1 )
+    PM->APBBMASK.reg |= APBBMask;
+  if( APBCMask != -1 )
+    PM->APBCMASK.reg |= APBCMask;
 }
 
 void disableClockNVIC( uint32_t *periph )
 {
   uint8_t clockId = 0;
   IRQn_Type IdNvic;
-  uint32_t APBMask = 0;
+  int32_t APBAMask = -1;
+  int32_t APBBMask = -1;
+  int32_t APBCMask = -1;
 
   if( periph == SERCOM0 ) {
     clockId = GCM_SERCOM0_CORE;
     IdNvic = SERCOM0_IRQn;
-    APBMask = PM_APBCMASK_SERCOM0;
+    APBCMask = PM_APBCMASK_SERCOM0;
   }
   else if( periph == SERCOM1 ) {
     clockId = GCM_SERCOM1_CORE;
     IdNvic = SERCOM1_IRQn;
-    APBMask = PM_APBCMASK_SERCOM1;
+    APBCMask = PM_APBCMASK_SERCOM1;
   }
   else if( periph == SERCOM2 ) {
     clockId = GCM_SERCOM2_CORE;
     IdNvic = SERCOM2_IRQn;
-    APBMask = PM_APBCMASK_SERCOM2;
+    APBCMask = PM_APBCMASK_SERCOM2;
   }
   else if( periph == SERCOM3 ) {
     clockId = GCM_SERCOM3_CORE;
     IdNvic = SERCOM3_IRQn;
-    APBMask = PM_APBCMASK_SERCOM3;
+    APBCMask = PM_APBCMASK_SERCOM3;
+  }
+  else if( periph == TC0 ) {
+    clockId = GCM_TC0_TC1;
+    IdNvic = TC0_IRQn;
+    APBCMask = PM_APBCMASK_TC0;
+  }
+  else if( periph == TC1 ) {
+    clockId = GCM_TC0_TC1;
+    IdNvic = TC1_IRQn;
+    APBCMask = PM_APBCMASK_TC1;
+  }
+  else if( periph == TC2 ) {
+    clockId = GCM_TC2_TC3;
+    IdNvic = TC2_IRQn;
+    APBCMask = PM_APBCMASK_TC2;
+  }
+  else if( periph == TC3 ) {
+    clockId = GCM_TC2_TC3;
+    IdNvic = TC3_IRQn;
+    APBCMask = PM_APBCMASK_TC3;
+  }
+  else if( periph == TC4 ) {
+    clockId = GCM_TC4_TC5;
+    IdNvic = TC4_IRQn;
+    APBCMask = PM_APBCMASK_TC4;
+  }
+  else if( periph == TC5 ) {
+    clockId = GCM_TC4_TC5;
+    IdNvic = TC5_IRQn;
+    APBCMask = PM_APBCMASK_TC5;
+  }
+  else if( periph == WDT ) {
+    clockId = GCM_WDT;
+    IdNvic = WDT_IRQn;
+    APBAMask = PM_APBAMASK_WDT;
   }
   else {
     return;
@@ -112,7 +192,12 @@ void disableClockNVIC( uint32_t *periph )
   GCLK->CLKCTRL.reg = ( GCLK_CLKCTRL_ID( clockId ) );
   WAIT_GCLK_SYNC;
 
-  PM->APBCMASK.reg &= ~APBMask;
+  if( APBAMask != -1 )
+    PM->APBAMASK.reg &= ~APBAMask;
+  if( APBBMask != -1 )
+    PM->APBBMASK.reg &= ~APBBMask;
+  if( APBCMask != -1 )
+    PM->APBCMASK.reg &= ~APBCMask;
 }
 
 /*
@@ -181,15 +266,6 @@ void init( void )
 
   enableADC();
   enableDAC();
-
-  // Clock TC/TCC for Pulse and Analog
-#ifndef SAMD20
-  PM->APBCMASK.reg |= PM_APBCMASK_TCC0 | PM_APBCMASK_TCC1 | PM_APBCMASK_TCC2 
-  | PM_APBCMASK_TC3 | PM_APBCMASK_TC4 | PM_APBCMASK_TC5 ;
-#else
-  PM->APBCMASK.reg |= PM_APBCMASK_TC0 | PM_APBCMASK_TC1 | PM_APBCMASK_TC2 
-  | PM_APBCMASK_TC3 | PM_APBCMASK_TC4 | PM_APBCMASK_TC5 ;
-#endif /* SAMD20 */
 
   // Setup all pins (digital and analog) in INPUT mode (default is nothing)
   for (uint32_t ul = 0 ; ul < NUM_DIGITAL_PINS ; ul++ )
