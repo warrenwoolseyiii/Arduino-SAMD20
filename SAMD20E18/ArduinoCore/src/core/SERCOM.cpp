@@ -18,6 +18,7 @@
 
 #include "SERCOM.h"
 #include "variant.h"
+#include "wiring.h"
 
 #ifndef WIRE_RISE_TIME_NANOSECONDS
 // Default rise time in nanoseconds, based on 4.7K ohm pull up resistors
@@ -36,7 +37,7 @@ SERCOM::SERCOM(Sercom* s)
 */
 void SERCOM::initUART(SercomUartMode mode, SercomUartSampleRate sampleRate, uint32_t baudrate)
 {
-  initClockNVIC();
+  enableSerial();
   resetUART();
 
   //Setting the CTRLA register
@@ -239,8 +240,8 @@ void SERCOM::disableDataRegisterEmptyInterruptUART()
 */
 void SERCOM::initSPI(SercomSpiTXPad mosi, SercomRXPad miso, SercomSpiCharSize charSize, SercomDataOrder dataOrder)
 {
+  enableSPI();
   resetSPI();
-  initClockNVIC();
 
   //Setting the CTRLA register
   sercom->SPI.CTRLA.reg =	SERCOM_SPI_CTRLA_MODE_SPI_MASTER |
@@ -480,9 +481,8 @@ void SERCOM::disableWIRE()
 
 void SERCOM::initSlaveWIRE( uint8_t ucAddress, bool enableGeneralCall )
 {
-  // Initialize the peripheral clock and interruption
-  initClockNVIC() ;
-  resetWIRE() ;
+  enableWIRE();
+  resetWIRE();
 
   // Set slave mode
   sercom->I2CS.CTRLA.bit.MODE = I2C_SLAVE_OPERATION;
@@ -510,10 +510,8 @@ void SERCOM::initSlaveWIRE( uint8_t ucAddress, bool enableGeneralCall )
 
 void SERCOM::initMasterWIRE( uint32_t baudrate )
 {
-  // Initialize the peripheral clock and interruption
-  initClockNVIC() ;
-
-  resetWIRE() ;
+  enableWire();
+  resetWIRE();
 
   // Set master mode and enable SCL Clock Stretch mode (stretch after ACK bit)
   sercom->I2CM.CTRLA.reg =  SERCOM_I2CM_CTRLA_MODE( I2C_MASTER_OPERATION )/* |
@@ -725,64 +723,3 @@ uint8_t SERCOM::readDataWIRE( void )
   }
 }
 
-
-void SERCOM::initClockNVIC( void )
-{
-  uint8_t clockId = 0;
-  IRQn_Type IdNvic=PendSV_IRQn ; // Dummy init to intercept potential error later
-
-  if(sercom == SERCOM0)
-  {
-    clockId = GCM_SERCOM0_CORE;
-    IdNvic = SERCOM0_IRQn;
-  }
-  else if(sercom == SERCOM1)
-  {
-    clockId = GCM_SERCOM1_CORE;
-    IdNvic = SERCOM1_IRQn;
-  }
-  else if(sercom == SERCOM2)
-  {
-    clockId = GCM_SERCOM2_CORE;
-    IdNvic = SERCOM2_IRQn;
-  }
-  else if(sercom == SERCOM3)
-  {
-    clockId = GCM_SERCOM3_CORE;
-    IdNvic = SERCOM3_IRQn;
-  }
-  #if defined(SERCOM4)
-  else if(sercom == SERCOM4)
-  {
-    clockId = GCM_SERCOM4_CORE;
-    IdNvic = SERCOM4_IRQn;
-  }
-  #endif // SERCOM4
-  #if defined(SERCOM5)
-  else if(sercom == SERCOM5)
-  {
-    clockId = GCM_SERCOM5_CORE;
-    IdNvic = SERCOM5_IRQn;
-  }
-  #endif // SERCOM5
-
-  if ( IdNvic == PendSV_IRQn )
-  {
-    // We got a problem here
-    return ;
-  }
-
-  // Setting NVIC
-  NVIC_EnableIRQ(IdNvic);
-  NVIC_SetPriority (IdNvic, SERCOM_NVIC_PRIORITY);  /* set Priority */
-
-  //Setting clock
-  GCLK->CLKCTRL.reg = GCLK_CLKCTRL_ID( clockId ) | // Generic Clock 0 (SERCOMx)
-                      GCLK_CLKCTRL_GEN_GCLK0 | // Generic Clock Generator 0 is source
-                      GCLK_CLKCTRL_CLKEN ;
-
-  while ( GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY )
-  {
-    /* Wait for synchronization */
-  }
-}

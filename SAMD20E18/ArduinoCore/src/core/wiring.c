@@ -28,24 +28,158 @@ extern "C" {
  */
 uint32_t SystemCoreClock=1000000ul ;
 
-/*
-void calibrateADC()
+#define SERCOM_NVIC_PRIORITY ((1<<__NVIC_PRIO_BITS) - 1)
+#define WAIT_GCLK_SYNC while ( GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY )
+
+void enableClockNVIC( uint32_t *periph, uint32_t genClk, uint32_t prio )
 {
-  volatile uint32_t valeur = 0;
+  uint8_t clockId = 0;
+  IRQn_Type IdNvic;
 
-  for(int i = 0; i < 5; ++i)
-  {
-    ADC->SWTRIG.bit.START = 1;
-    while( ADC->INTFLAG.bit.RESRDY == 0 || ADC->STATUS.bit.SYNCBUSY == 1 )
-    {
-      // Waiting for a complete conversion and complete synchronization
-    }
+  // Make sure the clock source is valid
+  if( genClk < GCLK_CLKCTRL_GEN_GCLK0 || genClk > GCLK_CLKCTRL_GEN_GCLK7 )
+    return;
 
-    valeur += ADC->RESULT.bit.RESULT;
+  if( periph == SERCOM0 ) {
+    clockId = GCM_SERCOM0_CORE;
+    IdNvic = SERCOM0_IRQn;
+  }
+  else if( periph == SERCOM1 ) {
+    clockId = GCM_SERCOM1_CORE;
+    IdNvic = SERCOM1_IRQn;
+  }
+  else if( periph == SERCOM3 ) {
+    clockId = GCM_SERCOM3_CORE;
+    IdNvic = SERCOM3_IRQn;
+  }
+  else {
+    return;
   }
 
-  valeur = valeur/5;
-}*/
+  // Interrupt priority
+  NVIC_EnableIRQ( IdNvic );
+  NVIC_SetPriority( IdNvic, prio );
+
+  // Setting clock
+  GCLK->CLKCTRL.reg = ( GCLK_CLKCTRL_ID( clockId ) | genClk | GCLK_CLKCTRL_CLKEN );
+  WAIT_GCLK_SYNC;
+}
+
+void disableClockNVIC( uint32_t periph )
+{
+  uint8_t clockId = 0;
+  IRQn_Type IdNvic;
+
+  if( periph == SERCOM0 ) {
+    clockId = GCM_SERCOM0_CORE;
+    IdNvic = SERCOM0_IRQn;
+  }
+  else if( periph == SERCOM1 ) {
+    clockId = GCM_SERCOM1_CORE;
+    IdNvic = SERCOM1_IRQn;
+  }
+  else if( periph == SERCOM3 ) {
+    clockId = GCM_SERCOM3_CORE;
+    IdNvic = SERCOM3_IRQn;
+  }
+  else {
+    return;
+  }
+
+  // Disable interrupt
+  NVIC_DisableIRQ( IdNvic );
+
+  // Disable clock
+  GCLK->CLKCTRL.reg = ( GCLK_CLKCTRL_ID( clockId ) );
+  WAIT_GCLK_SYNC;
+}
+
+/*
+In order to enable a peripheral that is clocked by a Generic Clock, the following 
+parts of the system needs to be configured:
+ - A running Clock Source. 
+ - A clock from the Generic Clock Generator must be configured to use one of the 
+  running Clock Sources, and the Generator must be enabled. 
+ - The Generic Clock Multiplexer that provides the Generic Clock signal to the peripheral 
+  must be configured to use a running Generic Clock Generator, and the Generic Clock must be enabled. 
+ - The user interface of the peripheral needs to be unmasked in the PM. If this is not done 
+  the peripheral registers will read all 0’s and any writing attempts to the peripheral will be discarded
+ SAMD20E18 Data sheet 13.4 "Enabling a Peripheral 
+ */
+
+void enableADC()
+{
+  PM->APBCMASK.reg |= PM_APBCMASK_ADC;
+}
+
+void disableADC()
+{
+  PM->APBCMASK.reg &= ~PM_APBCMASK_ADC;
+}
+
+void enableDAC()
+{
+  PM->APBCMASK.reg |= PM_APBCMASK_DAC;
+}
+
+void disableDAC()
+{
+  PM->APBCMASK.reg &= ~PM_APBCMASK_DAC;
+}
+
+int8_t enableSysTick()
+{
+  int8_t rtn = 0;
+  // Set Systick to 1ms interval, common to all Cortex-M variants
+  // set Priority for Systick Interrupt (2nd lowest)
+  if ( !SysTick_Config( SystemCoreClock / 1000 ) )
+    NVIC_SetPriority (SysTick_IRQn,  (1 << __NVIC_PRIO_BITS) - 2);
+  else
+    rtn = 1;
+  return rtn;
+}
+
+void disableSysTick()
+{
+  SysTick->CTRL &= ~( SysTick_CTRL_TICKINT_Msk | SysTick_CTRL_ENABLE_Msk );
+  SCB->ICSR |= ( SCB_ICSR_PENDSTCLR_Msk );
+}
+
+void enableSerial()
+{
+  enableClockNVIC( SERCOM3, GCLK_CLKCTRL_GEN_GCLK0, SERCOM_NVIC_PRIORITY );
+  PM->APBCMASK.reg |= PM_APBCMASK_SERCOM3;
+}
+
+void disableSerial()
+{
+  disableClockNVIC( SERCOM3 );
+  PM->APBCMASK.reg &= ~PM_APBCMASK_SERCOM3;
+}
+
+void enableSPI()
+{
+  enableClockNVIC( SERCOM1, GCLK_CLKCTRL_GEN_GCLK0, SERCOM_NVIC_PRIORITY );
+  PM->APBCMASK.reg |= PM_APBCMASK_SERCOM1;
+}
+
+void disableSPI()
+{
+  disableClockNVIC( SERCOM1 );
+  PM->APBCMASK.reg &= ~PM_APBCMASK_SERCOM1;
+}
+
+void enableWire()
+{
+  enableClockNVIC( SERCOM0, GCLK_CLKCTRL_GEN_GCLK0, SERCOM_NVIC_PRIORITY );
+  PM->APBCMASK.reg |= PM_APBCMASK_SERCOM0;
+}
+
+void disableWire()
+{
+  disableClockNVIC( SERCOM0 );
+  PM->APBCMASK.reg &= ~PM_APBCMASK_SERCOM0;
+}
 
 /*
  * Arduino Zero board initialization
@@ -57,32 +191,23 @@ void calibrateADC()
  */
 void init( void )
 {
-  // Set Systick to 1ms interval, common to all Cortex-M variants
-  if ( SysTick_Config( SystemCoreClock / 1000 ) )
-  {
-    // Capture error
-    while ( 1 ) ;
-  }
-  NVIC_SetPriority (SysTick_IRQn,  (1 << __NVIC_PRIO_BITS) - 2);  /* set Priority for Systick Interrupt (2nd lowest) */
+  if( enableSysTick() )
+    while( 1 );
 
-  // Clock PORT for Digital I/O
-//  PM->APBBMASK.reg |= PM_APBBMASK_PORT ;
-//
-//  // Clock EIC for I/O interrupts
-//  PM->APBAMASK.reg |= PM_APBAMASK_EIC ;
-
-  // Clock SERCOM for Serial
-  PM->APBCMASK.reg |= PM_APBCMASK_SERCOM0 | PM_APBCMASK_SERCOM1 | PM_APBCMASK_SERCOM2 | PM_APBCMASK_SERCOM3 | PM_APBCMASK_SERCOM4 | PM_APBCMASK_SERCOM5 ;
+  enableSerial();
+  enableSPI();
+  enableWire();
+  enableADC();
+  enableDAC();
 
   // Clock TC/TCC for Pulse and Analog
 #ifndef SAMD20
-  PM->APBCMASK.reg |= PM_APBCMASK_TCC0 | PM_APBCMASK_TCC1 | PM_APBCMASK_TCC2 | PM_APBCMASK_TC3 | PM_APBCMASK_TC4 | PM_APBCMASK_TC5 ;
+  PM->APBCMASK.reg |= PM_APBCMASK_TCC0 | PM_APBCMASK_TCC1 | PM_APBCMASK_TCC2 
+  | PM_APBCMASK_TC3 | PM_APBCMASK_TC4 | PM_APBCMASK_TC5 ;
 #else
-  PM->APBCMASK.reg |= PM_APBCMASK_TC0 | PM_APBCMASK_TC1 | PM_APBCMASK_TC2 | PM_APBCMASK_TC3 | PM_APBCMASK_TC4 | PM_APBCMASK_TC5 ;
+  PM->APBCMASK.reg |= PM_APBCMASK_TC0 | PM_APBCMASK_TC1 | PM_APBCMASK_TC2 
+  | PM_APBCMASK_TC3 | PM_APBCMASK_TC4 | PM_APBCMASK_TC5 ;
 #endif /* SAMD20 */
-
-  // Clock ADC/DAC for Analog
-  PM->APBCMASK.reg |= PM_APBCMASK_ADC | PM_APBCMASK_DAC ;
 
   // Setup all pins (digital and analog) in INPUT mode (default is nothing)
   for (uint32_t ul = 0 ; ul < NUM_DIGITAL_PINS ; ul++ )
@@ -113,7 +238,8 @@ void init( void )
   ADC->AVGCTRL.reg = ADC_AVGCTRL_SAMPLENUM_1 |    // 1 sample only (no oversampling nor averaging)
                      ADC_AVGCTRL_ADJRES(0x0ul);   // Adjusting result by 0
 
-  analogReference( AR_DEFAULT ) ; // Analog Reference is AREF pin (3.3v)
+  //analogReference( AR_DEFAULT ) ; // Analog Reference is AREF pin (3.3v)
+  analogReference( AR_INTERNAL1V0 );
 
   // Initialize DAC
   // Setting clock

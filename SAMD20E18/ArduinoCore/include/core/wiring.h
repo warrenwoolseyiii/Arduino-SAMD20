@@ -23,6 +23,18 @@ extern "C" {
 #endif
 
 extern void init(void);
+void enableADC();
+void disableADC();
+void enableDAC();
+void disableDAC();
+int8_t enableSysTick();
+void disableSysTick();
+void enableSerial();
+void disableSerial();
+void enableSPI();
+void disableSPI();
+void enableWire();
+void disableWire();
 
 #ifdef __cplusplus
 }
