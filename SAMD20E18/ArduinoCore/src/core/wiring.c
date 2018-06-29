@@ -28,13 +28,13 @@ extern "C" {
  */
 uint32_t SystemCoreClock=1000000ul ;
 
-#define SERCOM_NVIC_PRIORITY ((1<<__NVIC_PRIO_BITS) - 1)
 #define WAIT_GCLK_SYNC while ( GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY )
 
 void enableClockNVIC( uint32_t *periph, uint32_t genClk, uint32_t prio )
 {
   uint8_t clockId = 0;
   IRQn_Type IdNvic;
+  uint32_t APBMask = 0;
 
   // Make sure the clock source is valid
   if( genClk < GCLK_CLKCTRL_GEN_GCLK0 || genClk > GCLK_CLKCTRL_GEN_GCLK7 )
@@ -43,14 +43,22 @@ void enableClockNVIC( uint32_t *periph, uint32_t genClk, uint32_t prio )
   if( periph == SERCOM0 ) {
     clockId = GCM_SERCOM0_CORE;
     IdNvic = SERCOM0_IRQn;
+    APBMask = PM_APBCMASK_SERCOM0;
   }
   else if( periph == SERCOM1 ) {
     clockId = GCM_SERCOM1_CORE;
     IdNvic = SERCOM1_IRQn;
+    APBMask = PM_APBCMASK_SERCOM1;
+  }
+  else if( periph == SERCOM2 ) {
+    clockId = GCM_SERCOM2_CORE;
+    IdNvic = SERCOM2_IRQn;
+    APBMask = PM_APBCMASK_SERCOM2;
   }
   else if( periph == SERCOM3 ) {
     clockId = GCM_SERCOM3_CORE;
     IdNvic = SERCOM3_IRQn;
+    APBMask = PM_APBCMASK_SERCOM3;
   }
   else {
     return;
@@ -63,24 +71,35 @@ void enableClockNVIC( uint32_t *periph, uint32_t genClk, uint32_t prio )
   // Setting clock
   GCLK->CLKCTRL.reg = ( GCLK_CLKCTRL_ID( clockId ) | genClk | GCLK_CLKCTRL_CLKEN );
   WAIT_GCLK_SYNC;
+
+  PM->APBCMASK.reg |= APBMask;
 }
 
-void disableClockNVIC( uint32_t periph )
+void disableClockNVIC( uint32_t *periph )
 {
   uint8_t clockId = 0;
   IRQn_Type IdNvic;
+  uint32_t APBMask = 0;
 
   if( periph == SERCOM0 ) {
     clockId = GCM_SERCOM0_CORE;
     IdNvic = SERCOM0_IRQn;
+    APBMask = PM_APBCMASK_SERCOM0;
   }
   else if( periph == SERCOM1 ) {
     clockId = GCM_SERCOM1_CORE;
     IdNvic = SERCOM1_IRQn;
+    APBMask = PM_APBCMASK_SERCOM1;
+  }
+  else if( periph == SERCOM2 ) {
+    clockId = GCM_SERCOM2_CORE;
+    IdNvic = SERCOM2_IRQn;
+    APBMask = PM_APBCMASK_SERCOM2;
   }
   else if( periph == SERCOM3 ) {
     clockId = GCM_SERCOM3_CORE;
     IdNvic = SERCOM3_IRQn;
+    APBMask = PM_APBCMASK_SERCOM3;
   }
   else {
     return;
@@ -92,6 +111,8 @@ void disableClockNVIC( uint32_t periph )
   // Disable clock
   GCLK->CLKCTRL.reg = ( GCLK_CLKCTRL_ID( clockId ) );
   WAIT_GCLK_SYNC;
+
+  PM->APBCMASK.reg &= ~APBMask;
 }
 
 /*
@@ -145,42 +166,6 @@ void disableSysTick()
   SCB->ICSR |= ( SCB_ICSR_PENDSTCLR_Msk );
 }
 
-void enableSerial()
-{
-  enableClockNVIC( SERCOM3, GCLK_CLKCTRL_GEN_GCLK0, SERCOM_NVIC_PRIORITY );
-  PM->APBCMASK.reg |= PM_APBCMASK_SERCOM3;
-}
-
-void disableSerial()
-{
-  disableClockNVIC( SERCOM3 );
-  PM->APBCMASK.reg &= ~PM_APBCMASK_SERCOM3;
-}
-
-void enableSPI()
-{
-  enableClockNVIC( SERCOM1, GCLK_CLKCTRL_GEN_GCLK0, SERCOM_NVIC_PRIORITY );
-  PM->APBCMASK.reg |= PM_APBCMASK_SERCOM1;
-}
-
-void disableSPI()
-{
-  disableClockNVIC( SERCOM1 );
-  PM->APBCMASK.reg &= ~PM_APBCMASK_SERCOM1;
-}
-
-void enableWire()
-{
-  enableClockNVIC( SERCOM0, GCLK_CLKCTRL_GEN_GCLK0, SERCOM_NVIC_PRIORITY );
-  PM->APBCMASK.reg |= PM_APBCMASK_SERCOM0;
-}
-
-void disableWire()
-{
-  disableClockNVIC( SERCOM0 );
-  PM->APBCMASK.reg &= ~PM_APBCMASK_SERCOM0;
-}
-
 /*
  * Arduino Zero board initialization
  *
@@ -194,9 +179,6 @@ void init( void )
   if( enableSysTick() )
     while( 1 );
 
-  enableSerial();
-  enableSPI();
-  enableWire();
   enableADC();
   enableDAC();
 

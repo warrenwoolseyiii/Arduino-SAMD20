@@ -59,7 +59,7 @@ void TwoWire::setClock(uint32_t baudrate) {
 }
 
 void TwoWire::end() {
-  sercom->disableWIRE();
+  sercom->endWire();
 }
 
 uint8_t TwoWire::requestFrom(uint8_t address, size_t quantity, bool stopBit)

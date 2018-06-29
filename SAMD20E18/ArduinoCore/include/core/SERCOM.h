@@ -152,6 +152,7 @@ class SERCOM
 		void initPads(SercomUartTXPad txPad, SercomRXPad rxPad) ;
 
 		void resetUART( void ) ;
+    void endUART( void ) ;
 		void enableUART( void ) ;
 		void flushUART( void ) ;
 		void clearStatusUART( void ) ;
@@ -172,6 +173,7 @@ class SERCOM
 		void initSPIClock(SercomSpiClockMode clockMode, uint32_t baudrate) ;
 
 		void resetSPI( void ) ;
+    void endSPI( void ) ;
 		void enableSPI( void ) ;
 		void disableSPI( void ) ;
 		void setDataOrderSPI(SercomDataOrder dataOrder) ;
@@ -191,6 +193,7 @@ class SERCOM
 		void resetWIRE( void ) ;
 		void enableWIRE( void ) ;
     void disableWIRE( void );
+    void endWire( void ) ;
     void prepareNackBitWIRE( void ) ;
     void prepareAckBitWIRE( void ) ;
     void prepareCommandBitsWire(uint8_t cmd);
@@ -214,6 +217,8 @@ class SERCOM
 		Sercom* sercom;
 		uint8_t calculateBaudrateSynchronous(uint32_t baudrate) ;
 		uint32_t division(uint32_t dividend, uint32_t divisor) ;
+    void enableSERCOM() ;
+    void disableSERCOM() ;
 };
 
 #endif

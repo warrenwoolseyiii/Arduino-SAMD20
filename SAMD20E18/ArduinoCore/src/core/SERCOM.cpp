@@ -37,7 +37,7 @@ SERCOM::SERCOM(Sercom* s)
 */
 void SERCOM::initUART(SercomUartMode mode, SercomUartSampleRate sampleRate, uint32_t baudrate)
 {
-  enableSerial();
+  enableSERCOM();
   resetUART();
 
   //Setting the CTRLA register
@@ -121,6 +121,11 @@ void SERCOM::resetUART()
   {
     // Wait for both bits Software Reset from CTRLA and SYNCBUSY coming back to 0
   }
+}
+
+void SERCOM::endUART()
+{
+  disableSERCOM();
 }
 
 void SERCOM::enableUART()
@@ -240,7 +245,7 @@ void SERCOM::disableDataRegisterEmptyInterruptUART()
 */
 void SERCOM::initSPI(SercomSpiTXPad mosi, SercomRXPad miso, SercomSpiCharSize charSize, SercomDataOrder dataOrder)
 {
-  enableSPI();
+  enableSERCOM();
   resetSPI();
 
   //Setting the CTRLA register
@@ -290,6 +295,11 @@ void SERCOM::resetSPI()
 #else
   while(sercom->SPI.CTRLA.bit.SWRST || sercom->SPI.STATUS.bit.SYNCBUSY);
 #endif /* SAMD20 */
+}
+
+void SERCOM::endSPI()
+{
+  disableSERCOM();
 }
 
 void SERCOM::enableSPI()
@@ -479,9 +489,15 @@ void SERCOM::disableWIRE()
   }
 }
 
+void SERCOM::endWire()
+{
+  resetWIRE();
+  disableSERCOM();
+}
+
 void SERCOM::initSlaveWIRE( uint8_t ucAddress, bool enableGeneralCall )
 {
-  enableWIRE();
+  enableSERCOM();
   resetWIRE();
 
   // Set slave mode
@@ -510,7 +526,7 @@ void SERCOM::initSlaveWIRE( uint8_t ucAddress, bool enableGeneralCall )
 
 void SERCOM::initMasterWIRE( uint32_t baudrate )
 {
-  enableWire();
+  enableSERCOM();
   resetWIRE();
 
   // Set master mode and enable SCL Clock Stretch mode (stretch after ACK bit)
@@ -721,5 +737,15 @@ uint8_t SERCOM::readDataWIRE( void )
   {
     return sercom->I2CS.DATA.reg ;
   }
+}
+
+void SERCOM::enableSERCOM()
+{
+  enableClockNVIC( (uint32_t *)sercom, GCLK_CLKCTRL_GEN_GCLK0, SERCOM_NVIC_PRIORITY );
+}
+
+void SERCOM::disableSERCOM()
+{
+  disableClockNVIC( (uint32_t *)sercom );
 }
 

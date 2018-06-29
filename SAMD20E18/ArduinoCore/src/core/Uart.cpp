@@ -77,6 +77,7 @@ void Uart::begin(unsigned long baudrate, uint16_t config)
 void Uart::end()
 {
   sercom->resetUART();
+  sercom->endUART();
   rxBuffer.clear();
   txBuffer.clear();
 }

@@ -68,8 +68,6 @@ void SPIClass::init()
 
 void SPIClass::config(SPISettings settings)
 {
-  _p_sercom->disableSPI();
-
   _p_sercom->initSPI(_padTx, _padRx, SPI_CHAR_SIZE_8_BITS, settings.bitOrder);
   _p_sercom->initSPIClock(settings.dataMode, settings.clockFreq);
 
@@ -78,8 +76,11 @@ void SPIClass::config(SPISettings settings)
 
 void SPIClass::end()
 {
-  _p_sercom->resetSPI();
-  initialized = false;
+  if( initialized ) {
+    _p_sercom->resetSPI();
+    _p_sercom->endSPI();
+    initialized = false;
+  }
 }
 
 #ifndef interruptsStatus

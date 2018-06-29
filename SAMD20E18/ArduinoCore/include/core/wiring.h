@@ -23,18 +23,14 @@ extern "C" {
 #endif
 
 extern void init(void);
+void enableClockNVIC( uint32_t *periph, uint32_t genClk, uint32_t prio );
+void disableClockNVIC( uint32_t *periph );
 void enableADC();
 void disableADC();
 void enableDAC();
 void disableDAC();
 int8_t enableSysTick();
 void disableSysTick();
-void enableSerial();
-void disableSerial();
-void enableSPI();
-void disableSPI();
-void enableWire();
-void disableWire();
 
 #ifdef __cplusplus
 }
