@@ -44,6 +44,38 @@
 // Constants for Clock multiplexers
 #define GENERIC_CLOCK_MULTIPLEXER_DFLL48M (0u)
 
+#define GCLK_WAIT_SYNC while( GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY )
+
+void initXOSC32()
+{
+  // Longest start up time, run in stand by
+  SYSCTRL->XOSC32K.reg = SYSCTRL_XOSC32K_STARTUP( 0x7u ) 
+    | SYSCTRL_XOSC32K_XTALEN 
+    | SYSCTRL_XOSC32K_EN32K 
+    | SYSCTRL_XOSC32K_RUNSTDBY;
+  SYSCTRL->XOSC32K.bit.ENABLE = 1;  // Set in a separate call as called out in 16.6.3
+
+  while ( !SYSCTRL->PCLKSR.bit.XOSC32KRDY );
+}
+
+void initOSC23K()
+{
+
+#ifndef SAMD20
+  uint32_t calib = (*((uint32_t *) FUSES_OSC32K_CAL_ADDR) & FUSES_OSC32K_CAL_Msk) >> FUSES_OSC32K_CAL_Pos;
+#else
+#define FUSES_OSC32K_CAL_ADDR (uint32_t)(0x806020 + 38) // SAMD20 data sheet section 9.5, table 9-4
+  uint32_t calib = (*((uint32_t *) FUSES_OSC32K_CAL_ADDR) & 0x00FFFFFF);
+#endif /* SAMD20 */
+
+  SYSCTRL->OSC32K.reg = SYSCTRL_OSC32K_CALIB( calib ) 
+    | SYSCTRL_OSC32K_STARTUP( 0x7u ) // cf table 15.10 of product data sheet in chapter 15.8.6
+    | SYSCTRL_OSC32K_EN32K
+    | SYSCTRL_OSC32K_ENABLE;
+
+  while ( !SYSCTRL->PCLKSR.bit.OSC32KRDY ); 
+}
+
 void SystemInit( void )
 {
   /* Set 1 Flash Wait State for 48MHz, cf tables 20.9 and 35.27 in SAMD21 Datasheet */
@@ -327,41 +359,13 @@ void LowPowerSysInit( void )
   /* Turn on the digital interface clock */
   PM->APBAMASK.reg |= PM_APBAMASK_GCLK ;
 
-
+/* ----------------------------------------------------------------------------------------------
+ * 1) Initialize the 32768 Hz oscillator (either, internal or external) 
+ */
 #if defined(CRYSTALLESS)
-
-  /* ----------------------------------------------------------------------------------------------
-   * 1) Enable OSC32K clock (Internal 32.768Hz oscillator)
-   */
-  uint32_t calib =
-#ifndef SAMD20
-        (*((uint32_t *) FUSES_OSC32K_CAL_ADDR) & FUSES_OSC32K_CAL_Msk) >> FUSES_OSC32K_CAL_Pos;
+  initOSC23K();
 #else
-#define FUSES_OSC32K_CAL_ADDR (uint32_t)(0x806020 + 38) // SAMD20 datasheet section 9.5, table 9-4
-        (*((uint32_t *) FUSES_OSC32K_CAL_ADDR) & 0x00FFFFFF);
-#endif /* SAMD20 */
-
-  SYSCTRL->OSC32K.reg = SYSCTRL_OSC32K_CALIB(calib) |
-                        SYSCTRL_OSC32K_STARTUP( 0x6u ) | // cf table 15.10 of product datasheet in chapter 15.8.6
-                        SYSCTRL_OSC32K_EN32K |
-                        SYSCTRL_OSC32K_ENABLE;
-
-  while ( (SYSCTRL->PCLKSR.reg & SYSCTRL_PCLKSR_OSC32KRDY) == 0 ); // Wait for oscillator stabilization
-
-#else // has crystal
-
-  /* ----------------------------------------------------------------------------------------------
-   * 1) Enable XOSC32K clock (External on-board 32.768Hz oscillator)
-   */
-  SYSCTRL->XOSC32K.reg = SYSCTRL_XOSC32K_STARTUP( 0x6u ) | /* cf table 15.10 of product datasheet in chapter 15.8.6 */
-                         SYSCTRL_XOSC32K_XTALEN | SYSCTRL_XOSC32K_EN32K ;
-  SYSCTRL->XOSC32K.bit.ENABLE = 1 ; /* separate call, as described in chapter 15.6.3 */
-
-  while ( (SYSCTRL->PCLKSR.reg & SYSCTRL_PCLKSR_XOSC32KRDY) == 0 )
-  {
-    /* Wait for oscillator stabilization */
-  }
-
+  initXOSC32();
 #endif
 
   /* Software reset the module to ensure it is re-initialized correctly */
