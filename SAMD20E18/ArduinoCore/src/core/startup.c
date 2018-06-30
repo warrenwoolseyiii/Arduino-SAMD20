@@ -44,7 +44,8 @@
 // Constants for Clock multiplexers
 #define GENERIC_CLOCK_MULTIPLEXER_DFLL48M (0u)
 
-#define GCLK_WAIT_SYNC while( GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY )
+#define GCLK_WAIT_SYNC          while( GCLK->STATUS.bit.SYNCBUSY )
+#define SYSCTRL_DFLL_WAIT_SYNC  while ( !SYSCTRL->PCLKSR.bit.DFLLRDY )
 
 inline void resetGCLK()
 {
@@ -423,24 +424,19 @@ inline void LowPowerSysInit( void )
 
 /* ----------------------------------------------------------------------------------------------
  * 5) Enable DFLL48M clock
+      -> Freq = VARIANT_MCK (defined in variant.h)
+      -> Does not run in stand by
  */
   // DFLL Configuration in Closed Loop mode, cf product datasheet chapter 15.6.7.1 - Closed-Loop Operation
   // Remove the OnDemand mode, Bug http://avr32.icgroup.norway.atmel.com/bugzilla/show_bug.cgi?id=9905
   SYSCTRL->DFLLCTRL.reg = SYSCTRL_DFLLCTRL_ENABLE;
+  SYSCTRL_DFLL_WAIT_SYNC;
 
-  while ( (SYSCTRL->PCLKSR.reg & SYSCTRL_PCLKSR_DFLLRDY) == 0 )
-  {
-    /* Wait for synchronization */
-  }
+  SYSCTRL->DFLLMUL.reg = SYSCTRL_DFLLMUL_CSTEP( 31 )        // Coarse step is 31, half of the max value
+    | SYSCTRL_DFLLMUL_FSTEP( 511 )                          // Fine step is 511, half of the max value
+    | SYSCTRL_DFLLMUL_MUL( VARIANT_MCK / VARIANT_MAINOSC ); // External 32KHz is the reference
 
-  SYSCTRL->DFLLMUL.reg = SYSCTRL_DFLLMUL_CSTEP( 31 ) | // Coarse step is 31, half of the max value
-                         SYSCTRL_DFLLMUL_FSTEP( 511 ) | // Fine step is 511, half of the max value
-                         SYSCTRL_DFLLMUL_MUL( (VARIANT_MCK + VARIANT_MAINOSC/2) / VARIANT_MAINOSC ) ; // External 32KHz is the reference
-
-  while ( (SYSCTRL->PCLKSR.reg & SYSCTRL_PCLKSR_DFLLRDY) == 0 )
-  {
-    /* Wait for synchronization */
-  }
+  SYSCTRL_DFLL_WAIT_SYNC;
 
 #if defined(CRYSTALLESS)
 #define NVM_SW_CALIB_DFLL48M_COARSE_VAL 58
