@@ -85,6 +85,20 @@ inline void initOSC23K()
   while ( !SYSCTRL->PCLKSR.bit.OSC32KRDY ); 
 }
 
+inline void loadADCFactoryCal()
+{
+  // ADC Bias Calibration
+  uint32_t bias = (*((uint32_t *) ADC_FUSES_BIASCAL_ADDR) & ADC_FUSES_BIASCAL_Msk) >> ADC_FUSES_BIASCAL_Pos;
+
+  // ADC Linearity bits 4:0
+  uint32_t linearity = (*((uint32_t *) ADC_FUSES_LINEARITY_0_ADDR) & ADC_FUSES_LINEARITY_0_Msk) >> ADC_FUSES_LINEARITY_0_Pos;
+
+  // ADC Linearity bits 7:5
+  linearity |= ((*((uint32_t *) ADC_FUSES_LINEARITY_1_ADDR) & ADC_FUSES_LINEARITY_1_Msk) >> ADC_FUSES_LINEARITY_1_Pos) << 5;
+
+  ADC->CALIB.reg = ADC_CALIB_BIAS_CAL(bias) | ADC_CALIB_LINEARITY_CAL(linearity);
+}
+
 void SystemInit( void )
 {
   /* Set 1 Flash Wait State for 48MHz, cf tables 20.9 and 35.27 in SAMD21 Datasheet */
@@ -440,8 +454,7 @@ inline void LowPowerSysInit( void )
 
 #if defined(CRYSTALLESS)
 #define NVM_SW_CALIB_DFLL48M_COARSE_VAL 58
-
-  // Turn on DFLL
+  // Load factory coarse DFLL value
   uint32_t coarse =( *((uint32_t *)(NVMCTRL_OTP4) + (NVM_SW_CALIB_DFLL48M_COARSE_VAL / 32)) >> (NVM_SW_CALIB_DFLL48M_COARSE_VAL % 32) )
                    & ((1 << 6) - 1);
   if (coarse == 0x3f) {
@@ -453,108 +466,70 @@ inline void LowPowerSysInit( void )
 
   SYSCTRL->DFLLVAL.bit.COARSE = coarse;
   SYSCTRL->DFLLVAL.bit.FINE = fine;
-  /* Write full configuration to DFLL control register */
   SYSCTRL->DFLLMUL.reg = SYSCTRL_DFLLMUL_CSTEP( 0x1f / 4 ) | // Coarse step is 31, half of the max value
                          SYSCTRL_DFLLMUL_FSTEP( 10 ) |
                          SYSCTRL_DFLLMUL_MUL( (48000) ) ;
 
   SYSCTRL->DFLLCTRL.reg = 0;
+  SYSCTRL_DFLL_WAIT_SYNC;
 
-  while ( (SYSCTRL->PCLKSR.reg & SYSCTRL_PCLKSR_DFLLRDY) == 0 )
-  {
-    /* Wait for synchronization */
-  }
-
+  SYSCTRL->DFLLCTRL.reg =  SYSCTRL_DFLLCTRL_MODE
+    | SYSCTRL_DFLLCTRL_CCDIS
 #ifndef SAMD20
-  SYSCTRL->DFLLCTRL.reg =  SYSCTRL_DFLLCTRL_MODE |
-                           SYSCTRL_DFLLCTRL_CCDIS |
-                           SYSCTRL_DFLLCTRL_USBCRM | /* USB correction */
-                           SYSCTRL_DFLLCTRL_BPLCKC;
-#endif
-
-  while ( (SYSCTRL->PCLKSR.reg & SYSCTRL_PCLKSR_DFLLRDY) == 0 )
-  {
-    /* Wait for synchronization */
-  }
-
-  /* Enable the DFLL */
-  SYSCTRL->DFLLCTRL.reg |= SYSCTRL_DFLLCTRL_ENABLE ;
-
-#else   // has crystal
-
-  /* Write full configuration to DFLL control register */
-  SYSCTRL->DFLLCTRL.reg |= SYSCTRL_DFLLCTRL_MODE | /* Enable the closed loop mode */
-#ifndef SAMD20
-                           SYSCTRL_DFLLCTRL_WAITLOCK |
+    | SYSCTRL_DFLLCTRL_USBCRM
+    | SYSCTRL_DFLLCTRL_BPLCKC
 #endif /* SAMD20 */
-                           SYSCTRL_DFLLCTRL_QLDIS ; /* Disable Quick lock */
+    ;
 
-  while ( (SYSCTRL->PCLKSR.reg & SYSCTRL_PCLKSR_DFLLRDY) == 0 )
-  {
-    /* Wait for synchronization */
-  }
+  SYSCTRL_DFLL_WAIT_SYNC;
 
-  /* Enable the DFLL */
   SYSCTRL->DFLLCTRL.reg |= SYSCTRL_DFLLCTRL_ENABLE ;
+#else   // has crystal
+  // Run in closed-loop mode, disable quick lock
+  SYSCTRL->DFLLCTRL.reg |= SYSCTRL_DFLLCTRL_MODE
+#ifndef SAMD20
+    | SYSCTRL_DFLLCTRL_WAITLOCK
+#endif /* SAMD20 */
+    | SYSCTRL_DFLLCTRL_QLDIS;
 
+  SYSCTRL_DFLL_WAIT_SYNC;
+
+  // Enable and wait for lock
+  SYSCTRL->DFLLCTRL.reg |= SYSCTRL_DFLLCTRL_ENABLE;
   while ( (SYSCTRL->PCLKSR.reg & SYSCTRL_PCLKSR_DFLLLCKC) == 0 ||
-          (SYSCTRL->PCLKSR.reg & SYSCTRL_PCLKSR_DFLLLCKF) == 0 )
-  {
-    /* Wait for locks flags */
-  }
+          (SYSCTRL->PCLKSR.reg & SYSCTRL_PCLKSR_DFLLLCKF) == 0 );
+#endif /* CRYSTALLESS */
 
-#endif
+  SYSCTRL_DFLL_WAIT_SYNC;
 
-  while ( (SYSCTRL->PCLKSR.reg & SYSCTRL_PCLKSR_DFLLRDY) == 0 )
-  {
-    /* Wait for synchronization */
-  }
+/* ----------------------------------------------------------------------------------------------
+ * 6) Switch Generic Clock Generator 0 to DFLL48M. CPU will run at 48MHz.
+ */
+  // Set the divider to 0
+  GCLK->GENDIV.reg = GCLK_GENDIV_ID( 0u );
+  GCLK_WAIT_SYNC;
 
-  /* ----------------------------------------------------------------------------------------------
-   * 6) Switch Generic Clock Generator 0 to DFLL48M. CPU will run at 48MHz.
-   */
-  GCLK->GENDIV.reg = GCLK_GENDIV_ID( 0u ) ; // Generic Clock Generator 0
+  // Source is DFLL48M, 50% duty cycle
+  GCLK->GENCTRL.reg = GCLK_GENCTRL_ID( 0u ) 
+    | GCLK_GENCTRL_SRC_DFLL48M 
+    | GCLK_GENCTRL_IDC
+    | GCLK_GENCTRL_GENEN;
 
-  while ( GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY )
-  {
-    /* Wait for synchronization */
-  }
+  GCLK_WAIT_SYNC;
+  SystemCoreClock = VARIANT_MCK;
 
-  /* Write Generic Clock Generator 0 configuration */
-  GCLK->GENCTRL.reg = GCLK_GENCTRL_ID( 0u ) | // Generic Clock Generator 0
-                      GCLK_GENCTRL_SRC_DFLL48M | // Selected source is DFLL 48MHz
-//                      GCLK_GENCTRL_OE | // Output clock to a pin for tests
-                      GCLK_GENCTRL_IDC | // Set 50/50 duty cycle
-                      GCLK_GENCTRL_GENEN ;
-
-  while ( GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY )
-  {
-    /* Wait for synchronization */
-  }
-  SystemCoreClock=VARIANT_MCK ;
-
-  /* ----------------------------------------------------------------------------------------------
-   * 7) Disable the OSC8M
-   */
+/* ----------------------------------------------------------------------------------------------
+ * 7) Disable the OSC8M
+ */
    SYSCTRL->OSC8M.bit.ENABLE = 0;
 
-  /* ----------------------------------------------------------------------------------------------
-   * 8) Load ADC factory calibration values
-   */
+/* ----------------------------------------------------------------------------------------------
+ * 8) Load ADC factory calibration values
+ */
+  loadADCFactoryCal();
 
-  // ADC Bias Calibration
-  uint32_t bias = (*((uint32_t *) ADC_FUSES_BIASCAL_ADDR) & ADC_FUSES_BIASCAL_Msk) >> ADC_FUSES_BIASCAL_Pos;
-
-  // ADC Linearity bits 4:0
-  uint32_t linearity = (*((uint32_t *) ADC_FUSES_LINEARITY_0_ADDR) & ADC_FUSES_LINEARITY_0_Msk) >> ADC_FUSES_LINEARITY_0_Pos;
-
-  // ADC Linearity bits 7:5
-  linearity |= ((*((uint32_t *) ADC_FUSES_LINEARITY_1_ADDR) & ADC_FUSES_LINEARITY_1_Msk) >> ADC_FUSES_LINEARITY_1_Pos) << 5;
-
-  ADC->CALIB.reg = ADC_CALIB_BIAS_CAL(bias) | ADC_CALIB_LINEARITY_CAL(linearity);
-
-  /*
-   * 9) Disable automatic NVM write operations
-   */
+/* ----------------------------------------------------------------------------------------------
+ * 9) Disable automatic NVM write operations
+ */
   NVMCTRL->CTRLB.bit.MANW = 1;
 }
