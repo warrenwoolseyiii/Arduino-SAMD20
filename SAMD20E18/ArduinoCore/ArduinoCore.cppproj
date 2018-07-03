@@ -183,6 +183,7 @@
   </armgcc.compiler.symbols.DefSymbols>
   <armgcc.compiler.directories.IncludePaths>
     <ListValues>
+      <Value>../include/libraries/EEPROM</Value>
       <Value>..\include\libraries\wire</Value>
       <Value>..\include\libraries\spi</Value>
       <Value>..\include\core</Value>
@@ -222,6 +223,7 @@
   </armgcccpp.compiler.symbols.DefSymbols>
   <armgcccpp.compiler.directories.IncludePaths>
     <ListValues>
+      <Value>../include/libraries/EEPROM</Value>
       <Value>..\include\libraries\wire</Value>
       <Value>..\include\libraries\spi</Value>
       <Value>..\include\core</Value>
@@ -626,6 +628,12 @@
     <Compile Include="include\core\WVariant.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="include\libraries\EEPROM\EEPROM.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="include\libraries\EEPROM\FlashStorage.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="include\libraries\spi\SPI.h">
       <SubType>compile</SubType>
     </Compile>
@@ -722,6 +730,12 @@
     <Compile Include="src\core\WString.cpp">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="src\libraries\EEPROM\EEPROM.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\libraries\EEPROM\FlashStorage.cpp">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="src\libraries\spi\SPI.cpp">
       <SubType>compile</SubType>
     </Compile>
@@ -733,6 +747,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="ArduinoCore\" />
     <Folder Include="include\" />
     <Folder Include="include\core\" />
     <Folder Include="include\core\avr\" />
@@ -742,6 +757,7 @@
     <Folder Include="include\core\samd20\include\instance" />
     <Folder Include="include\core\samd20\include\pio" />
     <Folder Include="include\libraries\" />
+    <Folder Include="include\libraries\EEPROM" />
     <Folder Include="include\libraries\spi\" />
     <Folder Include="include\libraries\wire\" />
     <Folder Include="include\variants\" />
@@ -750,6 +766,7 @@
     <Folder Include="src\core\avr\" />
     <Folder Include="src\core\PreprocessingAssembly\" />
     <Folder Include="src\libraries\" />
+    <Folder Include="src\libraries\EEPROM" />
     <Folder Include="src\libraries\spi\" />
     <Folder Include="src\libraries\wire\" />
     <Folder Include="src\variants\" />

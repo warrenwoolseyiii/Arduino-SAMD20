@@ -58,6 +58,10 @@ src\core\WMath.cpp
 
 src\core\WString.cpp
 
+src\libraries\EEPROM\EEPROM.cpp
+
+src\libraries\EEPROM\FlashStorage.cpp
+
 src\libraries\spi\SPI.cpp
 
 src\libraries\wire\Wire.cpp

@@ -44,6 +44,18 @@ C_SRCS +=  \
 ../../../Flume/Flume_AMR/lib/FXOS8700/filter.cpp \
 ../../../Flume/Flume_AMR/lib/FXOS8700/FXOS8700.cpp \
 ../../../Flume/Flume_AMR/lib/PowerManagement/PowerManager.cpp \
+../../../Flume/Flume_AMR/lib/Radio/channel.cpp \
+../../../Flume/Flume_AMR/lib/Radio/esp8266_nosdk.cpp \
+../../../Flume/Flume_AMR/lib/Radio/fhop.cpp \
+../../../Flume/Flume_AMR/lib/Radio/mlisten.cpp \
+../../../Flume/Flume_AMR/lib/Radio/radio.cpp \
+../../../Flume/Flume_AMR/lib/Radio/radioadpt.cpp \
+../../../Flume/Flume_AMR/lib/Radio/rlock.cpp \
+../../../Flume/Flume_AMR/lib/Radio/rlog.cpp \
+../../../Flume/Flume_AMR/lib/Radio/rlogprint.cpp \
+../../../Flume/Flume_AMR/lib/Radio/rtc.cpp \
+../../../Flume/Flume_AMR/lib/Radio/sx1231drv.cpp \
+../../../Flume/Flume_AMR/lib/Radio/xradio.cpp \
 ../../../Flume/Flume_AMR/lib/SPIFlash/SPIFlash.cpp \
 ../../../Flume/Flume_AMR/lib/Utils/TimerTest.cpp \
 ../../../Flume/Flume_AMR/src/Flume_AMR.cpp
@@ -62,6 +74,18 @@ FlumeID.o \
 filter.o \
 FXOS8700.o \
 PowerManager.o \
+channel.o \
+esp8266_nosdk.o \
+fhop.o \
+mlisten.o \
+radio.o \
+radioadpt.o \
+rlock.o \
+rlog.o \
+rlogprint.o \
+rtc.o \
+sx1231drv.o \
+xradio.o \
 SPIFlash.o \
 TimerTest.o \
 Flume_AMR.o
@@ -73,6 +97,18 @@ FlumeID.o \
 filter.o \
 FXOS8700.o \
 PowerManager.o \
+channel.o \
+esp8266_nosdk.o \
+fhop.o \
+mlisten.o \
+radio.o \
+radioadpt.o \
+rlock.o \
+rlog.o \
+rlogprint.o \
+rtc.o \
+sx1231drv.o \
+xradio.o \
 SPIFlash.o \
 TimerTest.o \
 Flume_AMR.o
@@ -84,6 +120,18 @@ FlumeID.d \
 filter.d \
 FXOS8700.d \
 PowerManager.d \
+channel.d \
+esp8266_nosdk.d \
+fhop.d \
+mlisten.d \
+radio.d \
+radioadpt.d \
+rlock.d \
+rlog.d \
+rlogprint.d \
+rtc.d \
+sx1231drv.d \
+xradio.d \
 SPIFlash.d \
 TimerTest.d \
 Flume_AMR.d
@@ -95,6 +143,18 @@ FlumeID.d \
 filter.d \
 FXOS8700.d \
 PowerManager.d \
+channel.d \
+esp8266_nosdk.d \
+fhop.d \
+mlisten.d \
+radio.d \
+radioadpt.d \
+rlock.d \
+rlog.d \
+rlogprint.d \
+rtc.d \
+sx1231drv.d \
+xradio.d \
 SPIFlash.d \
 TimerTest.d \
 Flume_AMR.d
@@ -108,7 +168,7 @@ ADDITIONAL_DEPENDENCIES:=
 OUTPUT_FILE_DEP:= ./makedep.mk
 
 LIB_DEP+=  \
-C:/Users/warre/Repositories/Arduino-SAMD20/SAMD20E18/ArduinoCore/Debug/libArduinoCore.a
+C:/Users/budge/Repositories/Arduino-SAMD20/SAMD20E18/ArduinoCore/Debug/libArduinoCore.a
 
 LINKER_SCRIPT_DEP+=  \
 ../Device_Startup/samd20j18_flash.ld \
@@ -135,59 +195,90 @@ LINKER_SCRIPT_DEP+=  \
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ./%.o: ../../../Flume/Flume_AMR/lib/Commands/%.cpp
 	@echo Building file: $<
-	@echo Invoking: ARM/GNU C Compiler : 6.2.1
-	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\arm\arm-gnu-toolchain\bin\arm-none-eabi-g++.exe$(QUOTE) -mthumb -D__SAMD20E18__ -DDEBUG -DF_CPU=48000000L -DARDUINO_ARCH_SAMD -DSAMD20 -DFLUME_BUILD_TYPE=1 -DSERIAL_EN=1 -DINT_DEBUG_EN=0 -DDEBUG_CONSOLE_EN=1 -DTIMERTEST_EN=0 -DUUID_BINLEN=8 -DFXOS_EN=1 -DFXOS_I2C_ADDR=0x1E -DFXOS_ODR=ODR_200HZ -DFXOS_OSR=MOSR_6 -DFXOS_SLEEP_OSR=MSOSR_4 -DFXOS_STREAMING=0 -DRX_NO_PROCESSES=0 -DFLASH_EN=1 -DLED_EN=1 -DRADIO_EN=0 -DRADIO_USE_WDT=1  -I"../../SAMD20E18/ArduinoCore/include/core" -I"../../SAMD20E18/ArduinoCore/include/core/avr" -I"../../SAMD20E18/ArduinoCore/include/core/samd20" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include/component" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include/instance" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include/pio" -I"../../SAMD20E18/ArduinoCore/include/libraries" -I"../../SAMD20E18/ArduinoCore/include/libraries/spi" -I"../../SAMD20E18/ArduinoCore/include/libraries/wire" -I"../../SAMD20E18/ArduinoCore/include/variants" -I"../../../Flume/Flume_AMR" -I"../../../Flume/Flume_AMR/lib/include" -I"../../../Flume/Flume_AMR/lib/Flume" -I"../../../Flume/Flume_AMR/lib/FXOS8700" -I"../../../Flume/Flume_AMR/lib/SPIFlash" -I"../../../Flume/Flume_AMR/lib/Commands" -I"../../../Flume/Flume_AMR/lib/CurrentValueTable" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\SAMD20_DFP\1.2.91\samd20\include" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\arm\cmsis\5.0.1\CMSIS\Include"  -O1 -ffunction-sections -fno-rtti -fno-exceptions -mlong-calls -g3 -Wall -mcpu=cortex-m0plus -c -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	@echo Invoking: ARM/GNU C Compiler : 6.3.1
+	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\arm\arm-gnu-toolchain\bin\arm-none-eabi-g++.exe$(QUOTE) -mthumb -D__SAMD20E18__ -DDEBUG -DF_CPU=48000000L -DARDUINO_ARCH_SAMD -DARDUINO -DSAMD20 -DFLUME_BUILD_TYPE=1 -DSERIAL_EN=1 -DINT_DEBUG_EN=0 -DDEBUG_CONSOLE_EN=1 -DTIMERTEST_EN=0 -DUUID_BINLEN=8 -DFXOS_EN=1 -DFXOS_I2C_ADDR=0x1E -DFXOS_ODR=ODR_200HZ -DFXOS_OSR=MOSR_6 -DFXOS_SLEEP_OSR=MSOSR_4 -DFXOS_STREAMING=0 -DRX_NO_PROCESSES=0 -DFLASH_EN=1 -DLED_EN=1 -DRADIO_EN=0 -DRADIO_USE_WDT=1  -DRADIO -DFREQUENCY=RADIO_915MHZ -DNODEID=3 -DNETWORKID=100 -DGATEWAYID=1 -DIS_RFM69HW=1 -DRADIO_WITHIRQS -DRADIO_ENABLE_MESSAGEQUEUE=1 -DSX1231_DEFAULTPROFILE=SX1231_PROFILE_55555 -DRADIO_ENABLE_PROFILE_200000=1 -DRADIO_ENABLE_PROFILE_55555=1 -DRADIO_ENABLE_PROFILE_19200=1 -DRADIO_ENABLE_PROFILE_9600=0 -DRADIO_ENABLE_PROFILE_4800=1 -DRADIO_ENABLE_PROFILE_2400=0 -DRADIO_ENABLE_PROFILE_1200=1 -DRADIO_ENABLE_HOPPING=1 -DRADIO_ENABLE_TDMA=1 -DRADIO_ENABLE_RTC=1 -DRADIO_HOP_DWELL=MILLIS_TO_STEPS(150U) -DRADIO_HOP_SILENT=MILLIS_TO_STEPS(5U) -DRADIO_HOP_CHANNELS=50 -DRADIO_HOP_SPACING=500000 -DRADIO_SYNC_DURATION_55555=20 -DRADIO_SYNC_DURATION_1200=80 -DRADIO_ENABLE_AGC=1 -DRADIO_ENABLE_AFC=1 -DRADIO_LOG_ENABLE_FLASH=0 -DRADIO_ENABLE_LOG=0 -DRADIO_LOG_ALL=0 -DRADIO_LOG_BINARY=0 -DRADIO_DUMP_CALIBRATION_TABLE=0  -I"../../SAMD20E18/ArduinoCore/include/core" -I"../../SAMD20E18/ArduinoCore/include/core/avr" -I"../../SAMD20E18/ArduinoCore/include/core/samd20" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include/component" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include/instance" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include/pio" -I"../../SAMD20E18/ArduinoCore/include/libraries" -I"../../SAMD20E18/ArduinoCore/include/libraries/spi" -I"../../SAMD20E18/ArduinoCore/include/libraries/EEPROM" -I"../../SAMD20E18/ArduinoCore/include/libraries/wire" -I"../../SAMD20E18/ArduinoCore/include/variants" -I"../../../Flume/Flume_AMR" -I"../../../Flume/Flume_AMR/lib/include" -I"../../../Flume/Flume_AMR/lib/Flume" -I"../../../Flume/Flume_AMR/lib/FXOS8700" -I"../../../Flume/Flume_AMR/lib/SPIFlash" -I"../../../Flume/Flume_AMR/lib/Commands" -I"../../../Flume/Flume_AMR/lib/CurrentValueTable" -I"../../../Flume/Flume_AMR/lib/Radio" -I"../../../Flume/Flume_AMR/lib/PowerManagement" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\SAMD20_DFP\1.2.91\samd20\include" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\arm\cmsis\5.0.1\CMSIS\Include"  -O1 -ffunction-sections -fno-rtti -fno-exceptions -mlong-calls -g3 -Wall -mcpu=cortex-m0plus -c -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
 	@echo Finished building: $<
 	
 
 ./%.o: ../../../Flume/Flume_AMR/lib/CurrentValueTable/%.cpp
 	@echo Building file: $<
-	@echo Invoking: ARM/GNU C Compiler : 6.2.1
-	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\arm\arm-gnu-toolchain\bin\arm-none-eabi-g++.exe$(QUOTE) -mthumb -D__SAMD20E18__ -DDEBUG -DF_CPU=48000000L -DARDUINO_ARCH_SAMD -DSAMD20 -DFLUME_BUILD_TYPE=1 -DSERIAL_EN=1 -DINT_DEBUG_EN=0 -DDEBUG_CONSOLE_EN=1 -DTIMERTEST_EN=0 -DUUID_BINLEN=8 -DFXOS_EN=1 -DFXOS_I2C_ADDR=0x1E -DFXOS_ODR=ODR_200HZ -DFXOS_OSR=MOSR_6 -DFXOS_SLEEP_OSR=MSOSR_4 -DFXOS_STREAMING=0 -DRX_NO_PROCESSES=0 -DFLASH_EN=1 -DLED_EN=1 -DRADIO_EN=0 -DRADIO_USE_WDT=1  -I"../../SAMD20E18/ArduinoCore/include/core" -I"../../SAMD20E18/ArduinoCore/include/core/avr" -I"../../SAMD20E18/ArduinoCore/include/core/samd20" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include/component" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include/instance" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include/pio" -I"../../SAMD20E18/ArduinoCore/include/libraries" -I"../../SAMD20E18/ArduinoCore/include/libraries/spi" -I"../../SAMD20E18/ArduinoCore/include/libraries/wire" -I"../../SAMD20E18/ArduinoCore/include/variants" -I"../../../Flume/Flume_AMR" -I"../../../Flume/Flume_AMR/lib/include" -I"../../../Flume/Flume_AMR/lib/Flume" -I"../../../Flume/Flume_AMR/lib/FXOS8700" -I"../../../Flume/Flume_AMR/lib/SPIFlash" -I"../../../Flume/Flume_AMR/lib/Commands" -I"../../../Flume/Flume_AMR/lib/CurrentValueTable" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\SAMD20_DFP\1.2.91\samd20\include" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\arm\cmsis\5.0.1\CMSIS\Include"  -O1 -ffunction-sections -fno-rtti -fno-exceptions -mlong-calls -g3 -Wall -mcpu=cortex-m0plus -c -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	@echo Invoking: ARM/GNU C Compiler : 6.3.1
+	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\arm\arm-gnu-toolchain\bin\arm-none-eabi-g++.exe$(QUOTE) -mthumb -D__SAMD20E18__ -DDEBUG -DF_CPU=48000000L -DARDUINO_ARCH_SAMD -DARDUINO -DSAMD20 -DFLUME_BUILD_TYPE=1 -DSERIAL_EN=1 -DINT_DEBUG_EN=0 -DDEBUG_CONSOLE_EN=1 -DTIMERTEST_EN=0 -DUUID_BINLEN=8 -DFXOS_EN=1 -DFXOS_I2C_ADDR=0x1E -DFXOS_ODR=ODR_200HZ -DFXOS_OSR=MOSR_6 -DFXOS_SLEEP_OSR=MSOSR_4 -DFXOS_STREAMING=0 -DRX_NO_PROCESSES=0 -DFLASH_EN=1 -DLED_EN=1 -DRADIO_EN=0 -DRADIO_USE_WDT=1  -DRADIO -DFREQUENCY=RADIO_915MHZ -DNODEID=3 -DNETWORKID=100 -DGATEWAYID=1 -DIS_RFM69HW=1 -DRADIO_WITHIRQS -DRADIO_ENABLE_MESSAGEQUEUE=1 -DSX1231_DEFAULTPROFILE=SX1231_PROFILE_55555 -DRADIO_ENABLE_PROFILE_200000=1 -DRADIO_ENABLE_PROFILE_55555=1 -DRADIO_ENABLE_PROFILE_19200=1 -DRADIO_ENABLE_PROFILE_9600=0 -DRADIO_ENABLE_PROFILE_4800=1 -DRADIO_ENABLE_PROFILE_2400=0 -DRADIO_ENABLE_PROFILE_1200=1 -DRADIO_ENABLE_HOPPING=1 -DRADIO_ENABLE_TDMA=1 -DRADIO_ENABLE_RTC=1 -DRADIO_HOP_DWELL=MILLIS_TO_STEPS(150U) -DRADIO_HOP_SILENT=MILLIS_TO_STEPS(5U) -DRADIO_HOP_CHANNELS=50 -DRADIO_HOP_SPACING=500000 -DRADIO_SYNC_DURATION_55555=20 -DRADIO_SYNC_DURATION_1200=80 -DRADIO_ENABLE_AGC=1 -DRADIO_ENABLE_AFC=1 -DRADIO_LOG_ENABLE_FLASH=0 -DRADIO_ENABLE_LOG=0 -DRADIO_LOG_ALL=0 -DRADIO_LOG_BINARY=0 -DRADIO_DUMP_CALIBRATION_TABLE=0  -I"../../SAMD20E18/ArduinoCore/include/core" -I"../../SAMD20E18/ArduinoCore/include/core/avr" -I"../../SAMD20E18/ArduinoCore/include/core/samd20" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include/component" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include/instance" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include/pio" -I"../../SAMD20E18/ArduinoCore/include/libraries" -I"../../SAMD20E18/ArduinoCore/include/libraries/spi" -I"../../SAMD20E18/ArduinoCore/include/libraries/EEPROM" -I"../../SAMD20E18/ArduinoCore/include/libraries/wire" -I"../../SAMD20E18/ArduinoCore/include/variants" -I"../../../Flume/Flume_AMR" -I"../../../Flume/Flume_AMR/lib/include" -I"../../../Flume/Flume_AMR/lib/Flume" -I"../../../Flume/Flume_AMR/lib/FXOS8700" -I"../../../Flume/Flume_AMR/lib/SPIFlash" -I"../../../Flume/Flume_AMR/lib/Commands" -I"../../../Flume/Flume_AMR/lib/CurrentValueTable" -I"../../../Flume/Flume_AMR/lib/Radio" -I"../../../Flume/Flume_AMR/lib/PowerManagement" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\SAMD20_DFP\1.2.91\samd20\include" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\arm\cmsis\5.0.1\CMSIS\Include"  -O1 -ffunction-sections -fno-rtti -fno-exceptions -mlong-calls -g3 -Wall -mcpu=cortex-m0plus -c -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
 	@echo Finished building: $<
 	
 
 ./%.o: ../../../Flume/Flume_AMR/lib/Flume/%.cpp
 	@echo Building file: $<
-	@echo Invoking: ARM/GNU C Compiler : 6.2.1
-	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\arm\arm-gnu-toolchain\bin\arm-none-eabi-g++.exe$(QUOTE) -mthumb -D__SAMD20E18__ -DDEBUG -DF_CPU=48000000L -DARDUINO_ARCH_SAMD -DSAMD20 -DFLUME_BUILD_TYPE=1 -DSERIAL_EN=1 -DINT_DEBUG_EN=0 -DDEBUG_CONSOLE_EN=1 -DTIMERTEST_EN=0 -DUUID_BINLEN=8 -DFXOS_EN=1 -DFXOS_I2C_ADDR=0x1E -DFXOS_ODR=ODR_200HZ -DFXOS_OSR=MOSR_6 -DFXOS_SLEEP_OSR=MSOSR_4 -DFXOS_STREAMING=0 -DRX_NO_PROCESSES=0 -DFLASH_EN=1 -DLED_EN=1 -DRADIO_EN=0 -DRADIO_USE_WDT=1  -I"../../SAMD20E18/ArduinoCore/include/core" -I"../../SAMD20E18/ArduinoCore/include/core/avr" -I"../../SAMD20E18/ArduinoCore/include/core/samd20" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include/component" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include/instance" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include/pio" -I"../../SAMD20E18/ArduinoCore/include/libraries" -I"../../SAMD20E18/ArduinoCore/include/libraries/spi" -I"../../SAMD20E18/ArduinoCore/include/libraries/wire" -I"../../SAMD20E18/ArduinoCore/include/variants" -I"../../../Flume/Flume_AMR" -I"../../../Flume/Flume_AMR/lib/include" -I"../../../Flume/Flume_AMR/lib/Flume" -I"../../../Flume/Flume_AMR/lib/FXOS8700" -I"../../../Flume/Flume_AMR/lib/SPIFlash" -I"../../../Flume/Flume_AMR/lib/Commands" -I"../../../Flume/Flume_AMR/lib/CurrentValueTable" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\SAMD20_DFP\1.2.91\samd20\include" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\arm\cmsis\5.0.1\CMSIS\Include"  -O1 -ffunction-sections -fno-rtti -fno-exceptions -mlong-calls -g3 -Wall -mcpu=cortex-m0plus -c -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	@echo Invoking: ARM/GNU C Compiler : 6.3.1
+	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\arm\arm-gnu-toolchain\bin\arm-none-eabi-g++.exe$(QUOTE) -mthumb -D__SAMD20E18__ -DDEBUG -DF_CPU=48000000L -DARDUINO_ARCH_SAMD -DARDUINO -DSAMD20 -DFLUME_BUILD_TYPE=1 -DSERIAL_EN=1 -DINT_DEBUG_EN=0 -DDEBUG_CONSOLE_EN=1 -DTIMERTEST_EN=0 -DUUID_BINLEN=8 -DFXOS_EN=1 -DFXOS_I2C_ADDR=0x1E -DFXOS_ODR=ODR_200HZ -DFXOS_OSR=MOSR_6 -DFXOS_SLEEP_OSR=MSOSR_4 -DFXOS_STREAMING=0 -DRX_NO_PROCESSES=0 -DFLASH_EN=1 -DLED_EN=1 -DRADIO_EN=0 -DRADIO_USE_WDT=1  -DRADIO -DFREQUENCY=RADIO_915MHZ -DNODEID=3 -DNETWORKID=100 -DGATEWAYID=1 -DIS_RFM69HW=1 -DRADIO_WITHIRQS -DRADIO_ENABLE_MESSAGEQUEUE=1 -DSX1231_DEFAULTPROFILE=SX1231_PROFILE_55555 -DRADIO_ENABLE_PROFILE_200000=1 -DRADIO_ENABLE_PROFILE_55555=1 -DRADIO_ENABLE_PROFILE_19200=1 -DRADIO_ENABLE_PROFILE_9600=0 -DRADIO_ENABLE_PROFILE_4800=1 -DRADIO_ENABLE_PROFILE_2400=0 -DRADIO_ENABLE_PROFILE_1200=1 -DRADIO_ENABLE_HOPPING=1 -DRADIO_ENABLE_TDMA=1 -DRADIO_ENABLE_RTC=1 -DRADIO_HOP_DWELL=MILLIS_TO_STEPS(150U) -DRADIO_HOP_SILENT=MILLIS_TO_STEPS(5U) -DRADIO_HOP_CHANNELS=50 -DRADIO_HOP_SPACING=500000 -DRADIO_SYNC_DURATION_55555=20 -DRADIO_SYNC_DURATION_1200=80 -DRADIO_ENABLE_AGC=1 -DRADIO_ENABLE_AFC=1 -DRADIO_LOG_ENABLE_FLASH=0 -DRADIO_ENABLE_LOG=0 -DRADIO_LOG_ALL=0 -DRADIO_LOG_BINARY=0 -DRADIO_DUMP_CALIBRATION_TABLE=0  -I"../../SAMD20E18/ArduinoCore/include/core" -I"../../SAMD20E18/ArduinoCore/include/core/avr" -I"../../SAMD20E18/ArduinoCore/include/core/samd20" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include/component" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include/instance" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include/pio" -I"../../SAMD20E18/ArduinoCore/include/libraries" -I"../../SAMD20E18/ArduinoCore/include/libraries/spi" -I"../../SAMD20E18/ArduinoCore/include/libraries/EEPROM" -I"../../SAMD20E18/ArduinoCore/include/libraries/wire" -I"../../SAMD20E18/ArduinoCore/include/variants" -I"../../../Flume/Flume_AMR" -I"../../../Flume/Flume_AMR/lib/include" -I"../../../Flume/Flume_AMR/lib/Flume" -I"../../../Flume/Flume_AMR/lib/FXOS8700" -I"../../../Flume/Flume_AMR/lib/SPIFlash" -I"../../../Flume/Flume_AMR/lib/Commands" -I"../../../Flume/Flume_AMR/lib/CurrentValueTable" -I"../../../Flume/Flume_AMR/lib/Radio" -I"../../../Flume/Flume_AMR/lib/PowerManagement" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\SAMD20_DFP\1.2.91\samd20\include" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\arm\cmsis\5.0.1\CMSIS\Include"  -O1 -ffunction-sections -fno-rtti -fno-exceptions -mlong-calls -g3 -Wall -mcpu=cortex-m0plus -c -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
 	@echo Finished building: $<
 	
 
 ./%.o: ../../../Flume/Flume_AMR/lib/FXOS8700/%.cpp
 	@echo Building file: $<
-	@echo Invoking: ARM/GNU C Compiler : 6.2.1
-	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\arm\arm-gnu-toolchain\bin\arm-none-eabi-g++.exe$(QUOTE) -mthumb -D__SAMD20E18__ -DDEBUG -DF_CPU=48000000L -DARDUINO_ARCH_SAMD -DSAMD20 -DFLUME_BUILD_TYPE=1 -DSERIAL_EN=1 -DINT_DEBUG_EN=0 -DDEBUG_CONSOLE_EN=1 -DTIMERTEST_EN=0 -DUUID_BINLEN=8 -DFXOS_EN=1 -DFXOS_I2C_ADDR=0x1E -DFXOS_ODR=ODR_200HZ -DFXOS_OSR=MOSR_6 -DFXOS_SLEEP_OSR=MSOSR_4 -DFXOS_STREAMING=0 -DRX_NO_PROCESSES=0 -DFLASH_EN=1 -DLED_EN=1 -DRADIO_EN=0 -DRADIO_USE_WDT=1  -I"../../SAMD20E18/ArduinoCore/include/core" -I"../../SAMD20E18/ArduinoCore/include/core/avr" -I"../../SAMD20E18/ArduinoCore/include/core/samd20" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include/component" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include/instance" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include/pio" -I"../../SAMD20E18/ArduinoCore/include/libraries" -I"../../SAMD20E18/ArduinoCore/include/libraries/spi" -I"../../SAMD20E18/ArduinoCore/include/libraries/wire" -I"../../SAMD20E18/ArduinoCore/include/variants" -I"../../../Flume/Flume_AMR" -I"../../../Flume/Flume_AMR/lib/include" -I"../../../Flume/Flume_AMR/lib/Flume" -I"../../../Flume/Flume_AMR/lib/FXOS8700" -I"../../../Flume/Flume_AMR/lib/SPIFlash" -I"../../../Flume/Flume_AMR/lib/Commands" -I"../../../Flume/Flume_AMR/lib/CurrentValueTable" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\SAMD20_DFP\1.2.91\samd20\include" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\arm\cmsis\5.0.1\CMSIS\Include"  -O1 -ffunction-sections -fno-rtti -fno-exceptions -mlong-calls -g3 -Wall -mcpu=cortex-m0plus -c -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	@echo Invoking: ARM/GNU C Compiler : 6.3.1
+	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\arm\arm-gnu-toolchain\bin\arm-none-eabi-g++.exe$(QUOTE) -mthumb -D__SAMD20E18__ -DDEBUG -DF_CPU=48000000L -DARDUINO_ARCH_SAMD -DARDUINO -DSAMD20 -DFLUME_BUILD_TYPE=1 -DSERIAL_EN=1 -DINT_DEBUG_EN=0 -DDEBUG_CONSOLE_EN=1 -DTIMERTEST_EN=0 -DUUID_BINLEN=8 -DFXOS_EN=1 -DFXOS_I2C_ADDR=0x1E -DFXOS_ODR=ODR_200HZ -DFXOS_OSR=MOSR_6 -DFXOS_SLEEP_OSR=MSOSR_4 -DFXOS_STREAMING=0 -DRX_NO_PROCESSES=0 -DFLASH_EN=1 -DLED_EN=1 -DRADIO_EN=0 -DRADIO_USE_WDT=1  -DRADIO -DFREQUENCY=RADIO_915MHZ -DNODEID=3 -DNETWORKID=100 -DGATEWAYID=1 -DIS_RFM69HW=1 -DRADIO_WITHIRQS -DRADIO_ENABLE_MESSAGEQUEUE=1 -DSX1231_DEFAULTPROFILE=SX1231_PROFILE_55555 -DRADIO_ENABLE_PROFILE_200000=1 -DRADIO_ENABLE_PROFILE_55555=1 -DRADIO_ENABLE_PROFILE_19200=1 -DRADIO_ENABLE_PROFILE_9600=0 -DRADIO_ENABLE_PROFILE_4800=1 -DRADIO_ENABLE_PROFILE_2400=0 -DRADIO_ENABLE_PROFILE_1200=1 -DRADIO_ENABLE_HOPPING=1 -DRADIO_ENABLE_TDMA=1 -DRADIO_ENABLE_RTC=1 -DRADIO_HOP_DWELL=MILLIS_TO_STEPS(150U) -DRADIO_HOP_SILENT=MILLIS_TO_STEPS(5U) -DRADIO_HOP_CHANNELS=50 -DRADIO_HOP_SPACING=500000 -DRADIO_SYNC_DURATION_55555=20 -DRADIO_SYNC_DURATION_1200=80 -DRADIO_ENABLE_AGC=1 -DRADIO_ENABLE_AFC=1 -DRADIO_LOG_ENABLE_FLASH=0 -DRADIO_ENABLE_LOG=0 -DRADIO_LOG_ALL=0 -DRADIO_LOG_BINARY=0 -DRADIO_DUMP_CALIBRATION_TABLE=0  -I"../../SAMD20E18/ArduinoCore/include/core" -I"../../SAMD20E18/ArduinoCore/include/core/avr" -I"../../SAMD20E18/ArduinoCore/include/core/samd20" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include/component" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include/instance" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include/pio" -I"../../SAMD20E18/ArduinoCore/include/libraries" -I"../../SAMD20E18/ArduinoCore/include/libraries/spi" -I"../../SAMD20E18/ArduinoCore/include/libraries/EEPROM" -I"../../SAMD20E18/ArduinoCore/include/libraries/wire" -I"../../SAMD20E18/ArduinoCore/include/variants" -I"../../../Flume/Flume_AMR" -I"../../../Flume/Flume_AMR/lib/include" -I"../../../Flume/Flume_AMR/lib/Flume" -I"../../../Flume/Flume_AMR/lib/FXOS8700" -I"../../../Flume/Flume_AMR/lib/SPIFlash" -I"../../../Flume/Flume_AMR/lib/Commands" -I"../../../Flume/Flume_AMR/lib/CurrentValueTable" -I"../../../Flume/Flume_AMR/lib/Radio" -I"../../../Flume/Flume_AMR/lib/PowerManagement" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\SAMD20_DFP\1.2.91\samd20\include" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\arm\cmsis\5.0.1\CMSIS\Include"  -O1 -ffunction-sections -fno-rtti -fno-exceptions -mlong-calls -g3 -Wall -mcpu=cortex-m0plus -c -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
 	@echo Finished building: $<
 	
 
 ./%.o: ../../../Flume/Flume_AMR/lib/PowerManagement/%.cpp
 	@echo Building file: $<
-	@echo Invoking: ARM/GNU C Compiler : 6.2.1
-	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\arm\arm-gnu-toolchain\bin\arm-none-eabi-g++.exe$(QUOTE) -mthumb -D__SAMD20E18__ -DDEBUG -DF_CPU=48000000L -DARDUINO_ARCH_SAMD -DSAMD20 -DFLUME_BUILD_TYPE=1 -DSERIAL_EN=1 -DINT_DEBUG_EN=0 -DDEBUG_CONSOLE_EN=1 -DTIMERTEST_EN=0 -DUUID_BINLEN=8 -DFXOS_EN=1 -DFXOS_I2C_ADDR=0x1E -DFXOS_ODR=ODR_200HZ -DFXOS_OSR=MOSR_6 -DFXOS_SLEEP_OSR=MSOSR_4 -DFXOS_STREAMING=0 -DRX_NO_PROCESSES=0 -DFLASH_EN=1 -DLED_EN=1 -DRADIO_EN=0 -DRADIO_USE_WDT=1  -I"../../SAMD20E18/ArduinoCore/include/core" -I"../../SAMD20E18/ArduinoCore/include/core/avr" -I"../../SAMD20E18/ArduinoCore/include/core/samd20" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include/component" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include/instance" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include/pio" -I"../../SAMD20E18/ArduinoCore/include/libraries" -I"../../SAMD20E18/ArduinoCore/include/libraries/spi" -I"../../SAMD20E18/ArduinoCore/include/libraries/wire" -I"../../SAMD20E18/ArduinoCore/include/variants" -I"../../../Flume/Flume_AMR" -I"../../../Flume/Flume_AMR/lib/include" -I"../../../Flume/Flume_AMR/lib/Flume" -I"../../../Flume/Flume_AMR/lib/FXOS8700" -I"../../../Flume/Flume_AMR/lib/SPIFlash" -I"../../../Flume/Flume_AMR/lib/Commands" -I"../../../Flume/Flume_AMR/lib/CurrentValueTable" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\SAMD20_DFP\1.2.91\samd20\include" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\arm\cmsis\5.0.1\CMSIS\Include"  -O1 -ffunction-sections -fno-rtti -fno-exceptions -mlong-calls -g3 -Wall -mcpu=cortex-m0plus -c -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	@echo Invoking: ARM/GNU C Compiler : 6.3.1
+	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\arm\arm-gnu-toolchain\bin\arm-none-eabi-g++.exe$(QUOTE) -mthumb -D__SAMD20E18__ -DDEBUG -DF_CPU=48000000L -DARDUINO_ARCH_SAMD -DARDUINO -DSAMD20 -DFLUME_BUILD_TYPE=1 -DSERIAL_EN=1 -DINT_DEBUG_EN=0 -DDEBUG_CONSOLE_EN=1 -DTIMERTEST_EN=0 -DUUID_BINLEN=8 -DFXOS_EN=1 -DFXOS_I2C_ADDR=0x1E -DFXOS_ODR=ODR_200HZ -DFXOS_OSR=MOSR_6 -DFXOS_SLEEP_OSR=MSOSR_4 -DFXOS_STREAMING=0 -DRX_NO_PROCESSES=0 -DFLASH_EN=1 -DLED_EN=1 -DRADIO_EN=0 -DRADIO_USE_WDT=1  -DRADIO -DFREQUENCY=RADIO_915MHZ -DNODEID=3 -DNETWORKID=100 -DGATEWAYID=1 -DIS_RFM69HW=1 -DRADIO_WITHIRQS -DRADIO_ENABLE_MESSAGEQUEUE=1 -DSX1231_DEFAULTPROFILE=SX1231_PROFILE_55555 -DRADIO_ENABLE_PROFILE_200000=1 -DRADIO_ENABLE_PROFILE_55555=1 -DRADIO_ENABLE_PROFILE_19200=1 -DRADIO_ENABLE_PROFILE_9600=0 -DRADIO_ENABLE_PROFILE_4800=1 -DRADIO_ENABLE_PROFILE_2400=0 -DRADIO_ENABLE_PROFILE_1200=1 -DRADIO_ENABLE_HOPPING=1 -DRADIO_ENABLE_TDMA=1 -DRADIO_ENABLE_RTC=1 -DRADIO_HOP_DWELL=MILLIS_TO_STEPS(150U) -DRADIO_HOP_SILENT=MILLIS_TO_STEPS(5U) -DRADIO_HOP_CHANNELS=50 -DRADIO_HOP_SPACING=500000 -DRADIO_SYNC_DURATION_55555=20 -DRADIO_SYNC_DURATION_1200=80 -DRADIO_ENABLE_AGC=1 -DRADIO_ENABLE_AFC=1 -DRADIO_LOG_ENABLE_FLASH=0 -DRADIO_ENABLE_LOG=0 -DRADIO_LOG_ALL=0 -DRADIO_LOG_BINARY=0 -DRADIO_DUMP_CALIBRATION_TABLE=0  -I"../../SAMD20E18/ArduinoCore/include/core" -I"../../SAMD20E18/ArduinoCore/include/core/avr" -I"../../SAMD20E18/ArduinoCore/include/core/samd20" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include/component" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include/instance" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include/pio" -I"../../SAMD20E18/ArduinoCore/include/libraries" -I"../../SAMD20E18/ArduinoCore/include/libraries/spi" -I"../../SAMD20E18/ArduinoCore/include/libraries/EEPROM" -I"../../SAMD20E18/ArduinoCore/include/libraries/wire" -I"../../SAMD20E18/ArduinoCore/include/variants" -I"../../../Flume/Flume_AMR" -I"../../../Flume/Flume_AMR/lib/include" -I"../../../Flume/Flume_AMR/lib/Flume" -I"../../../Flume/Flume_AMR/lib/FXOS8700" -I"../../../Flume/Flume_AMR/lib/SPIFlash" -I"../../../Flume/Flume_AMR/lib/Commands" -I"../../../Flume/Flume_AMR/lib/CurrentValueTable" -I"../../../Flume/Flume_AMR/lib/Radio" -I"../../../Flume/Flume_AMR/lib/PowerManagement" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\SAMD20_DFP\1.2.91\samd20\include" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\arm\cmsis\5.0.1\CMSIS\Include"  -O1 -ffunction-sections -fno-rtti -fno-exceptions -mlong-calls -g3 -Wall -mcpu=cortex-m0plus -c -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	@echo Finished building: $<
+	
+
+./%.o: ../../../Flume/Flume_AMR/lib/Radio/%.cpp
+	@echo Building file: $<
+	@echo Invoking: ARM/GNU C Compiler : 6.3.1
+	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\arm\arm-gnu-toolchain\bin\arm-none-eabi-g++.exe$(QUOTE) -mthumb -D__SAMD20E18__ -DDEBUG -DF_CPU=48000000L -DARDUINO_ARCH_SAMD -DARDUINO -DSAMD20 -DFLUME_BUILD_TYPE=1 -DSERIAL_EN=1 -DINT_DEBUG_EN=0 -DDEBUG_CONSOLE_EN=1 -DTIMERTEST_EN=0 -DUUID_BINLEN=8 -DFXOS_EN=1 -DFXOS_I2C_ADDR=0x1E -DFXOS_ODR=ODR_200HZ -DFXOS_OSR=MOSR_6 -DFXOS_SLEEP_OSR=MSOSR_4 -DFXOS_STREAMING=0 -DRX_NO_PROCESSES=0 -DFLASH_EN=1 -DLED_EN=1 -DRADIO_EN=0 -DRADIO_USE_WDT=1  -DRADIO -DFREQUENCY=RADIO_915MHZ -DNODEID=3 -DNETWORKID=100 -DGATEWAYID=1 -DIS_RFM69HW=1 -DRADIO_WITHIRQS -DRADIO_ENABLE_MESSAGEQUEUE=1 -DSX1231_DEFAULTPROFILE=SX1231_PROFILE_55555 -DRADIO_ENABLE_PROFILE_200000=1 -DRADIO_ENABLE_PROFILE_55555=1 -DRADIO_ENABLE_PROFILE_19200=1 -DRADIO_ENABLE_PROFILE_9600=0 -DRADIO_ENABLE_PROFILE_4800=1 -DRADIO_ENABLE_PROFILE_2400=0 -DRADIO_ENABLE_PROFILE_1200=1 -DRADIO_ENABLE_HOPPING=1 -DRADIO_ENABLE_TDMA=1 -DRADIO_ENABLE_RTC=1 -DRADIO_HOP_DWELL=MILLIS_TO_STEPS(150U) -DRADIO_HOP_SILENT=MILLIS_TO_STEPS(5U) -DRADIO_HOP_CHANNELS=50 -DRADIO_HOP_SPACING=500000 -DRADIO_SYNC_DURATION_55555=20 -DRADIO_SYNC_DURATION_1200=80 -DRADIO_ENABLE_AGC=1 -DRADIO_ENABLE_AFC=1 -DRADIO_LOG_ENABLE_FLASH=0 -DRADIO_ENABLE_LOG=0 -DRADIO_LOG_ALL=0 -DRADIO_LOG_BINARY=0 -DRADIO_DUMP_CALIBRATION_TABLE=0  -I"../../SAMD20E18/ArduinoCore/include/core" -I"../../SAMD20E18/ArduinoCore/include/core/avr" -I"../../SAMD20E18/ArduinoCore/include/core/samd20" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include/component" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include/instance" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include/pio" -I"../../SAMD20E18/ArduinoCore/include/libraries" -I"../../SAMD20E18/ArduinoCore/include/libraries/spi" -I"../../SAMD20E18/ArduinoCore/include/libraries/EEPROM" -I"../../SAMD20E18/ArduinoCore/include/libraries/wire" -I"../../SAMD20E18/ArduinoCore/include/variants" -I"../../../Flume/Flume_AMR" -I"../../../Flume/Flume_AMR/lib/include" -I"../../../Flume/Flume_AMR/lib/Flume" -I"../../../Flume/Flume_AMR/lib/FXOS8700" -I"../../../Flume/Flume_AMR/lib/SPIFlash" -I"../../../Flume/Flume_AMR/lib/Commands" -I"../../../Flume/Flume_AMR/lib/CurrentValueTable" -I"../../../Flume/Flume_AMR/lib/Radio" -I"../../../Flume/Flume_AMR/lib/PowerManagement" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\SAMD20_DFP\1.2.91\samd20\include" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\arm\cmsis\5.0.1\CMSIS\Include"  -O1 -ffunction-sections -fno-rtti -fno-exceptions -mlong-calls -g3 -Wall -mcpu=cortex-m0plus -c -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
 	@echo Finished building: $<
 	
 
 ./%.o: ../../../Flume/Flume_AMR/lib/SPIFlash/%.cpp
 	@echo Building file: $<
-	@echo Invoking: ARM/GNU C Compiler : 6.2.1
-	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\arm\arm-gnu-toolchain\bin\arm-none-eabi-g++.exe$(QUOTE) -mthumb -D__SAMD20E18__ -DDEBUG -DF_CPU=48000000L -DARDUINO_ARCH_SAMD -DSAMD20 -DFLUME_BUILD_TYPE=1 -DSERIAL_EN=1 -DINT_DEBUG_EN=0 -DDEBUG_CONSOLE_EN=1 -DTIMERTEST_EN=0 -DUUID_BINLEN=8 -DFXOS_EN=1 -DFXOS_I2C_ADDR=0x1E -DFXOS_ODR=ODR_200HZ -DFXOS_OSR=MOSR_6 -DFXOS_SLEEP_OSR=MSOSR_4 -DFXOS_STREAMING=0 -DRX_NO_PROCESSES=0 -DFLASH_EN=1 -DLED_EN=1 -DRADIO_EN=0 -DRADIO_USE_WDT=1  -I"../../SAMD20E18/ArduinoCore/include/core" -I"../../SAMD20E18/ArduinoCore/include/core/avr" -I"../../SAMD20E18/ArduinoCore/include/core/samd20" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include/component" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include/instance" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include/pio" -I"../../SAMD20E18/ArduinoCore/include/libraries" -I"../../SAMD20E18/ArduinoCore/include/libraries/spi" -I"../../SAMD20E18/ArduinoCore/include/libraries/wire" -I"../../SAMD20E18/ArduinoCore/include/variants" -I"../../../Flume/Flume_AMR" -I"../../../Flume/Flume_AMR/lib/include" -I"../../../Flume/Flume_AMR/lib/Flume" -I"../../../Flume/Flume_AMR/lib/FXOS8700" -I"../../../Flume/Flume_AMR/lib/SPIFlash" -I"../../../Flume/Flume_AMR/lib/Commands" -I"../../../Flume/Flume_AMR/lib/CurrentValueTable" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\SAMD20_DFP\1.2.91\samd20\include" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\arm\cmsis\5.0.1\CMSIS\Include"  -O1 -ffunction-sections -fno-rtti -fno-exceptions -mlong-calls -g3 -Wall -mcpu=cortex-m0plus -c -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	@echo Invoking: ARM/GNU C Compiler : 6.3.1
+	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\arm\arm-gnu-toolchain\bin\arm-none-eabi-g++.exe$(QUOTE) -mthumb -D__SAMD20E18__ -DDEBUG -DF_CPU=48000000L -DARDUINO_ARCH_SAMD -DARDUINO -DSAMD20 -DFLUME_BUILD_TYPE=1 -DSERIAL_EN=1 -DINT_DEBUG_EN=0 -DDEBUG_CONSOLE_EN=1 -DTIMERTEST_EN=0 -DUUID_BINLEN=8 -DFXOS_EN=1 -DFXOS_I2C_ADDR=0x1E -DFXOS_ODR=ODR_200HZ -DFXOS_OSR=MOSR_6 -DFXOS_SLEEP_OSR=MSOSR_4 -DFXOS_STREAMING=0 -DRX_NO_PROCESSES=0 -DFLASH_EN=1 -DLED_EN=1 -DRADIO_EN=0 -DRADIO_USE_WDT=1  -DRADIO -DFREQUENCY=RADIO_915MHZ -DNODEID=3 -DNETWORKID=100 -DGATEWAYID=1 -DIS_RFM69HW=1 -DRADIO_WITHIRQS -DRADIO_ENABLE_MESSAGEQUEUE=1 -DSX1231_DEFAULTPROFILE=SX1231_PROFILE_55555 -DRADIO_ENABLE_PROFILE_200000=1 -DRADIO_ENABLE_PROFILE_55555=1 -DRADIO_ENABLE_PROFILE_19200=1 -DRADIO_ENABLE_PROFILE_9600=0 -DRADIO_ENABLE_PROFILE_4800=1 -DRADIO_ENABLE_PROFILE_2400=0 -DRADIO_ENABLE_PROFILE_1200=1 -DRADIO_ENABLE_HOPPING=1 -DRADIO_ENABLE_TDMA=1 -DRADIO_ENABLE_RTC=1 -DRADIO_HOP_DWELL=MILLIS_TO_STEPS(150U) -DRADIO_HOP_SILENT=MILLIS_TO_STEPS(5U) -DRADIO_HOP_CHANNELS=50 -DRADIO_HOP_SPACING=500000 -DRADIO_SYNC_DURATION_55555=20 -DRADIO_SYNC_DURATION_1200=80 -DRADIO_ENABLE_AGC=1 -DRADIO_ENABLE_AFC=1 -DRADIO_LOG_ENABLE_FLASH=0 -DRADIO_ENABLE_LOG=0 -DRADIO_LOG_ALL=0 -DRADIO_LOG_BINARY=0 -DRADIO_DUMP_CALIBRATION_TABLE=0  -I"../../SAMD20E18/ArduinoCore/include/core" -I"../../SAMD20E18/ArduinoCore/include/core/avr" -I"../../SAMD20E18/ArduinoCore/include/core/samd20" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include/component" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include/instance" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include/pio" -I"../../SAMD20E18/ArduinoCore/include/libraries" -I"../../SAMD20E18/ArduinoCore/include/libraries/spi" -I"../../SAMD20E18/ArduinoCore/include/libraries/EEPROM" -I"../../SAMD20E18/ArduinoCore/include/libraries/wire" -I"../../SAMD20E18/ArduinoCore/include/variants" -I"../../../Flume/Flume_AMR" -I"../../../Flume/Flume_AMR/lib/include" -I"../../../Flume/Flume_AMR/lib/Flume" -I"../../../Flume/Flume_AMR/lib/FXOS8700" -I"../../../Flume/Flume_AMR/lib/SPIFlash" -I"../../../Flume/Flume_AMR/lib/Commands" -I"../../../Flume/Flume_AMR/lib/CurrentValueTable" -I"../../../Flume/Flume_AMR/lib/Radio" -I"../../../Flume/Flume_AMR/lib/PowerManagement" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\SAMD20_DFP\1.2.91\samd20\include" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\arm\cmsis\5.0.1\CMSIS\Include"  -O1 -ffunction-sections -fno-rtti -fno-exceptions -mlong-calls -g3 -Wall -mcpu=cortex-m0plus -c -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
 	@echo Finished building: $<
 	
 
 ./%.o: ../../../Flume/Flume_AMR/lib/Utils/%.cpp
 	@echo Building file: $<
-	@echo Invoking: ARM/GNU C Compiler : 6.2.1
-	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\arm\arm-gnu-toolchain\bin\arm-none-eabi-g++.exe$(QUOTE) -mthumb -D__SAMD20E18__ -DDEBUG -DF_CPU=48000000L -DARDUINO_ARCH_SAMD -DSAMD20 -DFLUME_BUILD_TYPE=1 -DSERIAL_EN=1 -DINT_DEBUG_EN=0 -DDEBUG_CONSOLE_EN=1 -DTIMERTEST_EN=0 -DUUID_BINLEN=8 -DFXOS_EN=1 -DFXOS_I2C_ADDR=0x1E -DFXOS_ODR=ODR_200HZ -DFXOS_OSR=MOSR_6 -DFXOS_SLEEP_OSR=MSOSR_4 -DFXOS_STREAMING=0 -DRX_NO_PROCESSES=0 -DFLASH_EN=1 -DLED_EN=1 -DRADIO_EN=0 -DRADIO_USE_WDT=1  -I"../../SAMD20E18/ArduinoCore/include/core" -I"../../SAMD20E18/ArduinoCore/include/core/avr" -I"../../SAMD20E18/ArduinoCore/include/core/samd20" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include/component" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include/instance" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include/pio" -I"../../SAMD20E18/ArduinoCore/include/libraries" -I"../../SAMD20E18/ArduinoCore/include/libraries/spi" -I"../../SAMD20E18/ArduinoCore/include/libraries/wire" -I"../../SAMD20E18/ArduinoCore/include/variants" -I"../../../Flume/Flume_AMR" -I"../../../Flume/Flume_AMR/lib/include" -I"../../../Flume/Flume_AMR/lib/Flume" -I"../../../Flume/Flume_AMR/lib/FXOS8700" -I"../../../Flume/Flume_AMR/lib/SPIFlash" -I"../../../Flume/Flume_AMR/lib/Commands" -I"../../../Flume/Flume_AMR/lib/CurrentValueTable" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\SAMD20_DFP\1.2.91\samd20\include" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\arm\cmsis\5.0.1\CMSIS\Include"  -O1 -ffunction-sections -fno-rtti -fno-exceptions -mlong-calls -g3 -Wall -mcpu=cortex-m0plus -c -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	@echo Invoking: ARM/GNU C Compiler : 6.3.1
+	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\arm\arm-gnu-toolchain\bin\arm-none-eabi-g++.exe$(QUOTE) -mthumb -D__SAMD20E18__ -DDEBUG -DF_CPU=48000000L -DARDUINO_ARCH_SAMD -DARDUINO -DSAMD20 -DFLUME_BUILD_TYPE=1 -DSERIAL_EN=1 -DINT_DEBUG_EN=0 -DDEBUG_CONSOLE_EN=1 -DTIMERTEST_EN=0 -DUUID_BINLEN=8 -DFXOS_EN=1 -DFXOS_I2C_ADDR=0x1E -DFXOS_ODR=ODR_200HZ -DFXOS_OSR=MOSR_6 -DFXOS_SLEEP_OSR=MSOSR_4 -DFXOS_STREAMING=0 -DRX_NO_PROCESSES=0 -DFLASH_EN=1 -DLED_EN=1 -DRADIO_EN=0 -DRADIO_USE_WDT=1  -DRADIO -DFREQUENCY=RADIO_915MHZ -DNODEID=3 -DNETWORKID=100 -DGATEWAYID=1 -DIS_RFM69HW=1 -DRADIO_WITHIRQS -DRADIO_ENABLE_MESSAGEQUEUE=1 -DSX1231_DEFAULTPROFILE=SX1231_PROFILE_55555 -DRADIO_ENABLE_PROFILE_200000=1 -DRADIO_ENABLE_PROFILE_55555=1 -DRADIO_ENABLE_PROFILE_19200=1 -DRADIO_ENABLE_PROFILE_9600=0 -DRADIO_ENABLE_PROFILE_4800=1 -DRADIO_ENABLE_PROFILE_2400=0 -DRADIO_ENABLE_PROFILE_1200=1 -DRADIO_ENABLE_HOPPING=1 -DRADIO_ENABLE_TDMA=1 -DRADIO_ENABLE_RTC=1 -DRADIO_HOP_DWELL=MILLIS_TO_STEPS(150U) -DRADIO_HOP_SILENT=MILLIS_TO_STEPS(5U) -DRADIO_HOP_CHANNELS=50 -DRADIO_HOP_SPACING=500000 -DRADIO_SYNC_DURATION_55555=20 -DRADIO_SYNC_DURATION_1200=80 -DRADIO_ENABLE_AGC=1 -DRADIO_ENABLE_AFC=1 -DRADIO_LOG_ENABLE_FLASH=0 -DRADIO_ENABLE_LOG=0 -DRADIO_LOG_ALL=0 -DRADIO_LOG_BINARY=0 -DRADIO_DUMP_CALIBRATION_TABLE=0  -I"../../SAMD20E18/ArduinoCore/include/core" -I"../../SAMD20E18/ArduinoCore/include/core/avr" -I"../../SAMD20E18/ArduinoCore/include/core/samd20" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include/component" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include/instance" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include/pio" -I"../../SAMD20E18/ArduinoCore/include/libraries" -I"../../SAMD20E18/ArduinoCore/include/libraries/spi" -I"../../SAMD20E18/ArduinoCore/include/libraries/EEPROM" -I"../../SAMD20E18/ArduinoCore/include/libraries/wire" -I"../../SAMD20E18/ArduinoCore/include/variants" -I"../../../Flume/Flume_AMR" -I"../../../Flume/Flume_AMR/lib/include" -I"../../../Flume/Flume_AMR/lib/Flume" -I"../../../Flume/Flume_AMR/lib/FXOS8700" -I"../../../Flume/Flume_AMR/lib/SPIFlash" -I"../../../Flume/Flume_AMR/lib/Commands" -I"../../../Flume/Flume_AMR/lib/CurrentValueTable" -I"../../../Flume/Flume_AMR/lib/Radio" -I"../../../Flume/Flume_AMR/lib/PowerManagement" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\SAMD20_DFP\1.2.91\samd20\include" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\arm\cmsis\5.0.1\CMSIS\Include"  -O1 -ffunction-sections -fno-rtti -fno-exceptions -mlong-calls -g3 -Wall -mcpu=cortex-m0plus -c -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
 	@echo Finished building: $<
 	
 
 ./%.o: ../../../Flume/Flume_AMR/src/%.cpp
 	@echo Building file: $<
-	@echo Invoking: ARM/GNU C Compiler : 6.2.1
-	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\arm\arm-gnu-toolchain\bin\arm-none-eabi-g++.exe$(QUOTE) -mthumb -D__SAMD20E18__ -DDEBUG -DF_CPU=48000000L -DARDUINO_ARCH_SAMD -DSAMD20 -DFLUME_BUILD_TYPE=1 -DSERIAL_EN=1 -DINT_DEBUG_EN=0 -DDEBUG_CONSOLE_EN=1 -DTIMERTEST_EN=0 -DUUID_BINLEN=8 -DFXOS_EN=1 -DFXOS_I2C_ADDR=0x1E -DFXOS_ODR=ODR_200HZ -DFXOS_OSR=MOSR_6 -DFXOS_SLEEP_OSR=MSOSR_4 -DFXOS_STREAMING=0 -DRX_NO_PROCESSES=0 -DFLASH_EN=1 -DLED_EN=1 -DRADIO_EN=0 -DRADIO_USE_WDT=1  -I"../../SAMD20E18/ArduinoCore/include/core" -I"../../SAMD20E18/ArduinoCore/include/core/avr" -I"../../SAMD20E18/ArduinoCore/include/core/samd20" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include/component" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include/instance" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include/pio" -I"../../SAMD20E18/ArduinoCore/include/libraries" -I"../../SAMD20E18/ArduinoCore/include/libraries/spi" -I"../../SAMD20E18/ArduinoCore/include/libraries/wire" -I"../../SAMD20E18/ArduinoCore/include/variants" -I"../../../Flume/Flume_AMR" -I"../../../Flume/Flume_AMR/lib/include" -I"../../../Flume/Flume_AMR/lib/Flume" -I"../../../Flume/Flume_AMR/lib/FXOS8700" -I"../../../Flume/Flume_AMR/lib/SPIFlash" -I"../../../Flume/Flume_AMR/lib/Commands" -I"../../../Flume/Flume_AMR/lib/CurrentValueTable" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\SAMD20_DFP\1.2.91\samd20\include" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\arm\cmsis\5.0.1\CMSIS\Include"  -O1 -ffunction-sections -fno-rtti -fno-exceptions -mlong-calls -g3 -Wall -mcpu=cortex-m0plus -c -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	@echo Invoking: ARM/GNU C Compiler : 6.3.1
+	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\arm\arm-gnu-toolchain\bin\arm-none-eabi-g++.exe$(QUOTE) -mthumb -D__SAMD20E18__ -DDEBUG -DF_CPU=48000000L -DARDUINO_ARCH_SAMD -DARDUINO -DSAMD20 -DFLUME_BUILD_TYPE=1 -DSERIAL_EN=1 -DINT_DEBUG_EN=0 -DDEBUG_CONSOLE_EN=1 -DTIMERTEST_EN=0 -DUUID_BINLEN=8 -DFXOS_EN=1 -DFXOS_I2C_ADDR=0x1E -DFXOS_ODR=ODR_200HZ -DFXOS_OSR=MOSR_6 -DFXOS_SLEEP_OSR=MSOSR_4 -DFXOS_STREAMING=0 -DRX_NO_PROCESSES=0 -DFLASH_EN=1 -DLED_EN=1 -DRADIO_EN=0 -DRADIO_USE_WDT=1  -DRADIO -DFREQUENCY=RADIO_915MHZ -DNODEID=3 -DNETWORKID=100 -DGATEWAYID=1 -DIS_RFM69HW=1 -DRADIO_WITHIRQS -DRADIO_ENABLE_MESSAGEQUEUE=1 -DSX1231_DEFAULTPROFILE=SX1231_PROFILE_55555 -DRADIO_ENABLE_PROFILE_200000=1 -DRADIO_ENABLE_PROFILE_55555=1 -DRADIO_ENABLE_PROFILE_19200=1 -DRADIO_ENABLE_PROFILE_9600=0 -DRADIO_ENABLE_PROFILE_4800=1 -DRADIO_ENABLE_PROFILE_2400=0 -DRADIO_ENABLE_PROFILE_1200=1 -DRADIO_ENABLE_HOPPING=1 -DRADIO_ENABLE_TDMA=1 -DRADIO_ENABLE_RTC=1 -DRADIO_HOP_DWELL=MILLIS_TO_STEPS(150U) -DRADIO_HOP_SILENT=MILLIS_TO_STEPS(5U) -DRADIO_HOP_CHANNELS=50 -DRADIO_HOP_SPACING=500000 -DRADIO_SYNC_DURATION_55555=20 -DRADIO_SYNC_DURATION_1200=80 -DRADIO_ENABLE_AGC=1 -DRADIO_ENABLE_AFC=1 -DRADIO_LOG_ENABLE_FLASH=0 -DRADIO_ENABLE_LOG=0 -DRADIO_LOG_ALL=0 -DRADIO_LOG_BINARY=0 -DRADIO_DUMP_CALIBRATION_TABLE=0  -I"../../SAMD20E18/ArduinoCore/include/core" -I"../../SAMD20E18/ArduinoCore/include/core/avr" -I"../../SAMD20E18/ArduinoCore/include/core/samd20" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include/component" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include/instance" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include/pio" -I"../../SAMD20E18/ArduinoCore/include/libraries" -I"../../SAMD20E18/ArduinoCore/include/libraries/spi" -I"../../SAMD20E18/ArduinoCore/include/libraries/EEPROM" -I"../../SAMD20E18/ArduinoCore/include/libraries/wire" -I"../../SAMD20E18/ArduinoCore/include/variants" -I"../../../Flume/Flume_AMR" -I"../../../Flume/Flume_AMR/lib/include" -I"../../../Flume/Flume_AMR/lib/Flume" -I"../../../Flume/Flume_AMR/lib/FXOS8700" -I"../../../Flume/Flume_AMR/lib/SPIFlash" -I"../../../Flume/Flume_AMR/lib/Commands" -I"../../../Flume/Flume_AMR/lib/CurrentValueTable" -I"../../../Flume/Flume_AMR/lib/Radio" -I"../../../Flume/Flume_AMR/lib/PowerManagement" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\SAMD20_DFP\1.2.91\samd20\include" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\arm\cmsis\5.0.1\CMSIS\Include"  -O1 -ffunction-sections -fno-rtti -fno-exceptions -mlong-calls -g3 -Wall -mcpu=cortex-m0plus -c -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
 	@echo Finished building: $<
 	
 
@@ -215,8 +306,8 @@ all: $(OUTPUT_FILE_PATH) $(ADDITIONAL_DEPENDENCIES)
 
 $(OUTPUT_FILE_PATH): $(OBJS) $(USER_OBJS) $(OUTPUT_FILE_DEP) $(LIB_DEP) $(LINKER_SCRIPT_DEP)
 	@echo Building target: $@
-	@echo Invoking: ARM/GNU Linker : 6.2.1
-	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\arm\arm-gnu-toolchain\bin\arm-none-eabi-g++.exe$(QUOTE) -o$(OUTPUT_FILE_PATH_AS_ARGS) $(OBJS_AS_ARGS) $(USER_OBJS) $(LIBS) -mthumb -Wl,-Map="TestApp.map" --specs=nosys.specs -Wl,--start-group -lm -lArduinoCore  -Wl,--end-group -L"..\\Device_Startup" -L"C:\Users\warre\Repositories\Arduino-SAMD20\SAMD20E18\ArduinoCore\Debug"  -Wl,--gc-sections -mcpu=cortex-m0plus -Tsamd20j18_flash.ld  
+	@echo Invoking: ARM/GNU Linker : 6.3.1
+	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\arm\arm-gnu-toolchain\bin\arm-none-eabi-g++.exe$(QUOTE) -o$(OUTPUT_FILE_PATH_AS_ARGS) $(OBJS_AS_ARGS) $(USER_OBJS) $(LIBS) -mthumb -Wl,-Map="TestApp.map" --specs=nosys.specs -Wl,--start-group -lm -lArduinoCore  -Wl,--end-group -L"..\\Device_Startup" -L"C:\Users\budge\Repositories\Arduino-SAMD20\SAMD20E18\ArduinoCore\Debug"  -Wl,--gc-sections -mcpu=cortex-m0plus -Tsamd20j18_flash.ld  
 	@echo Finished building target: $@
 	"C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\arm\arm-gnu-toolchain\bin\arm-none-eabi-objcopy.exe" -O binary "TestApp.elf" "TestApp.bin"
 	"C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\arm\arm-gnu-toolchain\bin\arm-none-eabi-objcopy.exe" -O ihex -R .eeprom -R .fuse -R .lock -R .signature  "TestApp.elf" "TestApp.hex"
