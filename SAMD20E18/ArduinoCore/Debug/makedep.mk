@@ -32,6 +32,8 @@ src\core\pulse_asm.S
 
 src\core\Reset.cpp
 
+src\core\RTC.c
+
 src\core\SERCOM.cpp
 
 src\core\startup.c

@@ -217,11 +217,12 @@ void SysTick_Handler(void)
   SysTick_DefaultHandler();
 }
 
-extern void RTC_DefaultHandler(void);
+/* Default RTC handler */
+extern void RTC_IRQHandler(void);
 
 void RTC_Handler(void)
 {
-  RTC_DefaultHandler();
+  RTC_IRQHandler();
 }
 
 #ifndef SAMD20

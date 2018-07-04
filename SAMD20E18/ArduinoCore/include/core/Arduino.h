@@ -79,6 +79,8 @@ void loop( void ) ;
   #include "pulse.h"
 #endif
 #include "delay.h"
+#include "clocks.h"
+#include "RTC.h"
 #ifdef __cplusplus
   #include "Uart.h"
 #endif

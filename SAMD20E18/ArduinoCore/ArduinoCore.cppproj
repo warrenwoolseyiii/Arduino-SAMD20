@@ -322,6 +322,9 @@
     <Compile Include="include\core\RingBuffer.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="include\core\RTC.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="include\core\samd20\clocks.h">
       <SubType>compile</SubType>
     </Compile>
@@ -692,6 +695,9 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="src\core\Reset.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\core\RTC.c">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="src\core\SERCOM.cpp">

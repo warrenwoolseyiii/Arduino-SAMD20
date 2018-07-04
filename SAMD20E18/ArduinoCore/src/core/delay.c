@@ -23,60 +23,8 @@
 extern "C" {
 #endif
 
-#define RTC_WAIT_SYNC while( RTC->MODE1.STATUS.bit.SYNCBUSY )
-
 /** Tick Counter united by ms */
 static volatile uint32_t _ulTickCount=0 ;
-static volatile uint32_t _rtcSec=0 ;
-
-void initRTC()
-{
-  GCLK->CLKCTRL.reg = GCLK_CLKCTRL_ID( GCM_RTC ) |
-  GCLK_CLKCTRL_GEN_GCLK2 |
-  GCLK_CLKCTRL_CLKEN;
-
-  while ( GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY );
-
-  disableRTC();
-
-  // Set the period up for 1024 counts timeout (1s)
-  RTC->MODE1.CTRL.bit.MODE = 1;
-  RTC_WAIT_SYNC;
-  RTC->MODE1.PER.reg = 1023;
-  RTC_WAIT_SYNC;
-  RTC->MODE1.INTENSET.bit.OVF = 1;
-  NVIC_EnableIRQ( RTC_IRQn );
-
-  // Enable the RTC in 16 bit counter mode
-  RTC->MODE1.CTRL.bit.ENABLE = 1;
-  RTC_WAIT_SYNC;
-}
-
-void disableRTC()
-{
-  RTC->MODE1.CTRL.bit.SWRST = 1;
-  while( RTC->MODE1.STATUS.bit.SYNCBUSY || RTC->MODE1.CTRL.bit.SWRST );
-  NVIC_DisableIRQ( RTC_IRQn );
-}
-
-uint32_t millisRTC()
-{
-  RTC->MODE1.READREQ.bit.RREQ = 1;
-  RTC_WAIT_SYNC;
-  uint16_t ticks = RTC->MODE1.COUNT.reg;
-  return ( _rtcSec << 10 ) | ticks;
-}
-
-uint32_t secondsRTC()
-{
-  return _rtcSec;
-}
-
-void RTC_DefaultHandler()
-{
-  _rtcSec++;
-  RTC->MODE1.INTFLAG.bit.OVF = 1;
-}
 
 unsigned long millis( void )
 {

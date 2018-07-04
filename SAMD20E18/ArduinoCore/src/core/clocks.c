@@ -63,8 +63,10 @@ int8_t initClkGenerator( uint32_t clkSrc, uint32_t id, uint32_t div,
 
 void disableClkGenerator( uint32_t id )
 {
-  if( id <= GCLK_GENDIV_ID_GCLK7_Val )
+  if( id <= GCLK_GENDIV_ID_GCLK7_Val ) {
     GCLK->GENCTRL.reg = GCLK_GENCTRL_ID( id );
+    GCLK_WAIT_SYNC;
+  }
 
   return;
 }
@@ -80,6 +82,14 @@ int8_t initGenericClk( uint32_t genClk, uint32_t id )
   GCLK_WAIT_SYNC;
 
   return 0;
+}
+
+void disableGenericClk( uint32_t id )
+{
+  if( id <= GCLK_CLKCTRL_ID_PTC_Val ) {
+    GCLK->CLKCTRL.reg = GCLK_CLKCTRL_ID( id );
+    GCLK_WAIT_SYNC;
+  }
 }
 
 void initXOSC32()

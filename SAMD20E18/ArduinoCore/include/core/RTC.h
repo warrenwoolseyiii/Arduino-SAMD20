@@ -15,28 +15,26 @@
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-#ifndef CLOCKS_H_
-#define CLOCKS_H_
+#ifndef RTC_H_
+#define RTC_H_
+
+#include <stdint.h>
+
+#define RTC_STEPS_PER_SEC               32768ul
+#define RTC_ROUGH_STEPS_TO_MILLIS( x )   ( x >> 5 )
+#define RTC_ROUGH_STEPS_TO_MICROS( x )  ( x << 5 )
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void resetGCLK();
-int8_t initClkGenerator( uint32_t clkSrc, uint32_t id, uint32_t div, 
-                          uint8_t runInStdBy, uint8_t outPutToPin );
-void disableClkGenerator( uint32_t id );
-int8_t initGenericClk( uint32_t genClk, uint32_t id );
-void disableGenericClk( uint32_t id );
-void initXOSC32();
-void initOSC23K();
-void initDFLL48( uint32_t sourceFreq );
-void disableDFLL48();
-int8_t initOSC8M( uint32_t divBits );
-void disableOSC8M();
+void initRTC();
+void disableRTC();
+uint32_t stepsRTC();
+uint32_t secondsRTC();
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* CLOCKS_H_ */
+#endif /* RTC_H_ */
