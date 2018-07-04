@@ -20,6 +20,7 @@
 
 #define GCLK_WAIT_SYNC          while( GCLK->STATUS.bit.SYNCBUSY )
 #define SYSCTRL_DFLL_WAIT_SYNC  while ( !SYSCTRL->PCLKSR.bit.DFLLRDY )
+#define SYSCTRL_OSC8M_WAIT_SYNC while( !SYSCTRL->PCLKSR.bit.OSC8MRDY );
 
 void resetGCLK()
 {
@@ -106,11 +107,6 @@ void initOSC23K()
   while ( !SYSCTRL->PCLKSR.bit.OSC32KRDY );
 }
 
-void disableOSCULP32K()
-{
-  // TODO:
-}
-
 void initDFLL48( uint32_t sourceFreq )
 {
   // DFLL Configuration in Closed Loop mode, cf product datasheet chapter 15.6.7.1 - Closed-Loop Operation
@@ -152,6 +148,7 @@ int8_t initOSC8M( uint32_t divBits )
   SYSCTRL->OSC8M.bit.ONDEMAND = 0;
   SYSCTRL->OSC8M.bit.PRESC = divBits;
   SYSCTRL->OSC8M.bit.ENABLE = 1;
+  SYSCTRL_OSC8M_WAIT_SYNC;
 
   return 0;
 }
