@@ -34,11 +34,12 @@ void printRTC()
 void setup()
 {
   initClkOut();
-  initRTC();
   Serial.begin(9600);
 }
 
 void loop()
 {
-
+  printRTC();
+  delay( 500 );
+  delay( 0 );
 }

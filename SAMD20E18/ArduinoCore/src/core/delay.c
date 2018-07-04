@@ -26,63 +26,23 @@ extern "C" {
 /** Tick Counter united by ms */
 static volatile uint32_t _ulTickCount=0 ;
 
-unsigned long millis( void )
+uint32_t millis()
 {
-// todo: ensure no interrupts
-  return _ulTickCount ;
+  return RTC_ROUGH_STEPS_TO_MILLIS( stepsRTC() );
 }
 
-// Interrupt-compatible version of micros
-// Theory: repeatedly take readings of SysTick counter, millis counter and SysTick interrupt pending flag.
-// When it appears that millis counter and pending is stable and SysTick hasn't rolled over, use these
-// values to calculate micros. If there is a pending SysTick, add one to the millis counter in the calculation.
-unsigned long micros( void )
+uint32_t micros()
 {
-  uint32_t ticks, ticks2;
-  uint32_t pend, pend2;
-  uint32_t count, count2;
-
-  ticks2  = SysTick->VAL;
-  pend2   = !!(SCB->ICSR & SCB_ICSR_PENDSTSET_Msk)  ;
-  count2  = _ulTickCount ;
-
-  do
-  {
-    ticks=ticks2;
-    pend=pend2;
-    count=count2;
-    ticks2  = SysTick->VAL;
-    pend2   = !!(SCB->ICSR & SCB_ICSR_PENDSTSET_Msk)  ;
-    count2  = _ulTickCount ;
-  } while ((pend != pend2) || (count != count2) || (ticks < ticks2));
-
-  return ((count+pend) * 1000) + (((SysTick->LOAD  - ticks)*(1048576/(VARIANT_MCK/1000000)))>>20) ;
-  // this is an optimization to turn a runtime division into two compile-time divisions and
-  // a runtime multiplication and shift, saving a few cycles
+  return RTC_ROUGH_STEPS_TO_MICROS( stepsRTC() );  
 }
 
-void delay( unsigned long ms )
+void delay( uint32_t ms )
 {
-  if ( ms == 0 )
-  {
-    return ;
-  }
+  uint32_t start = millis();
 
-  uint32_t start = _ulTickCount ;
-
-  do
-  {
+  do {
     yield() ;
-  } while ( _ulTickCount - start < ms ) ;
-}
-
-#include "Reset.h" // for tickReset()
-
-void SysTick_DefaultHandler(void)
-{
-  // Increment tick count each ms
-  _ulTickCount++;
-  tickReset();
+  } while ( millis() - start < ms ) ;
 }
 
 #ifdef __cplusplus

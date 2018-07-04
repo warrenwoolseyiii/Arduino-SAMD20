@@ -21,8 +21,10 @@
 #include <stdint.h>
 
 #define RTC_STEPS_PER_SEC               32768ul
-#define RTC_ROUGH_STEPS_TO_MILLIS( x )   ( x >> 5 )
+#define RTC_ROUGH_STEPS_TO_MILLIS( x )  ( x >> 5 )
+#define RTC_ROUGH_MILLIS_TO_STEPS( x )  ( x << 5 )
 #define RTC_ROUGH_STEPS_TO_MICROS( x )  ( x << 5 )
+#define RTC_ROUGH_MICROS_TO_STEPS( x )  ( x >> 5 )
 
 #ifdef __cplusplus
 extern "C" {

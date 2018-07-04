@@ -233,24 +233,6 @@ void disableDAC()
   PM->APBCMASK.reg &= ~PM_APBCMASK_DAC;
 }
 
-int8_t enableSysTick()
-{
-  int8_t rtn = 0;
-  // Set Systick to 1ms interval, common to all Cortex-M variants
-  // set Priority for Systick Interrupt (2nd lowest)
-  if ( !SysTick_Config( SystemCoreClock / 1000 ) )
-    NVIC_SetPriority (SysTick_IRQn,  (1 << __NVIC_PRIO_BITS) - 2);
-  else
-    rtn = 1;
-  return rtn;
-}
-
-void disableSysTick()
-{
-  SysTick->CTRL &= ~( SysTick_CTRL_TICKINT_Msk | SysTick_CTRL_ENABLE_Msk );
-  SCB->ICSR |= ( SCB_ICSR_PENDSTCLR_Msk );
-}
-
 /*
  * Arduino Zero board initialization
  *
@@ -261,8 +243,7 @@ void disableSysTick()
  */
 void init( void )
 {
-  if( enableSysTick() )
-    while( 1 );
+  initRTC();
 
   enableADC();
   enableDAC();
