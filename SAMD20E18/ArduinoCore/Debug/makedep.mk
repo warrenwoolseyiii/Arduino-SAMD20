@@ -6,6 +6,8 @@ src\core\abi.cpp
 
 src\core\avr\dtostrf.c
 
+src\core\clocks.c
+
 src\core\cortex_handlers.c
 
 src\core\delay.c

@@ -5,7 +5,7 @@ VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{E66E83B9-2572-4076-B26E-6BE79FF3018A}") = "ArduinoCore", "SAMD20E18\ArduinoCore\ArduinoCore.cppproj", "{016014D1-F9BF-4234-A4E2-6B9378353220}"
 EndProject
-Project("{E66E83B9-2572-4076-B26E-6BE79FF3018A}") = "TestApp", "TestApp\TestApp.cppproj", "{DCE6C7E3-EE26-4D79-826B-08594B9AD897}"
+Project("{E66E83B9-2572-4076-B26E-6BE79FF3018A}") = "Drivers", "Drivers\Drivers.cppproj", "{DCE6C7E3-EE26-4D79-826B-08594B9AD897}"
 	ProjectSection(ProjectDependencies) = postProject
 		{016014D1-F9BF-4234-A4E2-6B9378353220} = {016014D1-F9BF-4234-A4E2-6B9378353220}
 	EndProjectSection

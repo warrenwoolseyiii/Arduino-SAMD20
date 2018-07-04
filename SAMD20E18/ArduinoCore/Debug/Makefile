@@ -63,6 +63,7 @@ SUBDIRS :=  \
 C_SRCS +=  \
 ../src/core/abi.cpp \
 ../src/core/avr/dtostrf.c \
+../src/core/clocks.c \
 ../src/core/cortex_handlers.c \
 ../src/core/delay.c \
 ../src/core/hooks.c \
@@ -105,6 +106,7 @@ ASM_SRCS +=
 OBJS +=  \
 src/core/abi.o \
 src/core/avr/dtostrf.o \
+src/core/clocks.o \
 src/core/cortex_handlers.o \
 src/core/delay.o \
 src/core/hooks.o \
@@ -140,6 +142,7 @@ src/variants/variant.o
 OBJS_AS_ARGS +=  \
 src/core/abi.o \
 src/core/avr/dtostrf.o \
+src/core/clocks.o \
 src/core/cortex_handlers.o \
 src/core/delay.o \
 src/core/hooks.o \
@@ -175,6 +178,7 @@ src/variants/variant.o
 C_DEPS +=  \
 src/core/abi.d \
 src/core/avr/dtostrf.d \
+src/core/clocks.d \
 src/core/cortex_handlers.d \
 src/core/delay.d \
 src/core/hooks.d \
@@ -210,6 +214,7 @@ src/variants/variant.d
 C_DEPS_AS_ARGS +=  \
 src/core/abi.d \
 src/core/avr/dtostrf.d \
+src/core/clocks.d \
 src/core/cortex_handlers.d \
 src/core/delay.d \
 src/core/hooks.d \
@@ -256,6 +261,8 @@ LINKER_SCRIPT_DEP+=
 
 
 # AVR32/GNU C Compiler
+
+
 
 
 

@@ -18,6 +18,7 @@
 
 #include "sam.h"
 #include "variant.h"
+#include "clocks.h"
 
 #include <stdio.h>
 
@@ -44,46 +45,15 @@
 // Constants for Clock multiplexers
 #define GENERIC_CLOCK_MULTIPLEXER_DFLL48M (0u)
 
+#ifndef TRUE
+#define TRUE 1
+#endif
+#ifndef FALSE
+#define FALSE 0
+#endif
+
 #define GCLK_WAIT_SYNC          while( GCLK->STATUS.bit.SYNCBUSY )
 #define SYSCTRL_DFLL_WAIT_SYNC  while ( !SYSCTRL->PCLKSR.bit.DFLLRDY )
-
-inline void resetGCLK()
-{
-  PM->APBAMASK.reg |= PM_APBAMASK_GCLK;
-  GCLK->CTRL.reg = GCLK_CTRL_SWRST;
-
-  while( ( GCLK->CTRL.bit.SWRST ) && ( GCLK->STATUS.bit.SYNCBUSY ) );
-}
-
-inline void initXOSC32()
-{
-  // Longest start up time, run in stand by
-  SYSCTRL->XOSC32K.reg = SYSCTRL_XOSC32K_STARTUP( 0x7u ) 
-    | SYSCTRL_XOSC32K_XTALEN 
-    | SYSCTRL_XOSC32K_EN32K 
-    | SYSCTRL_XOSC32K_RUNSTDBY;
-  SYSCTRL->XOSC32K.bit.ENABLE = 1;  // Set in a separate call as called out in 16.6.3
-
-  while ( !SYSCTRL->PCLKSR.bit.XOSC32KRDY );
-}
-
-inline void initOSC23K()
-{
-
-#ifndef SAMD20
-  uint32_t calib = (*((uint32_t *) FUSES_OSC32K_CAL_ADDR) & FUSES_OSC32K_CAL_Msk) >> FUSES_OSC32K_CAL_Pos;
-#else
-#define FUSES_OSC32K_CAL_ADDR (uint32_t)(0x806020 + 38) // SAMD20 data sheet section 9.5, table 9-4
-  uint32_t calib = (*((uint32_t *) FUSES_OSC32K_CAL_ADDR) & 0x00FFFFFF);
-#endif /* SAMD20 */
-
-  SYSCTRL->OSC32K.reg = SYSCTRL_OSC32K_CALIB( calib ) 
-    | SYSCTRL_OSC32K_STARTUP( 0x7u ) // cf table 15.10 of product data sheet in chapter 15.8.6
-    | SYSCTRL_OSC32K_EN32K
-    | SYSCTRL_OSC32K_ENABLE;
-
-  while ( !SYSCTRL->PCLKSR.bit.OSC32KRDY ); 
-}
 
 inline void loadADCFactoryCal()
 {
@@ -394,134 +364,44 @@ inline void LowPowerSysInit( void )
       -> Freq = 32768 Hz
       -> Runs in stand by
  */
-  // Set the divider to 0
-  GCLK->GENDIV.reg = GCLK_GENDIV_ID( 1u );
-  GCLK_WAIT_SYNC;
-
-  GCLK->GENCTRL.reg = GCLK_GENCTRL_ID( 1u )
-#if defined(CRYSTALLESS)
-    | GCLK_GENCTRL_SRC_OSC32K
-#else
-    | GCLK_GENCTRL_SRC_XOSC32K
-#endif /* CRYSTALLESS */
-    | GCLK_GENCTRL_RUNSTDBY
-    | GCLK_GENCTRL_GENEN;
-
-  GCLK_WAIT_SYNC;
+  initClkGenerator( GCLK_GENCTRL_SRC_XOSC32K_Val, GCLK_GENDIV_ID_GCLK1_Val, 
+    0, TRUE, TRUE );
 
 /* ----------------------------------------------------------------------------------------------
  * 3) Put 32K as source of Generic Clock Generator 2 
       -> Freq = 1024 Hz
       -> Runs in stand by
  */
-  // Set the divider to 32, which gives us 1024 output 
-  GCLK->GENDIV.reg = GCLK_GENDIV_ID( 2u ) | GCLK_GENDIV_DIV( 0x04 );
-  GCLK_WAIT_SYNC;
+  initClkGenerator( GCLK_GENCTRL_SRC_XOSC32K_Val, GCLK_GENDIV_ID_GCLK2_Val,
+    0x04, TRUE, TRUE );
 
-  GCLK->GENCTRL.reg = GCLK_GENCTRL_ID( 2u )
-#if defined(CRYSTALLESS)
-    | GCLK_GENCTRL_SRC_OSC32K
-#else
-    | GCLK_GENCTRL_SRC_XOSC32K
-#endif /* CRYSTALLESS */
-    | GCLK_GENCTRL_DIVSEL
-    | GCLK_GENCTRL_RUNSTDBY
-    | GCLK_GENCTRL_GENEN;
-
-  GCLK_WAIT_SYNC;
-
-/* ----------------------------------------------------------------------------------------------
- * 4) Put Generic Clock Generator 1 as source for Generic Clock Multiplexer 0 (DFLL48M reference)
- */
-  GCLK->CLKCTRL.reg = GCLK_CLKCTRL_ID( 0u ) | GCLK_CLKCTRL_GEN_GCLK1 | GCLK_CLKCTRL_CLKEN;
-  GCLK_WAIT_SYNC;
-
-/* ----------------------------------------------------------------------------------------------
- * 5) Enable DFLL48M clock
-      -> Freq = VARIANT_MCK (defined in variant.h)
-      -> Does not run in stand by
- */
-  // DFLL Configuration in Closed Loop mode, cf product datasheet chapter 15.6.7.1 - Closed-Loop Operation
-  // Remove the OnDemand mode, Bug http://avr32.icgroup.norway.atmel.com/bugzilla/show_bug.cgi?id=9905
-  SYSCTRL->DFLLCTRL.reg = SYSCTRL_DFLLCTRL_ENABLE;
-  SYSCTRL_DFLL_WAIT_SYNC;
-
-  SYSCTRL->DFLLMUL.reg = SYSCTRL_DFLLMUL_CSTEP( 31 )        // Coarse step is 31, half of the max value
-    | SYSCTRL_DFLLMUL_FSTEP( 511 )                          // Fine step is 511, half of the max value
-    | SYSCTRL_DFLLMUL_MUL( VARIANT_MCK / VARIANT_MAINOSC ); // External 32KHz is the reference
-
-  SYSCTRL_DFLL_WAIT_SYNC;
-
-#if defined(CRYSTALLESS)
-#define NVM_SW_CALIB_DFLL48M_COARSE_VAL 58
-  // Load factory coarse DFLL value
-  uint32_t coarse =( *((uint32_t *)(NVMCTRL_OTP4) + (NVM_SW_CALIB_DFLL48M_COARSE_VAL / 32)) >> (NVM_SW_CALIB_DFLL48M_COARSE_VAL % 32) )
-                   & ((1 << 6) - 1);
-  if (coarse == 0x3f) {
-    coarse = 0x1f;
-  }
-  // TODO(tannewt): Load this value from memory we've written previously. There
-  // isn't a value from the Atmel factory.
-  uint32_t fine = 0x1ff;
-
-  SYSCTRL->DFLLVAL.bit.COARSE = coarse;
-  SYSCTRL->DFLLVAL.bit.FINE = fine;
-  SYSCTRL->DFLLMUL.reg = SYSCTRL_DFLLMUL_CSTEP( 0x1f / 4 ) | // Coarse step is 31, half of the max value
-                         SYSCTRL_DFLLMUL_FSTEP( 10 ) |
-                         SYSCTRL_DFLLMUL_MUL( (48000) ) ;
-
-  SYSCTRL->DFLLCTRL.reg = 0;
-  SYSCTRL_DFLL_WAIT_SYNC;
-
-  SYSCTRL->DFLLCTRL.reg =  SYSCTRL_DFLLCTRL_MODE
-    | SYSCTRL_DFLLCTRL_CCDIS
-#ifndef SAMD20
-    | SYSCTRL_DFLLCTRL_USBCRM
-    | SYSCTRL_DFLLCTRL_BPLCKC
-#endif /* SAMD20 */
-    ;
-
-  SYSCTRL_DFLL_WAIT_SYNC;
-
-  SYSCTRL->DFLLCTRL.reg |= SYSCTRL_DFLLCTRL_ENABLE ;
-#else   // has crystal
-  // Run in closed-loop mode, disable quick lock
-  SYSCTRL->DFLLCTRL.reg |= SYSCTRL_DFLLCTRL_MODE
-#ifndef SAMD20
-    | SYSCTRL_DFLLCTRL_WAITLOCK
-#endif /* SAMD20 */
-    | SYSCTRL_DFLLCTRL_QLDIS;
-
-  SYSCTRL_DFLL_WAIT_SYNC;
-
-  // Enable and wait for lock
-  SYSCTRL->DFLLCTRL.reg |= SYSCTRL_DFLLCTRL_ENABLE;
-  while ( (SYSCTRL->PCLKSR.reg & SYSCTRL_PCLKSR_DFLLLCKC) == 0 ||
-          (SYSCTRL->PCLKSR.reg & SYSCTRL_PCLKSR_DFLLLCKF) == 0 );
-#endif /* CRYSTALLESS */
-
-  SYSCTRL_DFLL_WAIT_SYNC;
+///* ----------------------------------------------------------------------------------------------
+ //* 4) Put Generic Clock Generator 1 as source for Generic Clock Multiplexer 0 (DFLL48M reference)
+ //*/
+  //initGenericClk( GCLK_CLKCTRL_GEN_GCLK1_Val, GCLK_CLKCTRL_ID_DFLL48M_Val );
+//
+///* ----------------------------------------------------------------------------------------------
+ //* 5) Enable DFLL48M clock
+      //-> Freq = VARIANT_MCK (defined in variant.h)
+      //-> Does not run in stand by
+ //*/
+  //initDFLL48( VARIANT_MAINOSC );
+//
+///* ----------------------------------------------------------------------------------------------
+ //* 6) Switch Generic Clock Generator 0 to DFLL48M. CPU will run at 48MHz.
+ //*/
+  //initClkGenerator( GCLK_GENCTRL_SRC_DFLL48M_Val, GCLK_GENDIV_ID_GCLK0_Val,
+    //0, FALSE, TRUE );
+//
+  //SystemCoreClock = VARIANT_MCK;
 
 /* ----------------------------------------------------------------------------------------------
- * 6) Switch Generic Clock Generator 0 to DFLL48M. CPU will run at 48MHz.
+ * 7) Enable the OSC8M
  */
-  // Set the divider to 0
-  GCLK->GENDIV.reg = GCLK_GENDIV_ID( 0u );
-  GCLK_WAIT_SYNC;
-
-  // Source is DFLL48M, 50% duty cycle
-  GCLK->GENCTRL.reg = GCLK_GENCTRL_ID( 0u ) 
-    | GCLK_GENCTRL_SRC_DFLL48M 
-    | GCLK_GENCTRL_IDC
-    | GCLK_GENCTRL_GENEN;
-
-  GCLK_WAIT_SYNC;
-  SystemCoreClock = VARIANT_MCK;
-
-/* ----------------------------------------------------------------------------------------------
- * 7) Disable the OSC8M
- */
-   SYSCTRL->OSC8M.bit.ENABLE = 0;
+  initOSC8M( 0x0 );
+  initClkGenerator( GCLK_GENCTRL_SRC_OSC8M_Val, GCLK_GENDIV_ID_GCLK0_Val,
+    0, FALSE, TRUE );
+  SystemCoreClock = 8000000ul;
 
 /* ----------------------------------------------------------------------------------------------
  * 8) Load ADC factory calibration values

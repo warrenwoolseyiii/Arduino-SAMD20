@@ -267,7 +267,7 @@ void init( void )
   enableADC();
   enableDAC();
 
-  // Setup all pins (digital and analog) in INPUT mode (default is nothing)
+  /* Setup all pins (digital and analog) in INPUT mode (default is nothing) */
   for (uint32_t ul = 0 ; ul < NUM_DIGITAL_PINS ; ul++ )
   {
     pinMode( ul, INPUT ) ;
