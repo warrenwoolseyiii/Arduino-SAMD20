@@ -46,6 +46,8 @@ src\core\Tone.cpp
 
 src\core\Uart.cpp
 
+src\core\WDT.c
+
 src\core\WInterrupts.c
 
 src\core\wiring.c

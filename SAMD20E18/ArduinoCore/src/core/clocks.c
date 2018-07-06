@@ -17,9 +17,10 @@
 */
 
 #include "sam.h"
+#include "clocks.h"
 
 #define GCLK_WAIT_SYNC          while( GCLK->STATUS.bit.SYNCBUSY )
-#define SYSCTRL_DFLL_WAIT_SYNC  while ( !SYSCTRL->PCLKSR.bit.DFLLRDY )
+#define SYSCTRL_DFLL_WAIT_SYNC  while( !SYSCTRL->PCLKSR.bit.DFLLRDY )
 #define SYSCTRL_OSC8M_WAIT_SYNC while( !SYSCTRL->PCLKSR.bit.OSC8MRDY );
 
 void resetGCLK()
@@ -90,6 +91,33 @@ void disableGenericClk( uint32_t id )
     GCLK->CLKCTRL.reg = GCLK_CLKCTRL_ID( id );
     GCLK_WAIT_SYNC;
   }
+}
+
+void enableAPBAClk( uint32_t item, uint8_t enable ) 
+{
+  item &= PM_APBAMASK_MASK;
+  if( enable )
+    PM->APBAMASK.reg |= item;
+  else
+    PM->APBAMASK.reg &= ~( item );
+}
+
+void enableAPBBClk( uint32_t item, uint8_t enable )
+{
+  item &= PM_APBBMASK_MASK;
+  if( enable )
+    PM->APBBMASK.reg |= item;
+  else
+    PM->APBBMASK.reg &= ~( item );
+}
+
+void enableAPBCClk( uint32_t item, uint8_t enable )
+{
+  item &= PM_APBCMASK_MASK;
+  if( enable )
+    PM->APBCMASK.reg |= item;
+  else
+    PM->APBCMASK.reg &= ~( item );
 }
 
 void initXOSC32()

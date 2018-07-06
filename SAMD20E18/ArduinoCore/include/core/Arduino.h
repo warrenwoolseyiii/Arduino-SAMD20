@@ -81,6 +81,7 @@ void loop( void ) ;
 #include "delay.h"
 #include "clocks.h"
 #include "RTC.h"
+#include "WDT.h"
 #ifdef __cplusplus
   #include "Uart.h"
 #endif

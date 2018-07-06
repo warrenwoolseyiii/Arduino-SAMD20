@@ -81,6 +81,7 @@ C_SRCS +=  \
 ../src/core/TimerCounter.cpp \
 ../src/core/Tone.cpp \
 ../src/core/Uart.cpp \
+../src/core/WDT.c \
 ../src/core/WInterrupts.c \
 ../src/core/wiring.c \
 ../src/core/wiring_analog.c \
@@ -127,6 +128,7 @@ src/core/Stream.o \
 src/core/TimerCounter.o \
 src/core/Tone.o \
 src/core/Uart.o \
+src/core/WDT.o \
 src/core/WInterrupts.o \
 src/core/wiring.o \
 src/core/wiring_analog.o \
@@ -164,6 +166,7 @@ src/core/Stream.o \
 src/core/TimerCounter.o \
 src/core/Tone.o \
 src/core/Uart.o \
+src/core/WDT.o \
 src/core/WInterrupts.o \
 src/core/wiring.o \
 src/core/wiring_analog.o \
@@ -201,6 +204,7 @@ src/core/Stream.d \
 src/core/TimerCounter.d \
 src/core/Tone.d \
 src/core/Uart.d \
+src/core/WDT.d \
 src/core/WInterrupts.d \
 src/core/wiring.d \
 src/core/wiring_analog.d \
@@ -238,6 +242,7 @@ src/core/Stream.d \
 src/core/TimerCounter.d \
 src/core/Tone.d \
 src/core/Uart.d \
+src/core/WDT.d \
 src/core/WInterrupts.d \
 src/core/wiring.d \
 src/core/wiring_analog.d \
@@ -266,6 +271,8 @@ LINKER_SCRIPT_DEP+=
 
 
 # AVR32/GNU C Compiler
+
+
 
 
 

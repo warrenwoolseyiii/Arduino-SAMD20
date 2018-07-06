@@ -583,6 +583,9 @@
     <Compile Include="include\core\samd20\TimerCounter.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="include\core\samd20\WDT.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="include\core\SERCOM.h">
       <SubType>compile</SubType>
     </Compile>
@@ -716,6 +719,9 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="src\core\Uart.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\core\WDT.c">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="src\core\WInterrupts.c">

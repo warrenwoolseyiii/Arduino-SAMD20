@@ -24,22 +24,29 @@ void printRTC()
   Serial.print( "Steps: " );
   Serial.println( steps );
   Serial.print( "Micros: " );
-  Serial.println( RTC_ROUGH_STEPS_TO_MICROS( steps ) );
+  Serial.println( micros() );
   Serial.print( "Millis: " );
-  Serial.println( RTC_ROUGH_STEPS_TO_MILLIS( steps ) );
+  Serial.println( millis() );
   Serial.print( "Sec: " );
   Serial.println( secondsRTC() );
 }
 
+void testWDTReset()
+{
+  if( millis() > 12000 )
+    resetCPU();
+}
+
 void setup()
 {
+  initWDT( WDT_CONFIG_PER_4K_Val );
   initClkOut();
   Serial.begin(9600);
 }
 
 void loop()
 {
+  clearWDT();
   printRTC();
-  delay( 500 );
-  delay( 0 );
+  delay( 2000 );
 }
