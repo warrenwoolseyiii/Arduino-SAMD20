@@ -37,16 +37,32 @@ void testWDTReset()
     resetCPU();
 }
 
+void testNVMFlash()
+{
+  uint8_t buff[256];
+  for( uint16_t i = 0; i < 256; i++ )
+    buff[i] = i & 0xFF;
+
+  eraseRow( 0x10000 );
+  readFlash( (void *)0x10000, buff, 256 );
+
+  for( uint16_t i = 0; i < 256; i++ )
+    buff[i] = i & 0xFF;
+  writeFlash( (void *)0x10000, buff, 256 );
+  
+  memset( buff, 0, 256 );
+  readFlash( (void *)0x10000, buff, 256 );
+}
+
 void setup()
 {
   initWDT( WDT_CONFIG_PER_4K_Val );
   initClkOut();
-  Serial.begin(9600);
+  Serial.begin( 9600 );
 }
 
 void loop()
 {
+  //testNVMFlash();
   clearWDT();
-  printRTC();
-  delay( 2000 );
 }

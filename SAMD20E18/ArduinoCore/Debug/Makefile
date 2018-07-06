@@ -71,6 +71,7 @@ C_SRCS +=  \
 ../src/core/itoa.c \
 ../src/core/main.cpp \
 ../src/core/new.cpp \
+../src/core/NVM.c \
 ../src/core/Print.cpp \
 ../src/core/pulse.c \
 ../src/core/Reset.cpp \
@@ -116,6 +117,7 @@ src/core/IPAddress.o \
 src/core/itoa.o \
 src/core/main.o \
 src/core/new.o \
+src/core/NVM.o \
 src/core/PreprocessingAssembly/pulse_asm.o \
 src/core/Print.o \
 src/core/pulse.o \
@@ -154,6 +156,7 @@ src/core/IPAddress.o \
 src/core/itoa.o \
 src/core/main.o \
 src/core/new.o \
+src/core/NVM.o \
 src/core/PreprocessingAssembly/pulse_asm.o \
 src/core/Print.o \
 src/core/pulse.o \
@@ -192,6 +195,7 @@ src/core/IPAddress.d \
 src/core/itoa.d \
 src/core/main.d \
 src/core/new.d \
+src/core/NVM.d \
 src/core/PreprocessingAssembly/pulse_asm.d \
 src/core/Print.d \
 src/core/pulse.d \
@@ -230,6 +234,7 @@ src/core/IPAddress.d \
 src/core/itoa.d \
 src/core/main.d \
 src/core/new.d \
+src/core/NVM.d \
 src/core/PreprocessingAssembly/pulse_asm.d \
 src/core/Print.d \
 src/core/pulse.d \
@@ -271,6 +276,8 @@ LINKER_SCRIPT_DEP+=
 
 
 # AVR32/GNU C Compiler
+
+
 
 
 

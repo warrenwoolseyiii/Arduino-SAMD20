@@ -82,6 +82,7 @@ void loop( void ) ;
 #include "clocks.h"
 #include "RTC.h"
 #include "WDT.h"
+#include "NVM.h"
 #ifdef __cplusplus
   #include "Uart.h"
 #endif

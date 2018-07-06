@@ -22,6 +22,8 @@ src\core\main.cpp
 
 src\core\new.cpp
 
+src\core\NVM.c
+
 src\core\PreprocessingAssembly\pulse_asm.S
 
 src\core\Print.cpp

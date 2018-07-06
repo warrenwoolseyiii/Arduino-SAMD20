@@ -48,6 +48,13 @@ void initWDT( uint32_t wdtPeriod )
   enableWDT();
 }
 
+void endWDT()
+{
+  disableWDT();
+  enableAPBAClk( PM_APBAMASK_WDT, 0 );
+  disableGenericClk( GCLK_CLKCTRL_ID_WDT_Val );
+}
+
 void enableWDT()
 {
   WDT->CTRL.bit.ENABLE = 1;

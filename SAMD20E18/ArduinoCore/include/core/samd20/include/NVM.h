@@ -15,8 +15,8 @@
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-#ifndef WDT_H_
-#define WDT_H_
+#ifndef NVM_H_
+#define NVM_H_
 
 #include <stdint.h>
 
@@ -24,15 +24,16 @@
 extern "C" {
 #endif
 
-void initWDT( uint32_t wdtPeriod );
-void endWDT();
-void enableWDT();
-void disableWDT();
-void clearWDT();
-void resetCPU();
+void enableNVMCtrl();
+void disableNVMCtrl();
+void getNVMParams();
+void handleNVMError();
+void eraseRow( uint32_t addr );
+void writeFlash( const volatile void *flash_ptr, const void *data, uint32_t size );
+void readFlash( const volatile void *flash_ptr, void *data, uint32_t size );
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* WDT_H_ */
+#endif /* NVM_H_ */

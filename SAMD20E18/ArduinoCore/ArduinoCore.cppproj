@@ -469,6 +469,9 @@
     <Compile Include="include\core\samd20\include\instance\wdt.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="include\core\samd20\include\NVM.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="include\core\samd20\include\pio\samd20e14.h">
       <SubType>compile</SubType>
     </Compile>
@@ -683,6 +686,9 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="src\core\new.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\core\NVM.c">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="src\core\PreprocessingAssembly\pulse_asm.S">
