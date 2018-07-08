@@ -31,11 +31,7 @@
 }
 
 uint8_t _paramsLoaded = 0;
-uint32_t _bootLen = 0;
-uint32_t _progMemLen = 0;
-uint32_t _eepromLen = 0;
-uint32_t _nvmSize = 0;
-uint32_t _pageSize = 0;
+NVMParams_t _params;
 
 void enableNVMCtrl()
 {
@@ -47,7 +43,7 @@ void disableNVMCtrl()
   enableAPBBClk( PM_APBBMASK_NVMCTRL, 0 );
 }
 
-void getNVMParams()
+NVMParams_t getNVMParams()
 {
   // Pull the boot loader and EEPROM size configuration fuses
   uint32_t bootBits = ( *( ( uint32_t * ) NVMCTRL_FUSES_BOOTPROT_ADDR ) 
@@ -57,16 +53,18 @@ void getNVMParams()
 
   // Calculate the size of EEPROM and boot based on the fuses, see Data sheet section 20.6.5
   uint8_t divider = 0x1;
-  _bootLen = ( bootBits >= 0x7 ? 0 : MAX_BOOT_SIZE / ( divider << bootBits ) );
-  _eepromLen = ( eepBits >= 0x7 ? 0 : MAX_EEPROM_SIZE / ( divider << eepBits ) );
+  _params.bootSize = ( bootBits >= 0x7 ? 0 : MAX_BOOT_SIZE / ( divider << bootBits ) );
+  _params.eepromSize = ( eepBits >= 0x7 ? 0 : MAX_EEPROM_SIZE / ( divider << eepBits ) );
 
   // Calculate total memory size based on the PARAM register
   uint8_t pageSizeBits = NVMCTRL->PARAM.bit.PSZ;
-  _pageSize = ( 0x8 << pageSizeBits );
+  _params.pageSize = ( 0x8 << pageSizeBits );
   uint16_t numPages = NVMCTRL->PARAM.bit.NVMP;
-  _nvmSize = numPages * _pageSize;
+  _params.nvmTotalSize = numPages * _params.pageSize;
+  _params.rowSize = _params.pageSize * 4;
 
   _paramsLoaded = 0x1;
+  return _params;
 }
 
 void handleNVMError()
@@ -82,7 +80,7 @@ void eraseRow( uint32_t addr )
   if( !_paramsLoaded )
     getNVMParams();
 
-  if( addr > _nvmSize )
+  if( addr > _params.nvmTotalSize )
     return;
   NVM_WAIT_BUSY();
   NVMCTRL->ADDR.reg = addr / 2;
@@ -112,7 +110,7 @@ void writeFlash( const volatile void *flash_ptr, const void *data, uint32_t size
     NVM_WAIT_BUSY();
 
     // Fill page buffer
-    for ( uint32_t i = 0; i < ( _pageSize / 4 ) && size; i++ ) {
+    for ( uint32_t i = 0; i < ( _params.pageSize / 4 ) && size; i++ ) {
       *dst_addr = *( (uint32_t *)( src_addr ) );
       src_addr += 4;
       dst_addr++;

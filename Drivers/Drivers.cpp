@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <EEPROM.h>
 
 void initClkOut()
 {
@@ -40,18 +41,32 @@ void testWDTReset()
 void testNVMFlash()
 {
   uint8_t buff[256];
-  for( uint16_t i = 0; i < 256; i++ )
-    buff[i] = i & 0xFF;
 
   eraseRow( 0x10000 );
   readFlash( (void *)0x10000, buff, 256 );
 
-  for( uint16_t i = 0; i < 256; i++ )
+  for( uint16_t i = 0; i < 128; i++ )
     buff[i] = i & 0xFF;
-  writeFlash( (void *)0x10000, buff, 256 );
+  writeFlash( (void *)0x10000, buff, 128 );
   
   memset( buff, 0, 256 );
   readFlash( (void *)0x10000, buff, 256 );
+
+  for( uint16_t i = 0; i < 128; i++ )
+    buff[i] = i & 0xFF;
+  writeFlash( (void *)0x10080, buff, 128 );
+
+  memset( buff, 0, 256 );
+  readFlash( (void *)0x10000, buff, 256 );
+}
+
+EEEPROM<NVMFlash> eeeprom;
+void testEEEPROM()
+{
+  uint8_t buff[64];
+  Serial.println( eeeprom.getSize() );
+  eeeprom.read( 0, buff, 64 );
+  eeeprom.read( 245, buff, 64 );
 }
 
 void setup()
@@ -63,6 +78,7 @@ void setup()
 
 void loop()
 {
-  //testNVMFlash();
   clearWDT();
+  testEEEPROM();
+  delay( 2000 );
 }

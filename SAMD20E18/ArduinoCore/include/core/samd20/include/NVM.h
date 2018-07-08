@@ -20,13 +20,22 @@
 
 #include <stdint.h>
 
+typedef struct 
+{
+  uint16_t eepromSize;
+  uint16_t bootSize;
+  uint32_t nvmTotalSize;
+  uint16_t pageSize;
+  uint16_t rowSize;
+}NVMParams_t;
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 void enableNVMCtrl();
 void disableNVMCtrl();
-void getNVMParams();
+NVMParams_t getNVMParams();
 void handleNVMError();
 void eraseRow( uint32_t addr );
 void writeFlash( const volatile void *flash_ptr, const void *data, uint32_t size );
