@@ -62,46 +62,11 @@ template <>
 class EEEPROM <NVMFlash>
 {
   public:
-    EEEPROM()
-    {
-      _flashMem = NVMFlash();
-      
-      // Calculate the various parameters for the EEEPROM space
-      _minFlashPageSize = _flashMem.minimumEraseSize;
-      _useableMemSize = _flashMem.EEEPROMSize;
-      _numUsableBanks = _useableMemSize / _minFlashPageSize;
-      _EEEPROMSize = ( _numUsableBanks / 2 ) * ( _minFlashPageSize - 1 );
-      _flashEEEPROMStartAddr = _flashMem.startAddr;
-      
-      _bankStatus = (uint8_t *)malloc( _numUsableBanks );
-      _bankUpToDate = false;
-    }
-
-    uint16_t getSize()
-    {
-      return _EEEPROMSize;
-    }
-
-    void write( uint16_t addr, void *data, uint16_t size )
-    {
-      
-    }
-
-    void read( uint16_t addr, void *data, uint16_t size )
-    {
-      uint32_t flashAddr = getFlashAddr( addr );
-      uint16_t remainingBankSize = 
-        ( _minFlashPageSize - 1 ) - ( addr % ( _minFlashPageSize - 1 ) );
-      uint16_t readSize = ( remainingBankSize < size ? remainingBankSize : size );
-      _flashMem.read( ( void * )flashAddr, data, readSize );
-      if( remainingBankSize < size )
-        read( addr + readSize, data + readSize, size - readSize );
-    }
-
-    void erase( uint16_t addr, uint16_t size )
-    {
-
-    }
+    EEEPROM();
+    uint16_t getSize();
+    void write( uint16_t addr, void *data, uint16_t size );
+    void read( uint16_t addr, void *data, uint16_t size );
+    void erase( uint16_t addr, uint16_t size );
   private:
     NVMFlash _flashMem;
     uint16_t _minFlashPageSize;
@@ -112,32 +77,6 @@ class EEEPROM <NVMFlash>
     uint8_t *_bankStatus;
     bool _bankUpToDate;
 
-    void retrieveBankStatus()
-    {
-      for( uint8_t i = 0; i < _numUsableBanks; i++ ) {
-        _flashMem.read( ( void * )( _flashEEEPROMStartAddr + ( i * _minFlashPageSize ) ),
-          &_bankStatus[i], 1 );
-      }
-
-      _bankUpToDate = true;
-    }
-
-    uint32_t getFlashAddr( uint16_t eeepromAddr )
-    {
-      uint8_t bankId = eeepromAddr / ( _minFlashPageSize - 1 );
-      uint32_t addr = _flashEEEPROMStartAddr;
-      
-      // Index through the bank status array, if we get a match use that bank otherwise
-      // just use the last empty bank we find
-      if( !_bankUpToDate ) retrieveBankStatus();
-      for( uint8_t i = 0; i < _numUsableBanks; i++ ) {
-        if( _bankStatus[i] == bankId || _bankStatus[i] == 0xFF ) {
-          addr = _flashEEEPROMStartAddr + ( i * _minFlashPageSize ) + 1;
-          if( _bankStatus[i] == bankId )
-            break;
-        }
-      }
-
-      return addr;
-    }
+    void retrieveBankStatus();
+    uint32_t getFlashAddr( uint16_t eeepromAddr, bool findEmpty = false );
 };

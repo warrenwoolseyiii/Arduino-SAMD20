@@ -47,25 +47,33 @@ void testNVMFlash()
 
   for( uint16_t i = 0; i < 128; i++ )
     buff[i] = i & 0xFF;
-  writeFlash( (void *)0x10000, buff, 128 );
+  writeFlash( (void *)0x10000, buff, 64 );
   
   memset( buff, 0, 256 );
-  readFlash( (void *)0x10000, buff, 256 );
+  readFlash( (void *)0x10000, buff, 128 );
 
   for( uint16_t i = 0; i < 128; i++ )
     buff[i] = i & 0xFF;
-  writeFlash( (void *)0x10080, buff, 128 );
+  writeFlash( (void *)0x10040, buff, 64 );
 
   memset( buff, 0, 256 );
-  readFlash( (void *)0x10000, buff, 256 );
+  readFlash( (void *)0x10000, buff, 128 );
 }
 
 EEEPROM<NVMFlash> eeeprom;
 void testEEEPROM()
 {
   uint8_t buff[64];
+  for( uint16_t i = 0; i < 64; i++ )
+    buff[i] = i & 0xFF;
   Serial.println( eeeprom.getSize() );
+  eeeprom.write( 0, buff, 64 );
+  eeeprom.write( 64, buff, 64 );
+  memset( buff, 0, 64 );
   eeeprom.read( 0, buff, 64 );
+  memset( buff, 0, 64 );
+  eeeprom.read( 64, buff, 64 );
+
   eeeprom.read( 245, buff, 64 );
 }
 
@@ -80,5 +88,6 @@ void loop()
 {
   clearWDT();
   testEEEPROM();
+  testNVMFlash();
   delay( 2000 );
 }
