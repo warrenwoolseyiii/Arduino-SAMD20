@@ -63,10 +63,11 @@ void testNVMFlash()
 EEEPROM<NVMFlash> eeeprom;
 void testEEEPROM()
 {
-  uint8_t buff[64];
+  Serial.println( eeeprom.getSize() );
+
+  uint8_t buff[256];
   for( uint16_t i = 0; i < 64; i++ )
     buff[i] = i & 0xFF;
-  Serial.println( eeeprom.getSize() );
   eeeprom.write( 0, buff, 64 );
   eeeprom.write( 64, buff, 64 );
   memset( buff, 0, 64 );
@@ -74,7 +75,12 @@ void testEEEPROM()
   memset( buff, 0, 64 );
   eeeprom.read( 64, buff, 64 );
 
-  eeeprom.read( 245, buff, 64 );
+  for( uint16_t i = 0; i < 200; i++ )
+    buff[i] = i & 0xFF;
+
+  eeeprom.write( 128, buff, 200 );
+  memset( buff, 0, 200 );
+  eeeprom.read( 64, buff, 255 );
 }
 
 void setup()
