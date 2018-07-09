@@ -42,42 +42,26 @@ void EEEPROM<NVMFlash>::write( uint16_t addr, void *data, uint16_t size )
   if( addr + size > _EEEPROMSize ) return;
       
   // Cache the full page associated with the addr and set the bank ID
-  uint8_t *cache = ( uint8_t * )malloc( _minFlashPageSize * sizeof(  uint8_t ) );
+  uint8_t *cache = ( uint8_t * )malloc( _minFlashPageSize );
   if( cache == NULL ) return;
   read( ( addr - ( addr % _minFlashPageSize ) ),
     &cache[1], _minFlashPageSize - 1 );
-
-  // Determine if we need to write to a new bank, if the bytes we are writing to are already
-  // erased, there is no need to write a whole new bank. This will save Flash from wear and tear.
-  uint16_t cacheOffset = ( addr % ( _minFlashPageSize - 1 ) ) + 1;
-  bool writeNewBank = ( cache[0] == 0xFF );
-  if( !writeNewBank ) {
-    for( uint16_t i = cacheOffset; ( i < cacheOffset + size ) && ( i < _minFlashPageSize ); i++ ) {
-      if( cache[i] != 0xFF ) {
-        writeNewBank = true;
-        break;
-      }
-    }
-  }
 
   // Determine if the write will extend past the existing bank, if it does we will need to
   // recursively call write() until the write request has been fulfilled.
   uint16_t remainingBankSize =
     ( _minFlashPageSize - 1 ) - ( addr % ( _minFlashPageSize - 1 ) );
   uint16_t writeSize = ( remainingBankSize < size ? remainingBankSize : size );
+
+  uint16_t cacheOffset = ( addr % ( _minFlashPageSize - 1 ) ) + 1;
+  memcpy( &cache[cacheOffset], data, writeSize );
+  cache[0] = addr / ( _minFlashPageSize - 1 );
+
   uint32_t flashWriteAddr, flashEraseAddr;
-  if( writeNewBank ) {
-    memcpy( &cache[cacheOffset], data, writeSize );
-    cache[0] = addr / ( _minFlashPageSize - 1 );
-    flashWriteAddr = getFlashAddr( addr, true ) - 1;
-    flashEraseAddr = getFlashAddr( addr );
-    _flashMem.erase( flashEraseAddr );
-    _flashMem.write( ( void * )flashWriteAddr, cache, writeSize );
-  }
-  else {
-    flashWriteAddr = getFlashAddr( addr );
-    _flashMem.write( ( void * )flashWriteAddr, data, writeSize );
-  }
+  flashWriteAddr = getFlashAddr( addr, true ) - 1;
+  flashEraseAddr = getFlashAddr( addr );
+  _flashMem.erase( flashEraseAddr );
+  _flashMem.write( ( void * )flashWriteAddr, cache, _minFlashPageSize );
 
   free( cache );
   _bankUpToDate = false;
