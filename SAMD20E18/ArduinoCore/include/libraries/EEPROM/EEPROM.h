@@ -73,10 +73,12 @@ class EEEPROM <NVMFlash>
     uint16_t _useableMemSize;
     uint16_t _EEEPROMSize;
     uint8_t _numUsableBanks; 
+    uint8_t _nextBankUp;
     uint32_t _flashEEEPROMStartAddr;
     uint8_t *_bankStatus;
     bool _bankUpToDate;
 
     void retrieveBankStatus();
-    uint32_t getFlashAddr( uint16_t eeepromAddr, bool findEmpty = false );
+    uint32_t findNextEmptyBank();
+    uint32_t getFlashAddr( uint16_t eeepromAddr );
 };

@@ -30,6 +30,7 @@ EEEPROM<NVMFlash>::EEEPROM()
       
   _bankStatus = (uint8_t *)malloc( _numUsableBanks );
   _bankUpToDate = false;
+  _nextBankUp = 0;
 }
 
 uint16_t EEEPROM<NVMFlash>::getSize()
@@ -58,7 +59,7 @@ void EEEPROM<NVMFlash>::write( uint16_t addr, void *data, uint16_t size )
   cache[0] = addr / ( _minFlashPageSize - 1 );
 
   uint32_t flashWriteAddr, flashEraseAddr;
-  flashWriteAddr = getFlashAddr( addr, true ) - 1;
+  flashWriteAddr = findNextEmptyBank();
   flashEraseAddr = getFlashAddr( addr );
   _flashMem.erase( flashEraseAddr );
   _flashMem.write( ( void * )flashWriteAddr, cache, _minFlashPageSize );
@@ -101,7 +102,21 @@ void EEEPROM<NVMFlash>::retrieveBankStatus()
   _bankUpToDate = true;
 }
 
-uint32_t EEEPROM<NVMFlash>::getFlashAddr( uint16_t eeepromAddr, bool findEmpty )
+uint32_t EEEPROM<NVMFlash>::findNextEmptyBank()
+{
+  uint32_t addr = _flashEEEPROMStartAddr;
+
+  if( !_bankUpToDate ) retrieveBankStatus();
+  while( _bankStatus[_nextBankUp] != 0xFF ) {
+    if( ++_nextBankUp >= _numUsableBanks )
+      _nextBankUp = 0;
+  }
+
+  addr += _nextBankUp * _minFlashPageSize;
+  return addr;
+}
+
+uint32_t EEEPROM<NVMFlash>::getFlashAddr( uint16_t eeepromAddr )
 {
   uint8_t bankId = eeepromAddr / ( _minFlashPageSize - 1 );
   uint32_t addr = _flashEEEPROMStartAddr;
@@ -110,14 +125,11 @@ uint32_t EEEPROM<NVMFlash>::getFlashAddr( uint16_t eeepromAddr, bool findEmpty )
   // just use the last empty bank we find.
   if( !_bankUpToDate ) retrieveBankStatus();
   for( uint8_t i = 0; i < _numUsableBanks; i++ ) {
-    if( _bankStatus[i] == bankId && !findEmpty ) {
-      addr = _flashEEEPROMStartAddr + ( i * _minFlashPageSize ) + 1 
+    if( _bankStatus[i] == bankId || _bankStatus[i] == 0xFF ) {
+      addr = _flashEEEPROMStartAddr + ( i * _minFlashPageSize ) + 1
         + ( eeepromAddr % ( _minFlashPageSize - 1 ) );
-      break;
-    }
-    else if( _bankStatus[i] == 0xFF ) {
-      addr = _flashEEEPROMStartAddr + ( i * _minFlashPageSize ) + 1;
-      if( findEmpty ) break;
+      if( _bankStatus[i] == bankId )
+        break;
     }
   }
 
