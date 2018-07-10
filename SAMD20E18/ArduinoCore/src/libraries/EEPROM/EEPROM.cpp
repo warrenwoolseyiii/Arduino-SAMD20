@@ -90,6 +90,7 @@ void EEEPROM<NVMFlash>::read( uint16_t addr, void *data, uint16_t size )
 void EEEPROM<NVMFlash>::erase( uint16_t addr, uint16_t size )
 {
   uint8_t *data = ( uint8_t * )malloc( size );
+  if( data == NULL ) return;
   memset( data, 0xFF, size );
   write( addr, data, size );
   free( data );
