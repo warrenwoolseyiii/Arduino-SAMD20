@@ -24,7 +24,7 @@
  * Bytes[1 - _minFlashPageSize]   -> Data 
  * Each Flash memory page is treated as a "bank", and a range of EEEPROM
  * addressable space is associated with a bank. For example, if 
- * _minFlashPageSize == 256, than EEEPROM addresses 0 to 255 are located
+ * _minFlashPageSize == 256, than EEEPROM addresses 0 to 254 are located
  * in bank 0. Banks are not consecutive in memory and are moved when writes
  * occur with in the bank. This is done in an effort to reduce the write
  * and erase load on each individual Flash memory page.
