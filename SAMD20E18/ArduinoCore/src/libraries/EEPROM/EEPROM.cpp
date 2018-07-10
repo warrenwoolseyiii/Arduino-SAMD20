@@ -45,7 +45,7 @@ void EEEPROM<NVMFlash>::write( uint16_t addr, void *data, uint16_t size )
   // Cache the full page associated with the addr and set the bank ID
   uint8_t *cache = ( uint8_t * )malloc( _minFlashPageSize );
   if( cache == NULL ) return;
-  read( ( addr - ( addr % _minFlashPageSize ) ),
+  read( ( addr - ( addr % ( _minFlashPageSize - 1 ) ) ),
     &cache[1], _minFlashPageSize - 1 );
 
   // Determine if the write will extend past the existing bank, if it does we will need to
@@ -89,7 +89,10 @@ void EEEPROM<NVMFlash>::read( uint16_t addr, void *data, uint16_t size )
 
 void EEEPROM<NVMFlash>::erase( uint16_t addr, uint16_t size )
 {
-
+  uint8_t *data = ( uint8_t * )malloc( size );
+  memset( data, 0xFF, size );
+  write( addr, data, size );
+  free( data );
 }
 
 void EEEPROM<NVMFlash>::retrieveBankStatus()

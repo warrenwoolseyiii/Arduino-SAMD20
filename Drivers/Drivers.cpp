@@ -75,6 +75,9 @@ void testEEEPROM()
   memset( buff, 0, 256 );
   eeeprom.read( 0, buff, 128 );
   eeeprom.read( 200, buff, 256 );
+
+  eeeprom.erase( 200, 128 );
+  eeeprom.read ( 200, buff, 256 );
 }
 
 void setup()
