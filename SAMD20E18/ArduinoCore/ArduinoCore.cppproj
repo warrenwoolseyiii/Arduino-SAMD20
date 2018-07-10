@@ -583,6 +583,9 @@
     <Compile Include="include\core\samd20\include\system_samd20.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="include\core\samd20\sleep.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="include\core\samd20\TimerCounter.h">
       <SubType>compile</SubType>
     </Compile>
@@ -707,6 +710,9 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="src\core\SERCOM.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\core\sleep.c">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="src\core\startup.c">

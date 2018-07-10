@@ -351,6 +351,22 @@ inline void LowPowerSysInit( void )
   resetGCLK();
 
 /* ----------------------------------------------------------------------------------------------
+ * 0) Disable every clock generator except for 0, then disable all peripherals
+ */
+  disableClkGenerator( GCLK_GENDIV_ID_GCLK1_Val );
+  disableClkGenerator( GCLK_GENDIV_ID_GCLK2_Val );
+  disableClkGenerator( GCLK_GENDIV_ID_GCLK3_Val );
+  disableClkGenerator( GCLK_GENDIV_ID_GCLK4_Val );
+  disableClkGenerator( GCLK_GENDIV_ID_GCLK5_Val );
+  disableClkGenerator( GCLK_GENDIV_ID_GCLK6_Val );
+  disableClkGenerator( GCLK_GENDIV_ID_GCLK7_Val );
+
+  uint32_t apbMask = PM_APBAMASK_PAC0 | PM_APBAMASK_WDT | PM_APBAMASK_RTC | PM_APBAMASK_EIC;
+  enableAPBAClk( apbMask, 0 );
+  apbMask = PM_APBBMASK_PAC1 | PM_APBBMASK_DSU | PM_APBBMASK_PORT;
+  enableAPBBClk( apbMask, 0 );
+  enableAPBCClk( 0xFFFFFFFF, 0 );
+/* ----------------------------------------------------------------------------------------------
  * 1) Initialize the 32768 Hz oscillator (either, internal or external) 
  */
 #if defined(CRYSTALLESS)
@@ -365,16 +381,16 @@ inline void LowPowerSysInit( void )
       -> Runs in stand by
  */
   initClkGenerator( GCLK_GENCTRL_SRC_XOSC32K_Val, GCLK_GENDIV_ID_GCLK1_Val, 
-    0, TRUE, TRUE );
+    0, TRUE, FALSE );
 
-/* ----------------------------------------------------------------------------------------------
- * 3) Put 32K as source of Generic Clock Generator 2 
-      -> Freq = 1024 Hz
-      -> Runs in stand by
- */
-  initClkGenerator( GCLK_GENCTRL_SRC_XOSC32K_Val, GCLK_GENDIV_ID_GCLK2_Val,
-    0x04, TRUE, TRUE );
-
+///* ----------------------------------------------------------------------------------------------
+ //* 3) Put 32K as source of Generic Clock Generator 2 
+      //-> Freq = 1024 Hz
+      //-> Runs in stand by
+ //*/
+  //initClkGenerator( GCLK_GENCTRL_SRC_XOSC32K_Val, GCLK_GENDIV_ID_GCLK2_Val,
+    //0x04, TRUE, FALSE );
+//
 ///* ----------------------------------------------------------------------------------------------
  //* 4) Put Generic Clock Generator 1 as source for Generic Clock Multiplexer 0 (DFLL48M reference)
  //*/
@@ -400,13 +416,13 @@ inline void LowPowerSysInit( void )
  */
   initOSC8M( 0x0 );
   initClkGenerator( GCLK_GENCTRL_SRC_OSC8M_Val, GCLK_GENDIV_ID_GCLK0_Val,
-    0, FALSE, TRUE );
+    0, FALSE, FALSE );
   SystemCoreClock = 8000000ul;
 
-/* ----------------------------------------------------------------------------------------------
- * 8) Load ADC factory calibration values
- */
-  loadADCFactoryCal();
+///* ----------------------------------------------------------------------------------------------
+ //* 8) Load ADC factory calibration values
+ //*/
+  //loadADCFactoryCal();
 
 /* ----------------------------------------------------------------------------------------------
  * 9) Disable automatic NVM write operations

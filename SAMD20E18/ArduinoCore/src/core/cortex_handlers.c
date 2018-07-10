@@ -194,12 +194,8 @@ void Reset_Handler(void)
   }
 
   /* Get the reset cause flag, made available by externalizing gRCause */
-#ifdef SAMD20
   gRCause = PM->RCAUSE.reg;
   LowPowerSysInit();
-#else
-  SystemInit();
-#endif /* SAMD20 */
 
   main();
 

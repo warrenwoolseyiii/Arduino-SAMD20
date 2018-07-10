@@ -30,7 +30,9 @@ volatile uint32_t _rtcSec = 0;
 void initRTC()
 {
   initGenericClk( GCLK_CLKCTRL_GEN_GCLK1_Val, GCLK_CLKCTRL_ID_RTC_Val );
-  disableRTC();
+  enableAPBAClk( PM_APBAMASK_RTC, 1 );
+  RTC->MODE1.CTRL.bit.SWRST = 1;
+  while( RTC->MODE1.STATUS.bit.SYNCBUSY || RTC->MODE1.CTRL.bit.SWRST );
 
   RTC->MODE1.CTRL.bit.MODE = 1;
   RTC_WAIT_SYNC;
@@ -51,7 +53,8 @@ void disableRTC()
   RTC->MODE1.CTRL.bit.SWRST = 1;
   while( RTC->MODE1.STATUS.bit.SYNCBUSY || RTC->MODE1.CTRL.bit.SWRST );
   NVIC_DisableIRQ( RTC_IRQn );
-
+  enableAPBAClk( PM_APBAMASK_RTC, 0 );
+  disableGenericClk( GCLK_CLKCTRL_ID_RTC_Val );
   _rtcSec = 0;
 }
 

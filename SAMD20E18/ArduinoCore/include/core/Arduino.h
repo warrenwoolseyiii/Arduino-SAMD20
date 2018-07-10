@@ -71,20 +71,21 @@ void loop( void ) ;
 
 // The following headers are for C++ only compilation
 #ifdef __cplusplus
-  #include "WCharacter.h"
-  #include "WString.h"
-  #include "Tone.h"
-  #include "WMath.h"
-  #include "HardwareSerial.h"
-  #include "pulse.h"
+#include "WCharacter.h"
+#include "WString.h"
+#include "Tone.h"
+#include "WMath.h"
+#include "HardwareSerial.h"
+#include "pulse.h"
 #endif
 #include "delay.h"
 #include "clocks.h"
 #include "RTC.h"
 #include "WDT.h"
 #include "NVM.h"
+#include "sleep.h"
 #ifdef __cplusplus
-  #include "Uart.h"
+#include "Uart.h"
 #endif
 
 // Include board variant

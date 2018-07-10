@@ -38,6 +38,8 @@ src\core\RTC.c
 
 src\core\SERCOM.cpp
 
+src\core\sleep.c
+
 src\core\startup.c
 
 src\core\Stream.cpp

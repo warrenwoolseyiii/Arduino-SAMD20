@@ -28,6 +28,8 @@ uint8_t _isInit = 0;
 void initWDT( uint32_t wdtPeriod )
 {
   // Set up the clocks and APB
+  initClkGenerator( GCLK_GENCTRL_SRC_XOSC32K_Val, GCLK_GENDIV_ID_GCLK2_Val,
+    0x04, 0x1, 0x0 );
   initGenericClk( GCLK_CLKCTRL_GEN_GCLK2_Val, GCLK_CLKCTRL_ID_WDT_Val );
   enableAPBAClk( PM_APBAMASK_WDT, 1 );
 
@@ -53,6 +55,7 @@ void endWDT()
   disableWDT();
   enableAPBAClk( PM_APBAMASK_WDT, 0 );
   disableGenericClk( GCLK_CLKCTRL_ID_WDT_Val );
+  disableClkGenerator( GCLK_GENDIV_ID_GCLK2_Val );
 }
 
 void enableWDT()

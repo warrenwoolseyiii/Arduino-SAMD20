@@ -63,8 +63,6 @@ void testNVMFlash()
 EEEPROM<NVMFlash> eeeprom;
 void testEEEPROM()
 {
-  Serial.println( eeeprom.getSize() );
-
   uint8_t buff[256];
   for( uint16_t i = 0; i < 256; i++ )
     buff[i] = i & 0xFF;
@@ -80,16 +78,19 @@ void testEEEPROM()
   eeeprom.read ( 200, buff, 256 );
 }
 
+void testSleep()
+{
+  sleepCPU( 0xFF );
+}
+
 void setup()
 {
-  initWDT( WDT_CONFIG_PER_4K_Val );
-  initClkOut();
-  Serial.begin( 9600 );
+  //initWDT( WDT_CONFIG_PER_4K_Val );
 }
 
 void loop()
 {
-  clearWDT();
+  //clearWDT();
   testEEEPROM();
-  delay( 2000 );
+  testSleep();
 }

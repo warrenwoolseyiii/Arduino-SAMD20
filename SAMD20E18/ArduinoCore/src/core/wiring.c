@@ -237,16 +237,14 @@ void disableDAC()
  * Arduino Zero board initialization
  *
  * Good to know:
- *   - At reset, ResetHandler did the system clock configuration. Core is running at 48MHz.
- *   - Watchdog is disabled by default, unless someone plays with NVM User page
  *   - During reset, all PORT lines are configured as inputs with input buffers, output buffers and pull disabled.
  */
 void init( void )
 {
   initRTC();
 
-  enableADC();
-  enableDAC();
+  //enableADC();
+  //enableDAC();
 
   /* Setup all pins (digital and analog) in INPUT mode (default is nothing) */
   for (uint32_t ul = 0 ; ul < NUM_DIGITAL_PINS ; ul++ )
@@ -254,42 +252,43 @@ void init( void )
     pinMode( ul, INPUT ) ;
   }
 
-  // Initialize Analog Controller
-  // Setting clock
-  while(GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY);
-
-  GCLK->CLKCTRL.reg = GCLK_CLKCTRL_ID( GCM_ADC ) | // Generic Clock ADC
-                      GCLK_CLKCTRL_GEN_GCLK0     | // Generic Clock Generator 0 is source
-                      GCLK_CLKCTRL_CLKEN ;
-
-  while( ADC->STATUS.bit.SYNCBUSY == 1 );          // Wait for synchronization of registers between the clock domains
-
-  ADC->CTRLB.reg = ADC_CTRLB_PRESCALER_DIV512 |    // Divide Clock by 512.
-                   ADC_CTRLB_RESSEL_10BIT;         // 10 bits resolution as default
-
-  ADC->SAMPCTRL.reg = 0x3f;                        // Set max Sampling Time Length
-
-  while( ADC->STATUS.bit.SYNCBUSY == 1 );          // Wait for synchronization of registers between the clock domains
-
-  ADC->INPUTCTRL.reg = ADC_INPUTCTRL_MUXNEG_GND;   // No Negative input (Internal Ground)
-
-  // Averaging (see datasheet table in AVGCTRL register description)
-  ADC->AVGCTRL.reg = ADC_AVGCTRL_SAMPLENUM_1 |    // 1 sample only (no oversampling nor averaging)
-                     ADC_AVGCTRL_ADJRES(0x0ul);   // Adjusting result by 0
-
-  //analogReference( AR_DEFAULT ) ; // Analog Reference is AREF pin (3.3v)
-  analogReference( AR_INTERNAL1V0 );
-
-  // Initialize DAC
-  // Setting clock
-  while ( GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY );
-  GCLK->CLKCTRL.reg = GCLK_CLKCTRL_ID( GCM_DAC ) | // Generic Clock ADC
-                      GCLK_CLKCTRL_GEN_GCLK0     | // Generic Clock Generator 0 is source
-                      GCLK_CLKCTRL_CLKEN ;
-
-  while ( DAC->STATUS.bit.SYNCBUSY == 1 ); // Wait for synchronization of registers between the clock domains
-  DAC->CTRLB.reg = DAC_CTRLB_REFSEL_AVCC | // Using the 3.3V reference
-                   DAC_CTRLB_EOEN ;        // External Output Enable (Vout)
+  // TODO:
+  //// Initialize Analog Controller
+  //// Setting clock
+  //while(GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY);
+//
+  //GCLK->CLKCTRL.reg = GCLK_CLKCTRL_ID( GCM_ADC ) | // Generic Clock ADC
+                      //GCLK_CLKCTRL_GEN_GCLK0     | // Generic Clock Generator 0 is source
+                      //GCLK_CLKCTRL_CLKEN ;
+//
+  //while( ADC->STATUS.bit.SYNCBUSY == 1 );          // Wait for synchronization of registers between the clock domains
+//
+  //ADC->CTRLB.reg = ADC_CTRLB_PRESCALER_DIV512 |    // Divide Clock by 512.
+                   //ADC_CTRLB_RESSEL_10BIT;         // 10 bits resolution as default
+//
+  //ADC->SAMPCTRL.reg = 0x3f;                        // Set max Sampling Time Length
+//
+  //while( ADC->STATUS.bit.SYNCBUSY == 1 );          // Wait for synchronization of registers between the clock domains
+//
+  //ADC->INPUTCTRL.reg = ADC_INPUTCTRL_MUXNEG_GND;   // No Negative input (Internal Ground)
+//
+  //// Averaging (see datasheet table in AVGCTRL register description)
+  //ADC->AVGCTRL.reg = ADC_AVGCTRL_SAMPLENUM_1 |    // 1 sample only (no oversampling nor averaging)
+                     //ADC_AVGCTRL_ADJRES(0x0ul);   // Adjusting result by 0
+//
+  ////analogReference( AR_DEFAULT ) ; // Analog Reference is AREF pin (3.3v)
+  //analogReference( AR_INTERNAL1V0 );
+//
+  //// Initialize DAC
+  //// Setting clock
+  //while ( GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY );
+  //GCLK->CLKCTRL.reg = GCLK_CLKCTRL_ID( GCM_DAC ) | // Generic Clock ADC
+                      //GCLK_CLKCTRL_GEN_GCLK0     | // Generic Clock Generator 0 is source
+                      //GCLK_CLKCTRL_CLKEN ;
+//
+  //while ( DAC->STATUS.bit.SYNCBUSY == 1 ); // Wait for synchronization of registers between the clock domains
+  //DAC->CTRLB.reg = DAC_CTRLB_REFSEL_AVCC | // Using the 3.3V reference
+                   //DAC_CTRLB_EOEN ;        // External Output Enable (Vout)
 }
 
 #ifdef __cplusplus
