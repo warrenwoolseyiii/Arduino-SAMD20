@@ -69,16 +69,14 @@ class EEEPROM <NVMFlash>
     void erase( uint16_t addr, uint16_t size );
   private:
     NVMFlash _flashMem;
-    uint16_t _minFlashPageSize;
-    uint16_t _useableMemSize;
-    uint16_t _EEEPROMSize;
-    uint8_t _numUsableBanks; 
-    uint8_t _nextBankUp;
-    uint32_t _flashEEEPROMStartAddr;
+    uint16_t _minFlashPageSize, _effectivePageSize;
+    uint16_t _useableMemSize, _EEEPROMSize;
+    uint8_t _numUsableBanks, _nextBankUp;
     uint8_t *_bankStatus;
     bool _bankUpToDate;
+    uint32_t _flashEEEPROMStartAddr;
 
     void retrieveBankStatus();
-    uint32_t findNextEmptyBank();
+    uint32_t getNextEmptyBankAddr();
     uint32_t getFlashAddr( uint16_t eeepromAddr );
 };

@@ -69,7 +69,7 @@ NVMParams_t getNVMParams()
 
 void handleNVMError()
 {
-  // TODO:
+  NVMCTRL->INTFLAG.bit.ERROR = 1;
 }
 
 /* Note: user is responsible for knowing NVM erase procedures and memory spaces 

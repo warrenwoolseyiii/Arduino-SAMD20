@@ -68,7 +68,7 @@ ADDITIONAL_DEPENDENCIES:=
 OUTPUT_FILE_DEP:= ./makedep.mk
 
 LIB_DEP+=  \
-C:/Users/budge/Repositories/Arduino-SAMD20/SAMD20E18/ArduinoCore/Debug/libArduinoCore.a
+C:/Users/warre/Repositories/Arduino-SAMD20/SAMD20E18/ArduinoCore/Debug/libArduinoCore.a
 
 LINKER_SCRIPT_DEP+=  \
 ../Device_Startup/samd20e18_flash.ld \
@@ -81,7 +81,7 @@ LINKER_SCRIPT_DEP+=  \
 
 ./%.o: .././%.cpp
 	@echo Building file: $<
-	@echo Invoking: ARM/GNU C Compiler : 6.3.1
+	@echo Invoking: ARM/GNU C Compiler : 6.2.1
 	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\arm\arm-gnu-toolchain\bin\arm-none-eabi-g++.exe$(QUOTE) -mthumb -D__SAMD20E18__ -DDEBUG  -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\arm\cmsis\5.0.1\CMSIS\Include" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\SAMD20_DFP\1.2.91\samd20\include" -I"../../SAMD20E18/ArduinoCore/include/core" -I"../../SAMD20E18/ArduinoCore/include/core/avr" -I"../../SAMD20E18/ArduinoCore/include/core/samd20" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include/component" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include/instance" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include/pio" -I"../../SAMD20E18/ArduinoCore/include/libraries" -I"../../SAMD20E18/ArduinoCore/include/libraries/spi" -I"../../SAMD20E18/ArduinoCore/include/libraries/wire" -I"../../SAMD20E18/ArduinoCore/include/libraries/EEPROM" -I"../../SAMD20E18/ArduinoCore/include/variants"  -O1 -ffunction-sections -fno-rtti -fno-exceptions -mlong-calls -g3 -Wall -mcpu=cortex-m0plus -c -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
 	@echo Finished building: $<
 	
@@ -110,8 +110,8 @@ all: $(OUTPUT_FILE_PATH) $(ADDITIONAL_DEPENDENCIES)
 
 $(OUTPUT_FILE_PATH): $(OBJS) $(USER_OBJS) $(OUTPUT_FILE_DEP) $(LIB_DEP) $(LINKER_SCRIPT_DEP)
 	@echo Building target: $@
-	@echo Invoking: ARM/GNU Linker : 6.3.1
-	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\arm\arm-gnu-toolchain\bin\arm-none-eabi-g++.exe$(QUOTE) -o$(OUTPUT_FILE_PATH_AS_ARGS) $(OBJS_AS_ARGS) $(USER_OBJS) $(LIBS) -mthumb -Wl,-Map="Drivers.map" --specs=nosys.specs -Wl,--start-group -lm -lArduinoCore  -Wl,--end-group -L"..\\Device_Startup" -L"C:\Users\budge\Repositories\Arduino-SAMD20\SAMD20E18\ArduinoCore\Debug"  -Wl,--gc-sections -mcpu=cortex-m0plus -Tsamd20e18_flash.ld  
+	@echo Invoking: ARM/GNU Linker : 6.2.1
+	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\arm\arm-gnu-toolchain\bin\arm-none-eabi-g++.exe$(QUOTE) -o$(OUTPUT_FILE_PATH_AS_ARGS) $(OBJS_AS_ARGS) $(USER_OBJS) $(LIBS) -mthumb -Wl,-Map="Drivers.map" --specs=nosys.specs -Wl,--start-group -lm -lArduinoCore  -Wl,--end-group -L"..\\Device_Startup" -L"C:\Users\warre\Repositories\Arduino-SAMD20\SAMD20E18\ArduinoCore\Debug"  -Wl,--gc-sections -mcpu=cortex-m0plus -Tsamd20e18_flash.ld  
 	@echo Finished building target: $@
 	"C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\arm\arm-gnu-toolchain\bin\arm-none-eabi-objcopy.exe" -O binary "Drivers.elf" "Drivers.bin"
 	"C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\arm\arm-gnu-toolchain\bin\arm-none-eabi-objcopy.exe" -O ihex -R .eeprom -R .fuse -R .lock -R .signature  "Drivers.elf" "Drivers.hex"
