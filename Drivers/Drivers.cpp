@@ -78,19 +78,41 @@ void testEEEPROM()
   eeeprom.read ( 200, buff, 256 );
 }
 
+void hardMathTest()
+{
+  uint32_t value = 789456;
+  for( uint8_t i = 0; i < 200; i++ ) {
+    value /= ( i + 1 );
+    value *= 2;
+    value++;
+  }
+}
+
 void testSleep()
 {
-  sleepCPU( 0xFF );
+  // Sleep the CPU
+  sleepCPU( PM_SLEEP_STANDBY_Val );
+
+  // Select the clock
+  changeCPUClk( cpu_clk_oscm1 );
+
+  // Print time
+  Serial.begin( 9600 );
+  Serial.print( "Begin:" );
+  Serial.println( millis() );
+  testEEEPROM();
+  hardMathTest();
+  Serial.print( "End:" );
+  Serial.println( millis() );
+  delay( 25 );
+  Serial.end();
 }
 
 void setup()
 {
-  //initWDT( WDT_CONFIG_PER_4K_Val );
 }
 
 void loop()
 {
-  //clearWDT();
-  testEEEPROM();
   testSleep();
 }

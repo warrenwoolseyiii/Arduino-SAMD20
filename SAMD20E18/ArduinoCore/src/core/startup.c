@@ -351,8 +351,11 @@ inline void LowPowerSysInit( void )
   resetGCLK();
 
 /* ----------------------------------------------------------------------------------------------
- * 0) Disable every clock generator except for 0, then disable all peripherals
+ * 0) Disable every clock generator except for 0, then disable all peripherals, these are
+ * recommendations laid out in Atmel Application Note AT04188:
+ * http://ww1.microchip.com/downloads/en/AppNotes/Atmel-42248-SAM-D20-Power-Measurements_ApplicationNote_AT04188.pdf
  */
+  // Disable all clock generators except 0
   disableClkGenerator( GCLK_GENDIV_ID_GCLK1_Val );
   disableClkGenerator( GCLK_GENDIV_ID_GCLK2_Val );
   disableClkGenerator( GCLK_GENDIV_ID_GCLK3_Val );
@@ -361,11 +364,46 @@ inline void LowPowerSysInit( void )
   disableClkGenerator( GCLK_GENDIV_ID_GCLK6_Val );
   disableClkGenerator( GCLK_GENDIV_ID_GCLK7_Val );
 
+  // Kill all APB clocks
   uint32_t apbMask = PM_APBAMASK_PAC0 | PM_APBAMASK_WDT | PM_APBAMASK_RTC | PM_APBAMASK_EIC;
   enableAPBAClk( apbMask, 0 );
-  apbMask = PM_APBBMASK_PAC1 | PM_APBBMASK_DSU | PM_APBBMASK_PORT;
+  apbMask = PM_APBBMASK_PAC1 
+#ifndef DEBUG
+    | PM_APBBMASK_DSU 
+#endif /* DEBUG */
+    | PM_APBBMASK_PORT;
   enableAPBBClk( apbMask, 0 );
   enableAPBCClk( 0xFFFFFFFF, 0 );
+
+  // Hook all disabled peripherals to unused clock generators
+  disableGenericClk( GCLK_CLKCTRL_ID_DFLL48M_Val );
+  disableGenericClk( GCLK_CLKCTRL_ID_WDT_Val );
+  disableGenericClk( GCLK_CLKCTRL_ID_RTC_Val );
+  disableGenericClk( GCLK_CLKCTRL_ID_EIC_Val );
+  disableGenericClk( GCLK_CLKCTRL_ID_EVSYS_CHANNEL_0_Val );
+  disableGenericClk( GCLK_CLKCTRL_ID_EVSYS_CHANNEL_1_Val );
+  disableGenericClk( GCLK_CLKCTRL_ID_EVSYS_CHANNEL_2_Val );
+  disableGenericClk( GCLK_CLKCTRL_ID_EVSYS_CHANNEL_3_Val );
+  disableGenericClk( GCLK_CLKCTRL_ID_EVSYS_CHANNEL_4_Val );
+  disableGenericClk( GCLK_CLKCTRL_ID_EVSYS_CHANNEL_5_Val );
+  disableGenericClk( GCLK_CLKCTRL_ID_EVSYS_CHANNEL_6_Val );
+  disableGenericClk( GCLK_CLKCTRL_ID_EVSYS_CHANNEL_7_Val );
+  disableGenericClk( GCLK_CLKCTRL_ID_SERCOMX_SLOW_Val );
+  disableGenericClk( GCLK_CLKCTRL_ID_SERCOM0_CORE_Val );
+  disableGenericClk( GCLK_CLKCTRL_ID_SERCOM1_CORE_Val );
+  disableGenericClk( GCLK_CLKCTRL_ID_SERCOM2_CORE_Val );
+  disableGenericClk( GCLK_CLKCTRL_ID_SERCOM3_CORE_Val );
+  disableGenericClk( GCLK_CLKCTRL_ID_SERCOM4_CORE_Val );
+  disableGenericClk( GCLK_CLKCTRL_ID_SERCOM5_CORE_Val );
+  disableGenericClk( GCLK_CLKCTRL_ID_TC0_TC1_Val );
+  disableGenericClk( GCLK_CLKCTRL_ID_TC2_TC3_Val );
+  disableGenericClk( GCLK_CLKCTRL_ID_TC4_TC5_Val );
+  disableGenericClk( GCLK_CLKCTRL_ID_TC6_TC7_Val );
+  disableGenericClk( GCLK_CLKCTRL_ID_ADC_Val );
+  disableGenericClk( GCLK_CLKCTRL_ID_AC_DIG_Val );
+  disableGenericClk( GCLK_CLKCTRL_ID_AC_ANA_Val );
+  disableGenericClk( GCLK_CLKCTRL_ID_DAC_Val );
+  disableGenericClk( GCLK_CLKCTRL_ID_PTC_Val );
 /* ----------------------------------------------------------------------------------------------
  * 1) Initialize the 32768 Hz oscillator (either, internal or external) 
  */
@@ -407,7 +445,7 @@ inline void LowPowerSysInit( void )
  //* 6) Switch Generic Clock Generator 0 to DFLL48M. CPU will run at 48MHz.
  //*/
   //initClkGenerator( GCLK_GENCTRL_SRC_DFLL48M_Val, GCLK_GENDIV_ID_GCLK0_Val,
-    //0, FALSE, TRUE );
+    //0, FALSE, FALSE );
 //
   //SystemCoreClock = VARIANT_MCK;
 

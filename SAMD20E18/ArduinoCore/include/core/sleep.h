@@ -20,11 +20,23 @@
 
 #include <stdint.h>
 
+#define PM_SLEEP_STANDBY_Val 0xFF
+
+typedef enum
+{
+  cpu_clk_oscm1 = 0x3,
+  cpu_clk_oscm2 = 0x2,
+  cpu_clk_oscm4 = 0x1,
+  cpu_clk_oscm8 = 0x0,
+  cpu_clk_dfll48 = 0x4
+}CPUClkSrc_t;
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 void sleepCPU( uint32_t level );
+void changeCPUClk( CPUClkSrc_t src );
 
 #ifdef __cplusplus
 }

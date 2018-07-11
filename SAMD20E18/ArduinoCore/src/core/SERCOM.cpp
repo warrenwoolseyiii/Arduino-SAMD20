@@ -18,7 +18,7 @@
 
 #include "SERCOM.h"
 #include "variant.h"
-#include "wiring.h"
+#include <Arduino.h>
 
 #ifndef WIRE_RISE_TIME_NANOSECONDS
 // Default rise time in nanoseconds, based on 4.7K ohm pull up resistors
@@ -741,11 +741,81 @@ uint8_t SERCOM::readDataWIRE( void )
 
 void SERCOM::enableSERCOM()
 {
-  enableClockNVIC( (uint32_t *)sercom, GCLK_CLKCTRL_GEN_GCLK0, SERCOM_NVIC_PRIORITY );
+  uint32_t id = GCLK_CLKCTRL_ID_SERCOM0_CORE_Val;
+  uint32_t apbMask = PM_APBCMASK_SERCOM0;
+  uint32_t irqn = SERCOM0_IRQn;
+  if( sercom == SERCOM1 ) {
+    id = GCLK_CLKCTRL_ID_SERCOM1_CORE_Val;
+    apbMask = PM_APBCMASK_SERCOM1;
+    irqn = SERCOM1_IRQn;
+  }
+  if( sercom == SERCOM2 ) {
+    id = GCLK_CLKCTRL_ID_SERCOM2_CORE_Val;
+    apbMask = PM_APBCMASK_SERCOM2;
+    irqn = SERCOM2_IRQn;
+  }
+  if( sercom == SERCOM3 ) {
+    id = GCLK_CLKCTRL_ID_SERCOM3_CORE_Val;
+    apbMask = PM_APBCMASK_SERCOM3;
+    irqn = SERCOM3_IRQn;
+  }
+#if defined( SERCOM4 )
+  if( sercom == SERCOM4 ) {
+    id = GCLK_CLKCTRL_ID_SERCOM4_CORE_Val;
+    apbMask = PM_APBCMASK_SERCOM4;
+    irqn = SERCOM4_IRQn;
+  }
+#endif /* SERCOM4 */
+#if defined( SERCOM5 )
+  if( sercom == SERCOM5 ) {
+    id = GCLK_CLKCTRL_ID_SERCOM5_CORE_Val;
+    apbMask = PM_APBCMASK_SERCOM5;
+    irqn = SERCOM5_IRQn;
+  }
+#endif /* SERCOM5 */
+  
+  initGenericClk( GCLK_CLKCTRL_GEN_GCLK0_Val, id );
+  enableAPBCClk( apbMask, 1 );
+  NVIC_EnableIRQ( ( IRQn_Type )irqn );
 }
 
 void SERCOM::disableSERCOM()
 {
-  disableClockNVIC( (uint32_t *)sercom );
+  uint32_t id = GCLK_CLKCTRL_ID_SERCOM0_CORE_Val;
+  uint32_t apbMask = PM_APBCMASK_SERCOM0;
+  uint32_t irqn = SERCOM0_IRQn;
+  if( sercom == SERCOM1 ) {
+    id = GCLK_CLKCTRL_ID_SERCOM1_CORE_Val;
+    apbMask = PM_APBCMASK_SERCOM1;
+    irqn = SERCOM1_IRQn;
+  }
+  if( sercom == SERCOM2 ) {
+    id = GCLK_CLKCTRL_ID_SERCOM2_CORE_Val;
+    apbMask = PM_APBCMASK_SERCOM2;
+    irqn = SERCOM2_IRQn;
+  }
+  if( sercom == SERCOM3 ) {
+    id = GCLK_CLKCTRL_ID_SERCOM3_CORE_Val;
+    apbMask = PM_APBCMASK_SERCOM3;
+    irqn = SERCOM3_IRQn;
+  }
+#if defined( SERCOM4 )
+  if( sercom == SERCOM4 ) {
+    id = GCLK_CLKCTRL_ID_SERCOM4_CORE_Val;
+    apbMask = PM_APBCMASK_SERCOM4;
+    irqn = SERCOM4_IRQn;
+  }
+#endif /* SERCOM4 */
+#if defined( SERCOM5 )
+  if( sercom == SERCOM5 ) {
+    id = GCLK_CLKCTRL_ID_SERCOM5_CORE_Val;
+    apbMask = PM_APBCMASK_SERCOM5;
+    irqn = SERCOM5_IRQn;
+  }
+#endif /* SERCOM5 */
+
+  NVIC_DisableIRQ( ( IRQn_Type )irqn );
+  enableAPBCClk( apbMask, 0 );
+  disableGenericClk( id );
 }
 

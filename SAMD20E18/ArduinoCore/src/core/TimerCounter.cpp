@@ -47,7 +47,7 @@ void TimerCounter::deregisterISR()
 void TimerCounter::begin( uint32_t frequency, int8_t outputPin, TCMode_t mode)
 {
   _maxFreq = SystemCoreClock / 2;
-  enableClockNVIC( (uint32_t *)_timerCounter, GCLK_CLKCTRL_GEN_GCLK0, TIMER_NVIC_PRIORITY );
+  // TODO: enableClockNVIC( (uint32_t *)_timerCounter, GCLK_CLKCTRL_GEN_GCLK0, TIMER_NVIC_PRIORITY );
 
   // SWRST
   _timerCounter->COUNT16.CTRLA.reg = TC_CTRLA_SWRST;
@@ -86,7 +86,7 @@ void TimerCounter::reset()
 void TimerCounter::end()
 {
   reset();
-  disableClockNVIC( (uint32_t *)_timerCounter );
+  // TODO: disableClockNVIC( (uint32_t *)_timerCounter );
 }
 
 void TimerCounter::IrqHandler()

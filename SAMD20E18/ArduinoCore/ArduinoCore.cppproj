@@ -295,6 +295,9 @@
     <Compile Include="include\core\Client.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="include\core\clocks.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="include\core\delay.h">
       <SubType>compile</SubType>
     </Compile>
@@ -323,9 +326,6 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="include\core\RTC.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="include\core\samd20\clocks.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="include\core\samd20\include\component-version.h">
@@ -583,22 +583,19 @@
     <Compile Include="include\core\samd20\include\system_samd20.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="include\core\samd20\sleep.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="include\core\samd20\TimerCounter.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="include\core\samd20\WDT.h">
-      <SubType>compile</SubType>
-    </Compile>
     <Compile Include="include\core\SERCOM.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="include\core\Server.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="include\core\sleep.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="include\core\Stream.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="include\core\TimerCounter.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="include\core\Tone.h">
@@ -611,6 +608,9 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="include\core\WCharacter.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="include\core\WDT.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="include\core\WInterrupts.h">
