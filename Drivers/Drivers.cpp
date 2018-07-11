@@ -93,10 +93,8 @@ void testSleep()
   // Sleep the CPU
   sleepCPU( PM_SLEEP_STANDBY_Val );
 
-  // Select the clock
-  changeCPUClk( cpu_clk_oscm1 );
-
   // Print time
+  enableAPBBClk( PM_APBBMASK_PORT, 1 );
   Serial.begin( 9600 );
   Serial.print( "Begin:" );
   Serial.println( millis() );
@@ -106,10 +104,13 @@ void testSleep()
   Serial.println( millis() );
   delay( 25 );
   Serial.end();
+  enableAPBBClk( PM_APBBMASK_PORT, 0 );
 }
 
 void setup()
 {
+  // Select the clock
+  changeCPUClk( cpu_clk_dfll48 );
 }
 
 void loop()

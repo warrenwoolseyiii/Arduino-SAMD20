@@ -367,11 +367,7 @@ inline void LowPowerSysInit( void )
   // Kill all APB clocks
   uint32_t apbMask = PM_APBAMASK_PAC0 | PM_APBAMASK_WDT | PM_APBAMASK_RTC | PM_APBAMASK_EIC;
   enableAPBAClk( apbMask, 0 );
-  apbMask = PM_APBBMASK_PAC1 
-#ifndef DEBUG
-    | PM_APBBMASK_DSU 
-#endif /* DEBUG */
-    | PM_APBBMASK_PORT;
+  apbMask = PM_APBBMASK_PAC1 | PM_APBBMASK_DSU | PM_APBBMASK_PORT;
   enableAPBBClk( apbMask, 0 );
   enableAPBCClk( 0xFFFFFFFF, 0 );
 
