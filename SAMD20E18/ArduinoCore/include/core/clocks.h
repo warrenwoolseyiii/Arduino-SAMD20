@@ -24,21 +24,21 @@
 extern "C" {
 #endif
 
-void resetGCLK();
-int8_t initClkGenerator( uint32_t clkSrc, uint32_t id, uint32_t div, 
-                          uint8_t runInStdBy, uint8_t outPutToPin );
-void disableClkGenerator( uint32_t id );
+void   resetGCLK();
+int8_t initClkGenerator( uint32_t clkSrc, uint32_t id, uint32_t div,
+                         uint8_t runInStdBy, uint8_t outPutToPin );
+void   disableClkGenerator( uint32_t id );
 int8_t initGenericClk( uint32_t genClk, uint32_t id );
-void disableGenericClk( uint32_t id );
-void enableAPBAClk( uint32_t item, uint8_t enable );
-void enableAPBBClk( uint32_t item, uint8_t enable );
-void enableAPBCClk( uint32_t item, uint8_t enable );
-void initXOSC32();
-void initOSC23K();
-void initDFLL48( uint32_t sourceFreq );
-void disableDFLL48();
+void   disableGenericClk( uint32_t id );
+void   enableAPBAClk( uint32_t item, uint8_t enable );
+void   enableAPBBClk( uint32_t item, uint8_t enable );
+void   enableAPBCClk( uint32_t item, uint8_t enable );
+void   initXOSC32();
+void   initOSC23K();
+void   initDFLL48( uint32_t sourceFreq );
+void   disableDFLL48();
 int8_t initOSC8M( uint32_t divBits );
-void disableOSC8M();
+void   disableOSC8M();
 
 #ifdef __cplusplus
 }

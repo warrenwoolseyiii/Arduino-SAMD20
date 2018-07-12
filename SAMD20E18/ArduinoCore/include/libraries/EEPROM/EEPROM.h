@@ -25,58 +25,59 @@ class NVMFlash
     uint32_t EEEPROMSize;
     uint32_t startAddr;
 
-    NVMFlash() 
+    NVMFlash()
     {
-      NVMParams_t params = getNVMParams();
-      minimumEraseSize = params.rowSize;
-      EEEPROMSize = params.eepromSize;
-      startAddr = params.nvmTotalSize - EEEPROMSize;
+        NVMParams_t params = getNVMParams();
+        minimumEraseSize = params.rowSize;
+        EEEPROMSize = params.eepromSize;
+        startAddr = params.nvmTotalSize - EEEPROMSize;
     }
 
     void read( const volatile void *flash_ptr, void *data, uint32_t size )
     {
-      readFlash( flash_ptr, data, size );
+        readFlash( flash_ptr, data, size );
     }
 
     void erase( uint32_t addr )
     {
-      eraseRow( addr );
+        eraseRow( addr );
     }
 
-    void write( const volatile void *flash_ptr, const void *data, uint32_t size )
+    void write( const volatile void *flash_ptr, const void *data,
+                uint32_t size )
     {
-      writeFlash( flash_ptr, data, size );
+        writeFlash( flash_ptr, data, size );
     }
 };
 
-template <class T>
-class EEEPROM
+template <class T> class EEEPROM
 {
   public:
-    EEEPROM() {};
+    EEEPROM(){};
+
   private:
     T _flashMem;
 };
 
-template <>
-class EEEPROM <NVMFlash>
+template <> class EEEPROM<NVMFlash>
 {
   public:
     EEEPROM();
     uint16_t getSize();
-    void write( uint16_t addr, void *data, uint16_t size );
-    void read( uint16_t addr, void *data, uint16_t size );
-    void erase( uint16_t addr, uint16_t size );
+    void     write( uint16_t addr, void *data, uint16_t size );
+    void     read( uint16_t addr, void *data, uint16_t size );
+    void     erase( uint16_t addr, uint16_t size );
+
   private:
     NVMFlash _flashMem;
     uint16_t _minFlashPageSize, _effectivePageSize;
     uint16_t _useableMemSize, _EEEPROMSize;
-    uint8_t _numUsableBanks, _nextBankUp;
+    uint8_t  _numUsableBanks, _nextBankUp;
     uint8_t *_bankStatus;
-    bool _bankUpToDate;
+    bool     _bankUpToDate;
     uint32_t _flashEEEPROMStartAddr;
 
-    void retrieveBankStatus();
+    void     retrieveBankStatus();
     uint32_t getNextEmptyBankAddr();
     uint32_t getFlashAddr( uint16_t eeepromAddr );
 };

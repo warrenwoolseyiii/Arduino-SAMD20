@@ -216,19 +216,5 @@ void RTC_Handler(void)
   RTC_IRQHandler();
 }
 
-#ifndef SAMD20
-static void (*usb_isr)(void) = NULL;
-
-void USB_Handler(void)
-{
-  if (usb_isr)
-    usb_isr();
-}
-
-void USB_SetHandler(void (*new_usb_isr)(void))
-{
-  usb_isr = new_usb_isr;
-}
-#endif // SAMD20
 
 

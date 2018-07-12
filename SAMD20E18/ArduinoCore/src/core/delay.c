@@ -25,22 +25,22 @@ extern "C" {
 
 uint32_t millis()
 {
-  return RTC_EXACT_STEPS_TO_MILLIS( stepsRTC() );
+    return RTC_EXACT_STEPS_TO_MILLIS( stepsRTC() );
 }
 
 uint32_t micros()
 {
-  return RTC_ROUGH_STEPS_TO_MICROS( stepsRTC() );  
+    return RTC_ROUGH_STEPS_TO_MICROS( stepsRTC() );
 }
 
 void delay( uint32_t ms )
 {
-  uint32_t steps = RTC_EXACT_MILLIS_TO_STEPS( ms );
-  uint32_t start = stepsRTC();
+    uint32_t steps = RTC_EXACT_MILLIS_TO_STEPS( ms );
+    uint32_t start = stepsRTC();
 
-  do {
-    yield() ;
-  } while ( stepsRTC() - start < steps ) ;
+    do {
+        yield();
+    } while( stepsRTC() - start < steps );
 }
 
 #ifdef __cplusplus

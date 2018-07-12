@@ -23,70 +23,68 @@
 
 uint8_t _isInit = 0;
 
-/* Note: The WDT runs off the 32768 Hz clock source divided by 32, giving the WDT a 
- * 1024 Hz clock source. */
+/* Note: The WDT runs off the 32768 Hz clock source divided by 32, giving the
+ * WDT a 1024 Hz clock source. */
 void initWDT( uint32_t wdtPeriod )
 {
-  // Set up the clocks and APB
-  initClkGenerator( GCLK_GENCTRL_SRC_XOSC32K_Val, GCLK_GENDIV_ID_GCLK2_Val,
-    0x04, 0x1, 0x0 );
-  initGenericClk( GCLK_CLKCTRL_GEN_GCLK2_Val, GCLK_CLKCTRL_ID_WDT_Val );
-  enableAPBAClk( PM_APBAMASK_WDT, 1 );
+    // Set up the clocks and APB
+    initClkGenerator( GCLK_GENCTRL_SRC_XOSC32K_Val, GCLK_GENDIV_ID_GCLK2_Val,
+                      0x04, 0x1, 0x0 );
+    initGenericClk( GCLK_CLKCTRL_GEN_GCLK2_Val, GCLK_CLKCTRL_ID_WDT_Val );
+    enableAPBAClk( PM_APBAMASK_WDT, 1 );
 
-  // Reset the control reg
-  disableWDT();
-  WDT->CTRL.reg = 0;
-  WDT_WAIT_SYNC;
+    // Reset the control reg
+    disableWDT();
+    WDT->CTRL.reg = 0;
+    WDT_WAIT_SYNC;
 
-  // Ensure all interrupts are cleared
-  WDT->INTENCLR.bit.EW = 1;
-  NVIC_DisableIRQ( WDT_IRQn );
+    // Ensure all interrupts are cleared
+    WDT->INTENCLR.bit.EW = 1;
+    NVIC_DisableIRQ( WDT_IRQn );
 
-  // Set the period
-  if( wdtPeriod > WDT_CONFIG_PER_16K_Val )
-    wdtPeriod = WDT_CONFIG_PER_16K_Val;
-  WDT->CONFIG.reg = WDT_CONFIG_PER( wdtPeriod );
+    // Set the period
+    if( wdtPeriod > WDT_CONFIG_PER_16K_Val ) wdtPeriod = WDT_CONFIG_PER_16K_Val;
+    WDT->CONFIG.reg = WDT_CONFIG_PER( wdtPeriod );
 
-  enableWDT();
+    enableWDT();
 }
 
 void endWDT()
 {
-  disableWDT();
-  enableAPBAClk( PM_APBAMASK_WDT, 0 );
-  disableGenericClk( GCLK_CLKCTRL_ID_WDT_Val );
-  disableClkGenerator( GCLK_GENDIV_ID_GCLK2_Val );
+    disableWDT();
+    enableAPBAClk( PM_APBAMASK_WDT, 0 );
+    disableGenericClk( GCLK_CLKCTRL_ID_WDT_Val );
+    disableClkGenerator( GCLK_GENDIV_ID_GCLK2_Val );
 }
 
 void enableWDT()
 {
-  WDT->CTRL.bit.ENABLE = 1;
-  WDT_WAIT_SYNC;
-  _isInit = 1;
+    WDT->CTRL.bit.ENABLE = 1;
+    WDT_WAIT_SYNC;
+    _isInit = 1;
 }
 
 void disableWDT()
 {
-  WDT->CTRL.bit.ENABLE = 0;
-  WDT_WAIT_SYNC;
-  _isInit = 0;
+    WDT->CTRL.bit.ENABLE = 0;
+    WDT_WAIT_SYNC;
+    _isInit = 0;
 }
 
 void clearWDT()
 {
-  // Data sheet Section 17.8.8: Writing 0xA5 will reset the WDT counter
-  WDT->CLEAR.reg = 0xA5;
-  WDT_WAIT_SYNC;
+    // Data sheet Section 17.8.8: Writing 0xA5 will reset the WDT counter
+    WDT->CLEAR.reg = 0xA5;
+    WDT_WAIT_SYNC;
 }
 
 /* Warning! Will not return from here. */
 void resetCPU()
 {
-  if( !_isInit )
-    initWDT( WDT_CONFIG_PER_8_Val );
+    if( !_isInit ) initWDT( WDT_CONFIG_PER_8_Val );
 
-  // Data sheet Section 17.8.8: Writing any value other than 0xA5 will reset
-  // the CPU immediately 
-  WDT->CLEAR.reg = 0xFF;
-  WDT_WAIT_SYNC;
+    // Data sheet Section 17.8.8: Writing any value other than 0xA5 will reset
+    // the CPU immediately
+    WDT->CLEAR.reg = 0xFF;
+    WDT_WAIT_SYNC;
 }
