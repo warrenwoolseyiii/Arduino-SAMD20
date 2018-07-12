@@ -39,7 +39,7 @@ void init( void )
   initRTC();
 
   // Setup all pins (digital and analog) in INPUT mode (default is nothing)
-  enableAPBBClk( PM_APBBMASK_PORT, 1 );
+  //enableAPBBClk( PM_APBBMASK_PORT, 1 );
   //for (uint32_t ul = 0 ; ul < NUM_DIGITAL_PINS ; ul++ )
     //pinMode( ul, INPUT ) ;
 

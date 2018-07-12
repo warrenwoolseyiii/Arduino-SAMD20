@@ -35,51 +35,22 @@ SERCOM::SERCOM( Sercom *s )
  *	===== Sercom UART
  *	=========================
  */
-void SERCOM::initUART( SercomUartMode mode, SercomUartSampleRate sampleRate,
-                       uint32_t baudrate )
+void SERCOM::initUART( SercomUartMode mode, uint32_t baudrate )
 {
     enableSERCOM();
     resetUART();
 
     // Setting the CTRLA register
-    sercom->USART.CTRLA.reg = SERCOM_USART_CTRLA_MODE( mode )
-#ifndef SAMD20
-                              | SERCOM_USART_CTRLA_SAMPR( sampleRate )
-#endif /* SAMD20 */
-        ;
+    sercom->USART.CTRLA.reg = SERCOM_USART_CTRLA_MODE( mode );
 
-    // Setting the Interrupt register
-    sercom->USART.INTENSET.reg = SERCOM_USART_INTENSET_RXC /* Receive */
-#ifndef SAMD20
-                                 | SERCOM_USART_INTENSET_ERROR /* Errors */
-#endif                                                         /* SAMD20 */
-        ;
+    // Enable the receive data interrupt
+    sercom->USART.INTENSET.reg = SERCOM_USART_INTENSET_RXC;
 
     if( mode == UART_INT_CLOCK ) {
-        uint16_t sampleRateValue;
-
-        if( sampleRate == SAMPLE_RATE_x16 ) {
-            sampleRateValue = 16;
-        }
-        else {
-            sampleRateValue = 8;
-        }
-
-#ifndef SAMD20
-        // Asynchronous fractional mode (Table 24-2 in datasheet)
-        //   BAUD = fref / (sampleRateValue * fbaud)
-        // (multiply by 8, to calculate fractional piece)
-        uint32_t baudTimes8 =
-            ( SystemCoreClock * 8 ) / ( sampleRateValue * baudrate );
-
-        sercom->USART.BAUD.FRAC.FP = ( baudTimes8 % 8 );
-        sercom->USART.BAUD.FRAC.BAUD = ( baudTimes8 / 8 );
-#else
-        float baudF = (float)baudrate;
-        float ratio = ( baudF / (float)SystemCoreClock );
-        float baudReg = 65536.0 * ( 1.0 - ( 16.0 * ratio ) );
-        sercom->USART.BAUD.reg = (uint16_t)baudReg;
-#endif /* SAMD20 */
+        uint64_t ratio = 1048576;
+        ratio *= baudrate;
+        ratio /= SystemCoreClock;
+        sercom->USART.BAUD.reg = ( uint16_t )( 65536 - ratio );
     }
 }
 
@@ -102,34 +73,18 @@ void SERCOM::initFrame( SercomUartCharSize charSize, SercomDataOrder dataOrder,
 
 void SERCOM::initPads( SercomUartTXPad txPad, SercomRXPad rxPad )
 {
-// Setting the CTRLA register
-#ifndef SAMD20
-    sercom->USART.CTRLA.reg |=
-        SERCOM_USART_CTRLA_TXPO( txPad ) | SERCOM_USART_CTRLA_RXPO( rxPad );
-#else
     sercom->USART.CTRLA.reg |=
         SERCOM_USART_CTRLA_TXPO | SERCOM_USART_CTRLA_RXPO( rxPad );
-#endif /* SAMD20 */
 
-    // Enable Transceiver and Receiver
+    // Enable Transceiver
     sercom->USART.CTRLB.reg |=
         SERCOM_USART_CTRLB_TXEN | SERCOM_USART_CTRLB_RXEN;
 }
 
 void SERCOM::resetUART()
 {
-    // Start the Software Reset
     sercom->USART.CTRLA.bit.SWRST = 1;
-
-#ifndef SAMD20
-    while( sercom->USART.CTRLA.bit.SWRST || sercom->USART.SYNCBUSY.bit.SWRST )
-#else
-    while( sercom->USART.CTRLA.bit.SWRST || sercom->USART.STATUS.bit.SYNCBUSY )
-#endif /* SAMD20 */
-    {
-        // Wait for both bits Software Reset from CTRLA and SYNCBUSY coming back
-        // to 0
-    }
+    while( sercom->USART.CTRLA.bit.SWRST || sercom->USART.STATUS.bit.SYNCBUSY );
 }
 
 void SERCOM::endUART()
@@ -139,18 +94,9 @@ void SERCOM::endUART()
 
 void SERCOM::enableUART()
 {
-    // Setting  the enable bit to 1
     sercom->USART.CTRLA.bit.ENABLE = 0x1u;
-
-#ifndef SAMD20
-    // Wait for then enable bit from SYNCBUSY is equal to 0;
-    while( sercom->USART.SYNCBUSY.bit.ENABLE )
-        ;
-#else
-    // Wait for the clocks to sync
     while( sercom->USART.STATUS.bit.SYNCBUSY )
         ;
-#endif /* SAMD20 */
 }
 
 void SERCOM::flushUART()
@@ -177,29 +123,20 @@ bool SERCOM::availableDataUART()
 
 bool SERCOM::isUARTError()
 {
-    bool rtn =
-#ifndef SAMD20
-        sercom->USART.INTFLAG.bit.ERROR;
-#else
-        sercom->USART.STATUS.reg &
+    bool rtn = sercom->USART.STATUS.reg &
         ( SERCOM_USART_STATUS_BUFOVF | SERCOM_USART_STATUS_FERR |
           SERCOM_USART_STATUS_PERR );
-#endif /* SAMD20 */
     return rtn;
 }
 
 void SERCOM::acknowledgeUARTError()
 {
-#ifndef SAMD20
-    sercom->USART.INTFLAG.bit.ERROR = 1;
-#else
     if( isBufferOverflowErrorUART() )
         sercom->USART.STATUS.reg |= SERCOM_USART_STATUS_BUFOVF;
     if( isFrameErrorUART() )
         sercom->USART.STATUS.reg |= SERCOM_USART_STATUS_FERR;
     if( isParityErrorUART() )
         sercom->USART.STATUS.reg |= SERCOM_USART_STATUS_PERR;
-#endif /* SAMD20 */
 }
 
 bool SERCOM::isBufferOverflowErrorUART()
@@ -791,6 +728,10 @@ void SERCOM::enableSERCOM()
         irqn = SERCOM5_IRQn;
     }
 #endif /* SERCOM5 */
+
+    // Ensure that PORT is enabled
+    if( !( PM->APBBMASK.bit.PORT_ ) )
+        enableAPBBClk( PM_APBBMASK_PORT, 1 );
 
     initGenericClk( GCLK_CLKCTRL_GEN_GCLK0_Val, id );
     enableAPBCClk( apbMask, 1 );

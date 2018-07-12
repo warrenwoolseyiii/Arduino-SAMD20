@@ -122,8 +122,7 @@ class SERCOM
     SERCOM( Sercom *s );
 
     /* ========== UART ========== */
-    void initUART( SercomUartMode mode, SercomUartSampleRate sampleRate,
-                   uint32_t baudrate = 0 );
+    void initUART( SercomUartMode mode, uint32_t baudrate = 0 );
     void initFrame( SercomUartCharSize charSize, SercomDataOrder dataOrder,
                     SercomParityMode    parityMode,
                     SercomNumberStopBit nbStopBits );

@@ -67,7 +67,7 @@ void Uart::begin(unsigned long baudrate, uint16_t config)
     *pul_outclrRTS = ul_pinMaskRTS;
   }
 
-  sercom->initUART(UART_INT_CLOCK, SAMPLE_RATE_x16, baudrate);
+  sercom->initUART(UART_INT_CLOCK, baudrate);
   sercom->initFrame(extractCharSize(config), LSB_FIRST, extractParity(config), extractNbStopBit(config));
   sercom->initPads(uc_padTX, uc_padRX);
 

@@ -1,6 +1,8 @@
 #include <Arduino.h>
 #include <EEPROM.h>
 
+EEEPROM<NVMFlash> eeeprom;
+
 void initClkOut()
 {
     // For now output GCLK0 onto pin 3
@@ -57,8 +59,7 @@ void testNVMFlash()
     readFlash( (void *)0x10000, buff, 128 );
 }
 
-EEEPROM<NVMFlash> eeeprom;
-void              testEEEPROM()
+void testEEEPROM()
 {
     uint8_t buff[256];
     for( uint16_t i = 0; i < 256; i++ ) buff[i] = i & 0xFF;
@@ -107,7 +108,6 @@ void setup()
     changeCPUClk( cpu_clk_dfll48 );
 }
 
-uint8_t level = 0;
 void loop()
 {
     testSleep();
