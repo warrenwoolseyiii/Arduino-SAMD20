@@ -81,6 +81,16 @@ void pinMode( uint32_t ulPin, uint32_t ulMode )
                 ( uint32_t )( 1 << g_APinDescription[ulPin].ulPin );
             break;
 
+        case TRI_STATE:
+            // DIR = 0, INEN = 0, PULLEN = 0, OUT = X
+            PORT->Group[g_APinDescription[ulPin].ulPort].DIRCLR.reg =
+                ( uint32_t )( 1 << g_APinDescription[ulPin].ulPin );
+            PORT->Group[g_APinDescription[ulPin].ulPort]
+                .PINCFG[g_APinDescription[ulPin].ulPin]
+                .reg &= ~( ( uint8_t )( PORT_PINCFG_INEN | PORT_PINCFG_PULLEN 
+                | PORT_PINCFG_PMUXEN ) );
+            break;
+
         default:
             // do nothing
             break;

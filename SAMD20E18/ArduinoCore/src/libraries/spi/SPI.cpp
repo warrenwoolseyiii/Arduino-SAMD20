@@ -83,6 +83,13 @@ void SPIClass::end()
         _p_sercom->endSPI();
         initialized = false;
     }
+
+    pinMode( _uc_pinMiso, OUTPUT );
+    pinMode( _uc_pinSCK, OUTPUT );
+    pinMode( _uc_pinMosi, OUTPUT );
+    digitalWrite( _uc_pinMiso, HIGH );
+    digitalWrite( _uc_pinSCK, HIGH );
+    digitalWrite( _uc_pinMosi, HIGH );
 }
 
 #ifndef interruptsStatus

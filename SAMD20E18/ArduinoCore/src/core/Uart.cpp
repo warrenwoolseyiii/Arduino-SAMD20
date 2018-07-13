@@ -80,6 +80,12 @@ void Uart::end()
 {
     sercom->resetUART();
     sercom->endUART();
+
+    pinMode( uc_pinRX, OUTPUT );
+    pinMode( uc_pinTX, OUTPUT );
+    digitalWrite( uc_pinRX, HIGH );
+    digitalWrite( uc_pinTX, HIGH );
+
     rxBuffer.clear();
     txBuffer.clear();
 }
