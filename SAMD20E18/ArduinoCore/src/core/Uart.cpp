@@ -48,7 +48,6 @@ void Uart::begin( unsigned long baudrate )
 
 void Uart::begin( unsigned long baudrate, uint16_t config )
 {
-    enableAPBBClk( PM_APBBMASK_PORT, 1 );
     pinPeripheral( uc_pinRX, g_APinDescription[uc_pinRX].ulPinType );
     pinPeripheral( uc_pinTX, g_APinDescription[uc_pinTX].ulPinType );
 
