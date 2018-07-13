@@ -29,7 +29,7 @@ extern "C" {
 uint32_t millis();
 uint32_t micros();
 void     delay( uint32_t dwMs );
-
+void delayMicroseconds( uint32_t us );
 ///**
 //* \brief Pauses the program for the amount of time (in microseconds) specified
 //as parameter.

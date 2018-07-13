@@ -1,7 +1,10 @@
 #include <Arduino.h>
 #include <EEPROM.h>
+#include <SPIFlash.h>
 
+SPIFlash flash( 10, 0x1F44 );
 EEEPROM<NVMFlash> eeeprom;
+uint8_t buff[256];
 
 void initClkOut()
 {
@@ -41,8 +44,6 @@ void testWDTReset()
 
 void testNVMFlash()
 {
-    uint8_t buff[256];
-
     eraseRow( 0x10000 );
     readFlash( (void *)0x10000, buff, 256 );
 
@@ -59,9 +60,21 @@ void testNVMFlash()
     readFlash( (void *)0x10000, buff, 128 );
 }
 
+void testSPIFlash()
+{
+    flash.pageErase256( 0 );
+    memset( buff, 0, 256 );
+    flash.readBytes( 0, buff, 256 );
+
+    for( uint16_t i = 0; i < 256; i++ ) buff[i] = i & 0xFF;
+    flash.writeBytes( 0, buff, 256 );
+    
+    memset( buff, 0, 256 );
+    flash.readBytes( 0, buff, 256 );
+}
+
 void testEEEPROM()
 {
-    uint8_t buff[256];
     for( uint16_t i = 0; i < 256; i++ ) buff[i] = i & 0xFF;
     eeeprom.write( 0, buff, 64 );
     eeeprom.write( 64, &buff[64], 64 );
@@ -87,18 +100,21 @@ void hardMathTest()
 
 void testSleep()
 {
+    enableAPBBClk( PM_APBBMASK_PORT, 0 );
+
     // Sleep the CPU
     sleepCPU( PM_SLEEP_STANDBY_Val );
 
     // Print time
-    Serial.begin( 9600 );
+    Serial.begin( 115200 );
     Serial.print( "Begin:" );
     Serial.println( millis() );
     testEEEPROM();
     hardMathTest();
+    testSPIFlash();
     Serial.print( "End:" );
     Serial.println( millis() );
-    delay( 25 );
+    delay( 10 );
     Serial.end();
 }
 
@@ -106,6 +122,13 @@ void setup()
 {
     // Select the clock
     changeCPUClk( cpu_clk_dfll48 );
+
+    // RFM SS
+    pinMode( 7, OUTPUT );
+    digitalWrite( 7, HIGH );
+
+    // Flash SS
+    flash.initialize();
 }
 
 void loop()

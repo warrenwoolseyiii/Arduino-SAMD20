@@ -38,6 +38,7 @@ SUBDIRS :=  \
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS +=  \
+../../../Flume/Flume_AMR/lib/SPIFlash/SPIFlash.cpp \
 ../Drivers.cpp
 
 
@@ -48,15 +49,19 @@ ASM_SRCS +=
 
 
 OBJS +=  \
+SPIFlash.o \
 Drivers.o
 
 OBJS_AS_ARGS +=  \
+SPIFlash.o \
 Drivers.o
 
 C_DEPS +=  \
+SPIFlash.d \
 Drivers.d
 
 C_DEPS_AS_ARGS +=  \
+SPIFlash.d \
 Drivers.d
 
 OUTPUT_FILE_PATH +=Drivers.elf
@@ -79,10 +84,19 @@ LINKER_SCRIPT_DEP+=  \
 
 
 
+
+
+./%.o: ../../../Flume/Flume_AMR/lib/SPIFlash/%.cpp
+	@echo Building file: $<
+	@echo Invoking: ARM/GNU C Compiler : 6.3.1
+	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\arm\arm-gnu-toolchain\bin\arm-none-eabi-g++.exe$(QUOTE) -mthumb -D__SAMD20E18__ -DDEBUG -DSAMD20  -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\arm\cmsis\5.0.1\CMSIS\Include" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\SAMD20_DFP\1.2.91\samd20\include" -I"../../SAMD20E18/ArduinoCore/include/core" -I"../../SAMD20E18/ArduinoCore/include/core/avr" -I"../../SAMD20E18/ArduinoCore/include/core/samd20" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include/component" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include/instance" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include/pio" -I"../../SAMD20E18/ArduinoCore/include/libraries" -I"../../SAMD20E18/ArduinoCore/include/libraries/spi" -I"../../SAMD20E18/ArduinoCore/include/libraries/wire" -I"../../SAMD20E18/ArduinoCore/include/libraries/EEPROM" -I"../../SAMD20E18/ArduinoCore/include/variants" -I"../../../Flume/Flume_AMR/lib" -I"../../../Flume/Flume_AMR/lib/SPIFlash"  -O1 -ffunction-sections -fno-rtti -fno-exceptions -mlong-calls -g3 -Wall -mcpu=cortex-m0plus -c -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	@echo Finished building: $<
+	
+
 ./%.o: .././%.cpp
 	@echo Building file: $<
 	@echo Invoking: ARM/GNU C Compiler : 6.3.1
-	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\arm\arm-gnu-toolchain\bin\arm-none-eabi-g++.exe$(QUOTE) -mthumb -D__SAMD20E18__ -DDEBUG  -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\arm\cmsis\5.0.1\CMSIS\Include" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\SAMD20_DFP\1.2.91\samd20\include" -I"../../SAMD20E18/ArduinoCore/include/core" -I"../../SAMD20E18/ArduinoCore/include/core/avr" -I"../../SAMD20E18/ArduinoCore/include/core/samd20" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include/component" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include/instance" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include/pio" -I"../../SAMD20E18/ArduinoCore/include/libraries" -I"../../SAMD20E18/ArduinoCore/include/libraries/spi" -I"../../SAMD20E18/ArduinoCore/include/libraries/wire" -I"../../SAMD20E18/ArduinoCore/include/libraries/EEPROM" -I"../../SAMD20E18/ArduinoCore/include/variants"  -O1 -ffunction-sections -fno-rtti -fno-exceptions -mlong-calls -g3 -Wall -mcpu=cortex-m0plus -c -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\arm\arm-gnu-toolchain\bin\arm-none-eabi-g++.exe$(QUOTE) -mthumb -D__SAMD20E18__ -DDEBUG -DSAMD20  -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\arm\cmsis\5.0.1\CMSIS\Include" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\SAMD20_DFP\1.2.91\samd20\include" -I"../../SAMD20E18/ArduinoCore/include/core" -I"../../SAMD20E18/ArduinoCore/include/core/avr" -I"../../SAMD20E18/ArduinoCore/include/core/samd20" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include/component" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include/instance" -I"../../SAMD20E18/ArduinoCore/include/core/samd20/include/pio" -I"../../SAMD20E18/ArduinoCore/include/libraries" -I"../../SAMD20E18/ArduinoCore/include/libraries/spi" -I"../../SAMD20E18/ArduinoCore/include/libraries/wire" -I"../../SAMD20E18/ArduinoCore/include/libraries/EEPROM" -I"../../SAMD20E18/ArduinoCore/include/variants" -I"../../../Flume/Flume_AMR/lib" -I"../../../Flume/Flume_AMR/lib/SPIFlash"  -O1 -ffunction-sections -fno-rtti -fno-exceptions -mlong-calls -g3 -Wall -mcpu=cortex-m0plus -c -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
 	@echo Finished building: $<
 	
 

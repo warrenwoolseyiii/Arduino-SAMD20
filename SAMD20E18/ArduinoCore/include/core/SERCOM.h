@@ -21,7 +21,6 @@
 
 #include "sam.h"
 
-#define SERCOM_FREQ_REF 48000000
 #define SERCOM_NVIC_PRIORITY ( ( 1 << __NVIC_PRIO_BITS ) - 1 )
 
 typedef enum { UART_EXT_CLOCK = 0, UART_INT_CLOCK = 0x1u } SercomUartMode;

@@ -236,15 +236,8 @@ void SERCOM::resetSPI()
 {
     // Setting the Software Reset bit to 1
     sercom->SPI.CTRLA.bit.SWRST = 1;
-
-#ifndef SAMD20
-    // Wait both bits Software Reset from CTRLA and SYNCBUSY are equal to 0
-    while( sercom->SPI.CTRLA.bit.SWRST || sercom->SPI.SYNCBUSY.bit.SWRST )
-        ;
-#else
     while( sercom->SPI.CTRLA.bit.SWRST || sercom->SPI.STATUS.bit.SYNCBUSY )
         ;
-#endif /* SAMD20 */
 }
 
 void SERCOM::endSPI()
@@ -254,41 +247,21 @@ void SERCOM::endSPI()
 
 void SERCOM::enableSPI()
 {
-    // Setting the enable bit to 1
     sercom->SPI.CTRLA.bit.ENABLE = 1;
-
-#ifndef SAMD20
-    while( sercom->SPI.SYNCBUSY.bit.ENABLE )
-#else
-    while( sercom->SPI.STATUS.bit.SYNCBUSY )
-#endif /* SAMD20 */
-    {
-        // Waiting then enable bit from SYNCBUSY is equal to 0;
-    }
+    while( sercom->SPI.STATUS.bit.SYNCBUSY );
 }
 
 void SERCOM::disableSPI()
 {
-#ifndef SAMD20
-    while( sercom->SPI.SYNCBUSY.bit.ENABLE )
-#else
-    while( sercom->SPI.STATUS.bit.SYNCBUSY )
-#endif /* SAMD20 */
-    {
-        // Waiting then enable bit from SYNCBUSY is equal to 0;
-    }
-
-    // Setting the enable bit to 0
     sercom->SPI.CTRLA.bit.ENABLE = 0;
+    while( sercom->SPI.STATUS.bit.SYNCBUSY );
 }
 
 void SERCOM::setDataOrderSPI( SercomDataOrder dataOrder )
 {
     // Register enable-protected
     disableSPI();
-
     sercom->SPI.CTRLA.bit.DORD = dataOrder;
-
     enableSPI();
 }
 
@@ -304,10 +277,8 @@ void SERCOM::setBaudrateSPI( uint8_t divider )
 
     // Register enable-protected
     disableSPI();
-
     sercom->SPI.BAUD.reg =
-        calculateBaudrateSynchronous( SERCOM_FREQ_REF / divider );
-
+        calculateBaudrateSynchronous( SystemCoreClock / divider );
     enableSPI();
 }
 
@@ -326,22 +297,18 @@ void SERCOM::setClockModeSPI( SercomSpiClockMode clockMode )
 
     // Register enable-protected
     disableSPI();
-
     sercom->SPI.CTRLA.bit.CPOL = cpol;
     sercom->SPI.CTRLA.bit.CPHA = cpha;
-
     enableSPI();
 }
 
 uint8_t SERCOM::transferDataSPI( uint8_t data )
 {
-    sercom->SPI.DATA.bit.DATA = data; // Writing data into Data register
+    // Write data and wait for return data
+    sercom->SPI.DATA.bit.DATA = data; 
+    while( sercom->SPI.INTFLAG.bit.RXC == 0 );
 
-    while( sercom->SPI.INTFLAG.bit.RXC == 0 ) {
-        // Waiting Complete Reception
-    }
-
-    return sercom->SPI.DATA.bit.DATA; // Reading data
+    return sercom->SPI.DATA.bit.DATA;
 }
 
 bool SERCOM::isBufferOverflowErrorSPI()
@@ -351,25 +318,12 @@ bool SERCOM::isBufferOverflowErrorSPI()
 
 bool SERCOM::isDataRegisterEmptySPI()
 {
-    // DRE : Data Register Empty
     return sercom->SPI.INTFLAG.bit.DRE;
 }
 
-// bool SERCOM::isTransmitCompleteSPI()
-//{
-//	//TXC : Transmit complete
-//	return sercom->SPI.INTFLAG.bit.TXC;
-//}
-//
-// bool SERCOM::isReceiveCompleteSPI()
-//{
-//	//RXC : Receive complete
-//	return sercom->SPI.INTFLAG.bit.RXC;
-//}
-
 uint8_t SERCOM::calculateBaudrateSynchronous( uint32_t baudrate )
 {
-    return SERCOM_FREQ_REF / ( 2 * baudrate ) - 1;
+    return SystemCoreClock / ( 2 * baudrate ) - 1;
 }
 
 /*	=========================
@@ -730,8 +684,7 @@ void SERCOM::enableSERCOM()
 #endif /* SERCOM5 */
 
     // Ensure that PORT is enabled
-    if( !( PM->APBBMASK.bit.PORT_ ) )
-        enableAPBBClk( PM_APBBMASK_PORT, 1 );
+    enableAPBBClk( PM_APBBMASK_PORT, 1 );
 
     initGenericClk( GCLK_CLKCTRL_GEN_GCLK0_Val, id );
     enableAPBCClk( apbMask, 1 );

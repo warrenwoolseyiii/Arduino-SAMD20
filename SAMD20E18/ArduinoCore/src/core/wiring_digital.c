@@ -30,6 +30,7 @@ void pinMode( uint32_t ulPin, uint32_t ulMode )
     }
 
     // Set pin mode according to chapter '22.6.3 I/O Pin Configuration'
+    enableAPBBClk( PM_APBBMASK_PORT, 1 );
     switch( ulMode ) {
         case INPUT:
             // Set pin to input mode
@@ -93,6 +94,7 @@ void digitalWrite( uint32_t ulPin, uint32_t ulVal )
         return;
     }
 
+    enableAPBBClk( PM_APBBMASK_PORT, 1 );
     EPortType port = g_APinDescription[ulPin].ulPort;
     uint32_t  pin = g_APinDescription[ulPin].ulPin;
     uint32_t  pinMask = ( 1ul << pin );
@@ -118,6 +120,7 @@ uint8_t digitalRead( uint32_t ulPin )
 
     // Handle the case the pin isn't usable as PIO
     if( g_APinDescription[ulPin].ulPinType != PIO_NOT_A_PIN ) {
+        enableAPBBClk( PM_APBBMASK_PORT, 1 );
         if( ( PORT->Group[g_APinDescription[ulPin].ulPort].IN.reg &
               ( 1ul << g_APinDescription[ulPin].ulPin ) ) != 0 ) {
             rtn = HIGH;

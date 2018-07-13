@@ -43,6 +43,16 @@ void delay( uint32_t ms )
     } while( stepsRTC() - start < steps );
 }
 
+void delayMicroseconds( uint32_t us )
+{
+    uint32_t steps = RTC_ROUGH_MICROS_TO_STEPS( us );
+    uint32_t start = stepsRTC();
+
+    do {
+        yield();
+    } while( stepsRTC() - start < steps ); 
+}
+
 #ifdef __cplusplus
 }
 #endif
