@@ -55,8 +55,8 @@ extern "C"
 
 // Number of pins defined in PinDescription array
 #if defined(__SAMD20E18__)
-#define PINS_COUNT           (22u)
-#define NUM_DIGITAL_PINS     (16u)
+#define PINS_COUNT           (28u)
+#define NUM_DIGITAL_PINS     (28u)
 #define NUM_ANALOG_INPUTS    (6u)
 #define NUM_ANALOG_OUTPUTS   (1u)
 #define analogInputToDigitalPin(p)  ((p < 6u) ? (p) + 14u : -1)
@@ -151,7 +151,7 @@ static const uint8_t ATN = PIN_ATN;*/
  * SPI Interfaces
  */
 #if defined(__SAMD20E18__)
-#define SPI_INTERFACES_COUNT 1
+#define SPI_INTERFACES_COUNT 2
 
 #define PIN_SPI_MISO         (21ul)
 #define PIN_SPI_MOSI         (22ul)
@@ -164,6 +164,14 @@ static const uint8_t SS	  = (7ul);	// SERCOM4 last PAD is present on A2 but HW S
 static const uint8_t MOSI = PIN_SPI_MOSI ;
 static const uint8_t MISO = PIN_SPI_MISO ;
 static const uint8_t SCK  = PIN_SPI_SCK ;
+
+#define PIN_SPI1_MISO         (26ul)
+#define PIN_SPI1_MOSI         (24ul)
+#define PIN_SPI1_SCK          (25ul)
+#define PERIPH_SPI1           sercom0
+#define PAD_SPI1_TX           SPI_PAD_0_SCK_1
+#define PAD_SPI1_RX           SERCOM_RX_PAD_3
+
 #elif defined(__SAMD20J18__)
 #define SPI_INTERFACES_COUNT 1
 

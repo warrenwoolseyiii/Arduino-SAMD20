@@ -61,6 +61,12 @@
  * |            | 5                |        | RESET           |
  * |            | 6                |        | GND             |
  * +------------+------------------+--------+-----------------+--------------------------------------------------------------------------------------------------------
+ * |            |SPI 2             |        |                 |
+ * +------------+------------------+--------+-----------------+--------------------------------------------------------------------------------------------------------
+ * |            |                  |  PA11  | 24/MISO         | SERCOM0/PAD[3]
+ * |            |                  |  PA08  | 25/MOSI         | SERCOM0/PAD[0]
+ * |            |                  |  PA09  | 26/SCK          | SERCOM0/PAD[1]
+ * +------------+------------------+--------+-----------------+--------------------------------------------------------------------------------------------------------
  * |            | Debug/Flashing   |        |                 |
  * +------------+------------------+--------+-----------------+--------------------------------------------------------------------------------------------------------
  * |            | RESET            | /RESET |                 |
@@ -69,8 +75,8 @@
  * +------------+------------------+--------+-----------------+--------------------------------------------------------------------------------------------------------
  * |            | AREF/DAC         |        |                 |
  * +------------+------------------+--------+-----------------+--------------------------------------------------------------------------------------------------------
- * |            | AREF             |  PA03  | 24              | AIN[1]
- * | PD4/INT1   | DAC/VOUT         |  PA02  | 25/A0           | AIN[0]  DAC/VOUT
+ * |            | AREF             |  PA03  | 27              | AIN[1]
+ * | PD4/INT1   | DAC/VOUT         |  PA02  | 28/A0           | AIN[0]  DAC/VOUT
  * +------------+------------------+--------+-----------------+--------------------------------------------------------------------------------------------------------
  * |            |32.768KHz Crystal |        |                 |
  * +------------+------------------+--------+-----------------+--------------------------------------------------------------------------------------------------------
@@ -213,11 +219,17 @@ const PinDescription g_APinDescription[]=
   { PORTA, 16, PIO_SERCOM, PIN_ATTR_DIGITAL, No_ADC_Channel, NOT_ON_PWM, NOT_ON_TIMER, EXTERNAL_INT_0 }, // MOSI: SERCOM1/PAD[2]
   { PORTA, 17, PIO_SERCOM, PIN_ATTR_DIGITAL, No_ADC_Channel, NOT_ON_PWM, NOT_ON_TIMER, EXTERNAL_INT_1 }, // SCK: SERCOM1/PAD[3]
 
-  // 24 (AREF)
+  // 24..26 - SPI2 pins
+  // ----------------------
+  { PORTA,  8, PIO_SERCOM, PIN_ATTR_DIGITAL, No_ADC_Channel, NOT_ON_PWM, NOT_ON_TIMER, EXTERNAL_INT_NMI }, // MOSI: SERCOM0/PAD[0]
+  { PORTA,  9, PIO_SERCOM, PIN_ATTR_DIGITAL, No_ADC_Channel, NOT_ON_PWM, NOT_ON_TIMER, EXTERNAL_INT_9 },   // SCK: SERCOM0/PAD[1]
+  { PORTA, 11, PIO_SERCOM, PIN_ATTR_DIGITAL, No_ADC_Channel, NOT_ON_PWM, NOT_ON_TIMER, EXTERNAL_INT_11 },  // MISO: SERCOM0/PAD[3]
+
+  // 27 (AREF)
   { PORTA, 3, PIO_ANALOG, PIN_ATTR_ANALOG, No_ADC_Channel, NOT_ON_PWM, NOT_ON_TIMER, EXTERNAL_INT_NONE }, // DAC/VREFP
 
   // ----------------------
-  // 25 - Alternate use of A0 (DAC output)
+  // 28 - Alternate use of A0 (DAC output)
   { PORTA, 2, PIO_ANALOG, PIN_ATTR_ANALOG, DAC_Channel0, NOT_ON_PWM, NOT_ON_TIMER, EXTERNAL_INT_2 }, // DAC/VOUT  
 #elif defined(__SAMD20J18__)
   // 0..13 - Digital pins

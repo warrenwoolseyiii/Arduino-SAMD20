@@ -68,7 +68,7 @@ int pinPeripheral( uint32_t ulPin, EPioType ulPeripheral )
                 // Enable port mux
                 PORT->Group[g_APinDescription[ulPin].ulPort]
                     .PINCFG[g_APinDescription[ulPin].ulPin]
-                    .reg |= PORT_PINCFG_PMUXEN;
+                    .reg = PORT_PINCFG_PMUXEN;
             }
             // even pin
             else {
@@ -83,7 +83,7 @@ int pinPeripheral( uint32_t ulPin, EPioType ulPeripheral )
                     .reg = temp | PORT_PMUX_PMUXE( ulPeripheral );
                 PORT->Group[g_APinDescription[ulPin].ulPort]
                     .PINCFG[g_APinDescription[ulPin].ulPin]
-                    .reg |= PORT_PINCFG_PMUXEN; // Enable port mux
+                    .reg = PORT_PINCFG_PMUXEN; // Enable port mux
             }
             break;
 

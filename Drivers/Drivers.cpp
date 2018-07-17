@@ -104,34 +104,58 @@ void testSleep()
 
     // Sleep the CPU
     sleepCPU( PM_SLEEP_STANDBY_Val );
+}
 
-    // Print time
-    Serial.begin( 115200 );
-    Serial.print( "Begin:" );
-    Serial.println( millis() );
-    testEEEPROM();
-    hardMathTest();
-    testSPIFlash();
-    Serial.print( "End:" );
-    Serial.println( millis() );
+void FXOSSPI()
+{
+    // Tri-state MISO
+    pinMode( 26, TRI_STATE );
+
+    digitalWrite( 3, HIGH );
+    delay( 1 );
+    digitalWrite( 3, LOW );
     delay( 10 );
-    Serial.end();
+
+    SPISettings _settings = SPISettings( 1000000, MSBFIRST, SPI_MODE0 );
+    SPI1.beginTransaction( _settings );
+
+    uint8_t tx[3] = { 0x06, 0x80, 0x00 };
+    digitalWrite( 11, LOW );
+
+    for( uint8_t i = 0; i < 3; i++)
+        buff[i] = SPI1.transfer( tx[i] );
+
+    digitalWrite( 11, HIGH );
+    SPI1.end();
 }
 
 void setup()
 {
     // Select the clock
-    changeCPUClk( cpu_clk_dfll48 );
+    changeCPUClk( cpu_clk_oscm8 );
 
-    // RFM SS
-    pinMode( 7, OUTPUT );
-    digitalWrite( 7, HIGH );
+    // SPI1 CS
+    pinMode( 11, OUTPUT );
+    digitalWrite( 11, HIGH );
 
-    // Flash SS
-    flash.initialize();
+    // FXOS_RST
+    pinMode( 3, OUTPUT );
+    digitalWrite( 3, LOW );
 }
 
 void loop()
 {
     testSleep();
+
+    // Print time
+    //Serial.begin( 9600 );
+    //Serial.print( "Begin:" );
+    //Serial.println( millis() );
+    //testEEEPROM();
+    //hardMathTest();
+    //Serial.print( "End:" );
+    //Serial.println( millis() );
+    //delay( 25 );
+    //Serial.end();
+    FXOSSPI();
 }

@@ -49,12 +49,6 @@ SPIClass::SPIClass( SERCOM *p_sercom, uint8_t uc_pinMISO, uint8_t uc_pinSCK,
 void SPIClass::begin()
 {
     init();
-
-    // PIO init
-    pinPeripheral( _uc_pinMiso, g_APinDescription[_uc_pinMiso].ulPinType );
-    pinPeripheral( _uc_pinSCK, g_APinDescription[_uc_pinSCK].ulPinType );
-    pinPeripheral( _uc_pinMosi, g_APinDescription[_uc_pinMosi].ulPinType );
-
     config( DEFAULT_SPI_SETTINGS );
 }
 
@@ -69,6 +63,11 @@ void SPIClass::init()
 
 void SPIClass::config( SPISettings settings )
 {
+    // PIO init
+    pinPeripheral( _uc_pinMiso, g_APinDescription[_uc_pinMiso].ulPinType );
+    pinPeripheral( _uc_pinSCK, g_APinDescription[_uc_pinSCK].ulPinType );
+    pinPeripheral( _uc_pinMosi, g_APinDescription[_uc_pinMosi].ulPinType );
+
     _p_sercom->initSPI( _padTx, _padRx, SPI_CHAR_SIZE_8_BITS,
                         settings.bitOrder );
     _p_sercom->initSPIClock( settings.dataMode, settings.clockFreq );
