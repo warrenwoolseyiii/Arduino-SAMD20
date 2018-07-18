@@ -2,7 +2,13 @@
 #include <EEPROM.h>
 #include <SPIFlash.h>
 
-SPIFlash flash( 10, 0x1F44 );
+#define FXOS_MISO   26
+#define FXOS_CS     11
+#define FXOS_RST    3
+#define RFM_SS      7
+#define FLASH_SS    10
+
+SPIFlash flash( FLASH_SS, 0x1F44 );
 EEEPROM<NVMFlash> eeeprom;
 uint8_t buff[256];
 
@@ -109,34 +115,46 @@ void testSleep()
 void FXOSSPI()
 {
     // Tri-state MISO
-    pinMode( 26, TRI_STATE );
-
-    digitalWrite( 3, HIGH );
-    delay( 1 );
-    digitalWrite( 3, LOW );
+    pinMode( FXOS_MISO, TRI_STATE );
     delay( 10 );
 
+    // Reset the FXOS
+    digitalWrite( FXOS_RST, HIGH );
+    digitalWrite( FXOS_RST, LOW );
+    delay( 1 );
+
+    // Set up the bus
     SPISettings _settings = SPISettings( 1000000, MSBFIRST, SPI_MODE0 );
     SPI1.beginTransaction( _settings );
 
-    uint8_t tx[3] = { 0x06, 0x80, 0x00 };
-    digitalWrite( 11, LOW );
+    // Read WHO_AM_I
+    uint8_t tx[3] = { ( 0x0D & 0x7F ), ( 0x0D & 0x80 ) , 0xFF };
+    digitalWrite( FXOS_CS, LOW );
 
     for( uint8_t i = 0; i < 3; i++)
         buff[i] = SPI1.transfer( tx[i] );
 
-    digitalWrite( 11, HIGH );
+    digitalWrite( FXOS_CS, HIGH );
+    SPI1.endTransaction();
     SPI1.end();
 }
 
 void setup()
 {
     // Select the clock
-    changeCPUClk( cpu_clk_oscm8 );
+    changeCPUClk( cpu_clk_dfll48 );
 
-    // SPI1 CS
-    pinMode( 11, OUTPUT );
-    digitalWrite( 11, HIGH );
+    // FXOS CS
+    pinMode( FXOS_CS, OUTPUT );
+    digitalWrite( FXOS_CS, HIGH );
+
+    // RFM SS
+    pinMode( RFM_SS, OUTPUT );
+    digitalWrite( RFM_SS, HIGH );
+
+    // FLASH SS
+    pinMode( FLASH_SS, OUTPUT );
+    digitalWrite( FLASH_SS, HIGH );
 
     // FXOS_RST
     pinMode( 3, OUTPUT );
@@ -147,15 +165,17 @@ void loop()
 {
     testSleep();
 
-    // Print time
-    //Serial.begin( 9600 );
-    //Serial.print( "Begin:" );
-    //Serial.println( millis() );
-    //testEEEPROM();
-    //hardMathTest();
-    //Serial.print( "End:" );
-    //Serial.println( millis() );
-    //delay( 25 );
-    //Serial.end();
+    Serial.begin( 38400 );
+    Serial.print( "Wake: " );
+    Serial.println( millis() );
+
     FXOSSPI();
+    testEEEPROM();
+    hardMathTest();
+    testSPIFlash();
+
+    Serial.print( "Done: " );
+    Serial.println( millis() );
+    delay( 25 );
+    Serial.end();
 }

@@ -36,8 +36,7 @@ uint32_t micros()
 void delay( uint32_t ms )
 {
     uint32_t steps = RTC_EXACT_MILLIS_TO_STEPS( ms );
-    if( ms == 1 )
-        steps++;
+    if( ms == 1 ) steps++;
     uint32_t start = stepsRTC();
 
     do {
@@ -45,9 +44,12 @@ void delay( uint32_t ms )
     } while( stepsRTC() - start < steps );
 }
 
+// WARNING: Due to the frequency the RTC is running at (32768 Hz) the
+// smallest increment of time between RTC steps is 30.5 uS.
 void delayMicroseconds( uint32_t us )
 {
     uint32_t steps = RTC_ROUGH_MICROS_TO_STEPS( us );
+    if( steps == 0 ) steps = 32;
     uint32_t start = stepsRTC();
 
     do {
