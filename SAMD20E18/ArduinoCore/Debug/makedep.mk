@@ -20,6 +20,8 @@ src\core\itoa.c
 
 src\core\main.cpp
 
+src\core\micros.cpp
+
 src\core\new.cpp
 
 src\core\NVM.c

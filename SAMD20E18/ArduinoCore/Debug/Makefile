@@ -70,6 +70,7 @@ C_SRCS +=  \
 ../src/core/IPAddress.cpp \
 ../src/core/itoa.c \
 ../src/core/main.cpp \
+../src/core/micros.cpp \
 ../src/core/new.cpp \
 ../src/core/NVM.c \
 ../src/core/Print.cpp \
@@ -116,6 +117,7 @@ src/core/hooks.o \
 src/core/IPAddress.o \
 src/core/itoa.o \
 src/core/main.o \
+src/core/micros.o \
 src/core/new.o \
 src/core/NVM.o \
 src/core/PreprocessingAssembly/pulse_asm.o \
@@ -155,6 +157,7 @@ src/core/hooks.o \
 src/core/IPAddress.o \
 src/core/itoa.o \
 src/core/main.o \
+src/core/micros.o \
 src/core/new.o \
 src/core/NVM.o \
 src/core/PreprocessingAssembly/pulse_asm.o \
@@ -194,6 +197,7 @@ src/core/hooks.d \
 src/core/IPAddress.d \
 src/core/itoa.d \
 src/core/main.d \
+src/core/micros.d \
 src/core/new.d \
 src/core/NVM.d \
 src/core/PreprocessingAssembly/pulse_asm.d \
@@ -233,6 +237,7 @@ src/core/hooks.d \
 src/core/IPAddress.d \
 src/core/itoa.d \
 src/core/main.d \
+src/core/micros.d \
 src/core/new.d \
 src/core/NVM.d \
 src/core/PreprocessingAssembly/pulse_asm.d \
@@ -276,6 +281,8 @@ LINKER_SCRIPT_DEP+=
 
 
 # AVR32/GNU C Compiler
+
+
 
 
 

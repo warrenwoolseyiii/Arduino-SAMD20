@@ -22,27 +22,34 @@
 #include <stdint.h>
 #include "sam.h"
 
-typedef enum
-{
-  tc_mode_8_bit,
-  tc_mode_16_bit
-}TCMode_t;
+typedef enum { tc_mode_8_bit, tc_mode_16_bit, tc_mode_32_bit } TCMode_t;
 
-class TimerCounter 
+class TimerCounter
 {
-public:
-  TimerCounter( Tc* timerCounter );
-  void registerISR( void (*isr)() );
-  void deregisterISR();
-  void begin( uint32_t frequency, int8_t outputPin = -1, TCMode_t mode = tc_mode_16_bit );
-  void reset();
-  void end();
-  void IrqHandler();
-private:
-  uint32_t _maxFreq;
-  Tc *_timerCounter;
-  void (*isrPtr)();
-  uint32_t setDividerAndCC( uint32_t freq, uint16_t maxCC, uint32_t ctrlA );
+  public:
+    TimerCounter( Tc *timerCounter );
+    void registerISR( void ( *isr )() );
+    void deregisterISR();
+    void begin( uint32_t frequency, int8_t outputPin = -1,
+                TCMode_t mode = tc_mode_16_bit, bool useInterrupts = false );
+    void reset();
+    void end();
+    void resume();
+    void pause();
+    void IrqHandler();
+    uint32_t getCount();
+    void setCount( uint32_t count );
+
+  private:
+    bool _isPaused;
+    uint32_t _maxFreq;
+    Tc *     _timerCounter;
+    TCMode_t _mode;
+    uint32_t _APBCMask;
+    uint32_t _clkID;
+    uint32_t _irqn;
+    void ( *isrPtr )();
+    uint32_t setDividerAndCC( uint32_t freq, uint16_t maxCC, uint32_t ctrlA );
 };
 
 #endif /* TIMERCOUNTER_H_ */

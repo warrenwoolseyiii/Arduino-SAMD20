@@ -685,6 +685,9 @@
     <Compile Include="src\core\main.cpp">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="src\core\micros.cpp">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="src\core\new.cpp">
       <SubType>compile</SubType>
     </Compile>
