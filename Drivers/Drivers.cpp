@@ -139,6 +139,14 @@ void FXOSSPI()
     SPI1.end();
 }
 
+void testMicros()
+{
+    Serial.print( "Millis Start: " );
+    Serial.println( millis() );
+    delayMicroseconds( 1000 );
+    Serial.println( millis() );
+}
+
 void setup()
 {
     // Select the clock
@@ -159,23 +167,26 @@ void setup()
     // FXOS_RST
     pinMode( 3, OUTPUT );
     digitalWrite( 3, LOW );
+
+    Serial.begin( 38400 );
 }
 
 void loop()
 {
-    testSleep();
-
-    Serial.begin( 38400 );
-    Serial.print( "Wake: " );
-    Serial.println( millis() );
-
-    FXOSSPI();
-    testEEEPROM();
-    hardMathTest();
-    testSPIFlash();
-
-    Serial.print( "Done: " );
-    Serial.println( millis() );
-    delay( 25 );
-    Serial.end();
+    testMicros();
+    //testSleep();
+//
+    //Serial.begin( 38400 );
+    //Serial.print( "Wake: " );
+    //Serial.println( millis() );
+//
+    //FXOSSPI();
+    //testEEEPROM();
+    //hardMathTest();
+    //testSPIFlash();
+//
+    //Serial.print( "Done: " );
+    //Serial.println( millis() );
+    //delay( 25 );
+    //Serial.end();
 }

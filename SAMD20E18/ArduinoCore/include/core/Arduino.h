@@ -77,6 +77,7 @@ void loop( void ) ;
 #include "WMath.h"
 #include "HardwareSerial.h"
 #include "pulse.h"
+#include "TimerCounter.h"
 #endif
 #include "delay.h"
 #include "clocks.h"
@@ -91,6 +92,7 @@ void loop( void ) ;
 // Include board variant
 #include "variant.h"
 
+#include "micros.h"
 #include "wiring.h"
 #include "wiring_digital.h"
 #include "wiring_analog.h"

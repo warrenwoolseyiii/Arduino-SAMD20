@@ -36,7 +36,10 @@ uint32_t SystemCoreClock=1000000ul ;
  */
 void init( void )
 {
-  initRTC();
+    //initRTC();
+//#if defined( MICRO_TIMER )
+    //beginMicroTimer();
+//#endif /* MICRO_TIMER */
 
   // Setup all pins (digital and analog) in INPUT mode (default is nothing)
   //enableAPBBClk( PM_APBBMASK_PORT, 1 );

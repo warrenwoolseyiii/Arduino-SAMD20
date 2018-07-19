@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015 Arduino LLC.  All right reserved.
+  Written by Warren Woolsey
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -15,22 +15,25 @@
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+#ifndef MICROS_H_
+#define MICROS_H_
 
-#ifndef _DELAY_
-#define _DELAY_
-
-#include <stdint.h>
-#include "variant.h"
+#if defined( MICRO_TIMER )
+void beginMicroTimer();
+void resumeMicroTimer();
+void pauseMicroTimer();
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-uint32_t millis();
-void     delay( uint32_t ms );
-
+void resetMicroTimerCount();
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* _DELAY_ */
+#endif /* MICRO_TIMER */
+
+uint32_t micros();
+void delayMicroseconds( uint32_t us );
+
+#endif /* MICROS_H_ */

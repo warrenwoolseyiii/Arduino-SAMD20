@@ -356,50 +356,50 @@ LINKER_SCRIPT_DEP+=
 
 src/core/%.o: ../src/core/%.c
 	@echo Building file: $<
-	@echo Invoking: ARM/GNU C Compiler : 6.3.1
-	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\arm\arm-gnu-toolchain\bin\arm-none-eabi-gcc.exe$(QUOTE)  -x c -mthumb -D__SAMD20E18__ -DDEBUG -DF_CPU=48000000L -DARDUINO=10805 -DARDUINO_SAMD_E -DARDUINO_ARCH_SAMD -DUSB_VID=0x2341 -DUSB_PID=0x804f -DUSB_PRODUCT="\"Arduino MKRZero\"" -DUSB_MANUFACTURER="\"Arduino LLC\"" -DSAMD_SERIES -DSAMD20  -I"../include/libraries/EEPROM" -I"..\include\libraries\wire" -I"..\include\libraries\spi" -I"..\include\core" -I"..\include\core\avr" -I"..\include\variants" -I"../include/core/samd20" -I"../include/core/samd20/include" -I"../include/core/samd20/include/component" -I"../include/core/samd20/include/instance" -I"../include/core/samd20/include/pio" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\arm\cmsis\5.0.1\CMSIS\Include" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\SAMD20_DFP\1.2.91\samd20\include"  -Og -fno-threadsafe-statics -fno-exceptions -ffunction-sections -fdata-sections -g3 -w -mcpu=cortex-m0plus -c -std=gnu11 --param max-inline-insns-single=500 -nostdlib -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	@echo Invoking: ARM/GNU C Compiler : 6.2.1
+	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\arm\arm-gnu-toolchain\bin\arm-none-eabi-gcc.exe$(QUOTE)  -x c -mthumb -D__SAMD20E18__ -DDEBUG -DF_CPU=48000000L -DARDUINO=10805 -DARDUINO_SAMD_E -DARDUINO_ARCH_SAMD -DUSB_VID=0x2341 -DUSB_PID=0x804f -DUSB_PRODUCT="\"Arduino MKRZero\"" -DUSB_MANUFACTURER="\"Arduino LLC\"" -DSAMD_SERIES -DSAMD20 -DMICRO_TIMER  -I"../include/libraries/EEPROM" -I"..\include\libraries\wire" -I"..\include\libraries\spi" -I"..\include\core" -I"..\include\core\avr" -I"..\include\variants" -I"../include/core/samd20" -I"../include/core/samd20/include" -I"../include/core/samd20/include/component" -I"../include/core/samd20/include/instance" -I"../include/core/samd20/include/pio" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\arm\cmsis\5.0.1\CMSIS\Include" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\SAMD20_DFP\1.2.91\samd20\include"  -Og -fno-threadsafe-statics -fno-exceptions -ffunction-sections -fdata-sections -g3 -w -mcpu=cortex-m0plus -c -std=gnu11 --param max-inline-insns-single=500 -nostdlib -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
 	@echo Finished building: $<
 	
 
 src/core/%.o: ../src/core/%.cpp
 	@echo Building file: $<
-	@echo Invoking: ARM/GNU C Compiler : 6.3.1
-	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\arm\arm-gnu-toolchain\bin\arm-none-eabi-g++.exe$(QUOTE) -mthumb -D__SAMD20E18__ -DDEBUG -DF_CPU=48000000L -DARDUINO=10805 -DARDUINO_SAMD_E -DARDUINO_ARCH_SAMD -DUSB_VID=0x2341 -DUSB_PID=0x804f -DUSB_PRODUCT="\"Arduino MKRZero\"" -DUSB_MANUFACTURER="\"Arduino LLC\"" -DSAMD_SERIES -DSAMD20  -I"../include/libraries/EEPROM" -I"..\include\libraries\wire" -I"..\include\libraries\spi" -I"..\include\core" -I"..\include\core\avr" -I"..\include\variants" -I"../include/core/samd20" -I"../include/core/samd20/include" -I"../include/core/samd20/include/component" -I"../include/core/samd20/include/instance" -I"../include/core/samd20/include/pio" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\arm\cmsis\5.0.1\CMSIS\Include" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\SAMD20_DFP\1.2.91\samd20\include"  -Og -fno-threadsafe-statics -fno-exceptions -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -g3 -w -mcpu=cortex-m0plus -c -std=gnu++11 --param max-inline-insns-single=500 -nostdlib -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	@echo Invoking: ARM/GNU C Compiler : 6.2.1
+	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\arm\arm-gnu-toolchain\bin\arm-none-eabi-g++.exe$(QUOTE) -mthumb -D__SAMD20E18__ -DDEBUG -DF_CPU=48000000L -DARDUINO=10805 -DARDUINO_SAMD_E -DARDUINO_ARCH_SAMD -DUSB_VID=0x2341 -DUSB_PID=0x804f -DUSB_PRODUCT="\"Arduino MKRZero\"" -DUSB_MANUFACTURER="\"Arduino LLC\"" -DSAMD_SERIES -DSAMD20 -DMICRO_TIMER  -I"../include/libraries/EEPROM" -I"..\include\libraries\wire" -I"..\include\libraries\spi" -I"..\include\core" -I"..\include\core\avr" -I"..\include\variants" -I"../include/core/samd20" -I"../include/core/samd20/include" -I"../include/core/samd20/include/component" -I"../include/core/samd20/include/instance" -I"../include/core/samd20/include/pio" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\arm\cmsis\5.0.1\CMSIS\Include" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\SAMD20_DFP\1.2.91\samd20\include"  -Og -fno-threadsafe-statics -fno-exceptions -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -g3 -w -mcpu=cortex-m0plus -c -std=gnu++11 --param max-inline-insns-single=500 -nostdlib -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
 	@echo Finished building: $<
 	
 
 src/core/avr/%.o: ../src/core/avr/%.c
 	@echo Building file: $<
-	@echo Invoking: ARM/GNU C Compiler : 6.3.1
-	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\arm\arm-gnu-toolchain\bin\arm-none-eabi-gcc.exe$(QUOTE)  -x c -mthumb -D__SAMD20E18__ -DDEBUG -DF_CPU=48000000L -DARDUINO=10805 -DARDUINO_SAMD_E -DARDUINO_ARCH_SAMD -DUSB_VID=0x2341 -DUSB_PID=0x804f -DUSB_PRODUCT="\"Arduino MKRZero\"" -DUSB_MANUFACTURER="\"Arduino LLC\"" -DSAMD_SERIES -DSAMD20  -I"../include/libraries/EEPROM" -I"..\include\libraries\wire" -I"..\include\libraries\spi" -I"..\include\core" -I"..\include\core\avr" -I"..\include\variants" -I"../include/core/samd20" -I"../include/core/samd20/include" -I"../include/core/samd20/include/component" -I"../include/core/samd20/include/instance" -I"../include/core/samd20/include/pio" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\arm\cmsis\5.0.1\CMSIS\Include" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\SAMD20_DFP\1.2.91\samd20\include"  -Og -fno-threadsafe-statics -fno-exceptions -ffunction-sections -fdata-sections -g3 -w -mcpu=cortex-m0plus -c -std=gnu11 --param max-inline-insns-single=500 -nostdlib -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	@echo Invoking: ARM/GNU C Compiler : 6.2.1
+	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\arm\arm-gnu-toolchain\bin\arm-none-eabi-gcc.exe$(QUOTE)  -x c -mthumb -D__SAMD20E18__ -DDEBUG -DF_CPU=48000000L -DARDUINO=10805 -DARDUINO_SAMD_E -DARDUINO_ARCH_SAMD -DUSB_VID=0x2341 -DUSB_PID=0x804f -DUSB_PRODUCT="\"Arduino MKRZero\"" -DUSB_MANUFACTURER="\"Arduino LLC\"" -DSAMD_SERIES -DSAMD20 -DMICRO_TIMER  -I"../include/libraries/EEPROM" -I"..\include\libraries\wire" -I"..\include\libraries\spi" -I"..\include\core" -I"..\include\core\avr" -I"..\include\variants" -I"../include/core/samd20" -I"../include/core/samd20/include" -I"../include/core/samd20/include/component" -I"../include/core/samd20/include/instance" -I"../include/core/samd20/include/pio" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\arm\cmsis\5.0.1\CMSIS\Include" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\SAMD20_DFP\1.2.91\samd20\include"  -Og -fno-threadsafe-statics -fno-exceptions -ffunction-sections -fdata-sections -g3 -w -mcpu=cortex-m0plus -c -std=gnu11 --param max-inline-insns-single=500 -nostdlib -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
 	@echo Finished building: $<
 	
 
 src/libraries/EEPROM/%.o: ../src/libraries/EEPROM/%.cpp
 	@echo Building file: $<
-	@echo Invoking: ARM/GNU C Compiler : 6.3.1
-	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\arm\arm-gnu-toolchain\bin\arm-none-eabi-g++.exe$(QUOTE) -mthumb -D__SAMD20E18__ -DDEBUG -DF_CPU=48000000L -DARDUINO=10805 -DARDUINO_SAMD_E -DARDUINO_ARCH_SAMD -DUSB_VID=0x2341 -DUSB_PID=0x804f -DUSB_PRODUCT="\"Arduino MKRZero\"" -DUSB_MANUFACTURER="\"Arduino LLC\"" -DSAMD_SERIES -DSAMD20  -I"../include/libraries/EEPROM" -I"..\include\libraries\wire" -I"..\include\libraries\spi" -I"..\include\core" -I"..\include\core\avr" -I"..\include\variants" -I"../include/core/samd20" -I"../include/core/samd20/include" -I"../include/core/samd20/include/component" -I"../include/core/samd20/include/instance" -I"../include/core/samd20/include/pio" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\arm\cmsis\5.0.1\CMSIS\Include" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\SAMD20_DFP\1.2.91\samd20\include"  -Og -fno-threadsafe-statics -fno-exceptions -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -g3 -w -mcpu=cortex-m0plus -c -std=gnu++11 --param max-inline-insns-single=500 -nostdlib -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	@echo Invoking: ARM/GNU C Compiler : 6.2.1
+	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\arm\arm-gnu-toolchain\bin\arm-none-eabi-g++.exe$(QUOTE) -mthumb -D__SAMD20E18__ -DDEBUG -DF_CPU=48000000L -DARDUINO=10805 -DARDUINO_SAMD_E -DARDUINO_ARCH_SAMD -DUSB_VID=0x2341 -DUSB_PID=0x804f -DUSB_PRODUCT="\"Arduino MKRZero\"" -DUSB_MANUFACTURER="\"Arduino LLC\"" -DSAMD_SERIES -DSAMD20 -DMICRO_TIMER  -I"../include/libraries/EEPROM" -I"..\include\libraries\wire" -I"..\include\libraries\spi" -I"..\include\core" -I"..\include\core\avr" -I"..\include\variants" -I"../include/core/samd20" -I"../include/core/samd20/include" -I"../include/core/samd20/include/component" -I"../include/core/samd20/include/instance" -I"../include/core/samd20/include/pio" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\arm\cmsis\5.0.1\CMSIS\Include" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\SAMD20_DFP\1.2.91\samd20\include"  -Og -fno-threadsafe-statics -fno-exceptions -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -g3 -w -mcpu=cortex-m0plus -c -std=gnu++11 --param max-inline-insns-single=500 -nostdlib -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
 	@echo Finished building: $<
 	
 
 src/libraries/spi/%.o: ../src/libraries/spi/%.cpp
 	@echo Building file: $<
-	@echo Invoking: ARM/GNU C Compiler : 6.3.1
-	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\arm\arm-gnu-toolchain\bin\arm-none-eabi-g++.exe$(QUOTE) -mthumb -D__SAMD20E18__ -DDEBUG -DF_CPU=48000000L -DARDUINO=10805 -DARDUINO_SAMD_E -DARDUINO_ARCH_SAMD -DUSB_VID=0x2341 -DUSB_PID=0x804f -DUSB_PRODUCT="\"Arduino MKRZero\"" -DUSB_MANUFACTURER="\"Arduino LLC\"" -DSAMD_SERIES -DSAMD20  -I"../include/libraries/EEPROM" -I"..\include\libraries\wire" -I"..\include\libraries\spi" -I"..\include\core" -I"..\include\core\avr" -I"..\include\variants" -I"../include/core/samd20" -I"../include/core/samd20/include" -I"../include/core/samd20/include/component" -I"../include/core/samd20/include/instance" -I"../include/core/samd20/include/pio" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\arm\cmsis\5.0.1\CMSIS\Include" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\SAMD20_DFP\1.2.91\samd20\include"  -Og -fno-threadsafe-statics -fno-exceptions -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -g3 -w -mcpu=cortex-m0plus -c -std=gnu++11 --param max-inline-insns-single=500 -nostdlib -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	@echo Invoking: ARM/GNU C Compiler : 6.2.1
+	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\arm\arm-gnu-toolchain\bin\arm-none-eabi-g++.exe$(QUOTE) -mthumb -D__SAMD20E18__ -DDEBUG -DF_CPU=48000000L -DARDUINO=10805 -DARDUINO_SAMD_E -DARDUINO_ARCH_SAMD -DUSB_VID=0x2341 -DUSB_PID=0x804f -DUSB_PRODUCT="\"Arduino MKRZero\"" -DUSB_MANUFACTURER="\"Arduino LLC\"" -DSAMD_SERIES -DSAMD20 -DMICRO_TIMER  -I"../include/libraries/EEPROM" -I"..\include\libraries\wire" -I"..\include\libraries\spi" -I"..\include\core" -I"..\include\core\avr" -I"..\include\variants" -I"../include/core/samd20" -I"../include/core/samd20/include" -I"../include/core/samd20/include/component" -I"../include/core/samd20/include/instance" -I"../include/core/samd20/include/pio" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\arm\cmsis\5.0.1\CMSIS\Include" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\SAMD20_DFP\1.2.91\samd20\include"  -Og -fno-threadsafe-statics -fno-exceptions -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -g3 -w -mcpu=cortex-m0plus -c -std=gnu++11 --param max-inline-insns-single=500 -nostdlib -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
 	@echo Finished building: $<
 	
 
 src/libraries/wire/%.o: ../src/libraries/wire/%.cpp
 	@echo Building file: $<
-	@echo Invoking: ARM/GNU C Compiler : 6.3.1
-	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\arm\arm-gnu-toolchain\bin\arm-none-eabi-g++.exe$(QUOTE) -mthumb -D__SAMD20E18__ -DDEBUG -DF_CPU=48000000L -DARDUINO=10805 -DARDUINO_SAMD_E -DARDUINO_ARCH_SAMD -DUSB_VID=0x2341 -DUSB_PID=0x804f -DUSB_PRODUCT="\"Arduino MKRZero\"" -DUSB_MANUFACTURER="\"Arduino LLC\"" -DSAMD_SERIES -DSAMD20  -I"../include/libraries/EEPROM" -I"..\include\libraries\wire" -I"..\include\libraries\spi" -I"..\include\core" -I"..\include\core\avr" -I"..\include\variants" -I"../include/core/samd20" -I"../include/core/samd20/include" -I"../include/core/samd20/include/component" -I"../include/core/samd20/include/instance" -I"../include/core/samd20/include/pio" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\arm\cmsis\5.0.1\CMSIS\Include" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\SAMD20_DFP\1.2.91\samd20\include"  -Og -fno-threadsafe-statics -fno-exceptions -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -g3 -w -mcpu=cortex-m0plus -c -std=gnu++11 --param max-inline-insns-single=500 -nostdlib -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	@echo Invoking: ARM/GNU C Compiler : 6.2.1
+	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\arm\arm-gnu-toolchain\bin\arm-none-eabi-g++.exe$(QUOTE) -mthumb -D__SAMD20E18__ -DDEBUG -DF_CPU=48000000L -DARDUINO=10805 -DARDUINO_SAMD_E -DARDUINO_ARCH_SAMD -DUSB_VID=0x2341 -DUSB_PID=0x804f -DUSB_PRODUCT="\"Arduino MKRZero\"" -DUSB_MANUFACTURER="\"Arduino LLC\"" -DSAMD_SERIES -DSAMD20 -DMICRO_TIMER  -I"../include/libraries/EEPROM" -I"..\include\libraries\wire" -I"..\include\libraries\spi" -I"..\include\core" -I"..\include\core\avr" -I"..\include\variants" -I"../include/core/samd20" -I"../include/core/samd20/include" -I"../include/core/samd20/include/component" -I"../include/core/samd20/include/instance" -I"../include/core/samd20/include/pio" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\arm\cmsis\5.0.1\CMSIS\Include" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\SAMD20_DFP\1.2.91\samd20\include"  -Og -fno-threadsafe-statics -fno-exceptions -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -g3 -w -mcpu=cortex-m0plus -c -std=gnu++11 --param max-inline-insns-single=500 -nostdlib -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
 	@echo Finished building: $<
 	
 
 src/variants/%.o: ../src/variants/%.cpp
 	@echo Building file: $<
-	@echo Invoking: ARM/GNU C Compiler : 6.3.1
-	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\arm\arm-gnu-toolchain\bin\arm-none-eabi-g++.exe$(QUOTE) -mthumb -D__SAMD20E18__ -DDEBUG -DF_CPU=48000000L -DARDUINO=10805 -DARDUINO_SAMD_E -DARDUINO_ARCH_SAMD -DUSB_VID=0x2341 -DUSB_PID=0x804f -DUSB_PRODUCT="\"Arduino MKRZero\"" -DUSB_MANUFACTURER="\"Arduino LLC\"" -DSAMD_SERIES -DSAMD20  -I"../include/libraries/EEPROM" -I"..\include\libraries\wire" -I"..\include\libraries\spi" -I"..\include\core" -I"..\include\core\avr" -I"..\include\variants" -I"../include/core/samd20" -I"../include/core/samd20/include" -I"../include/core/samd20/include/component" -I"../include/core/samd20/include/instance" -I"../include/core/samd20/include/pio" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\arm\cmsis\5.0.1\CMSIS\Include" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\SAMD20_DFP\1.2.91\samd20\include"  -Og -fno-threadsafe-statics -fno-exceptions -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -g3 -w -mcpu=cortex-m0plus -c -std=gnu++11 --param max-inline-insns-single=500 -nostdlib -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	@echo Invoking: ARM/GNU C Compiler : 6.2.1
+	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\arm\arm-gnu-toolchain\bin\arm-none-eabi-g++.exe$(QUOTE) -mthumb -D__SAMD20E18__ -DDEBUG -DF_CPU=48000000L -DARDUINO=10805 -DARDUINO_SAMD_E -DARDUINO_ARCH_SAMD -DUSB_VID=0x2341 -DUSB_PID=0x804f -DUSB_PRODUCT="\"Arduino MKRZero\"" -DUSB_MANUFACTURER="\"Arduino LLC\"" -DSAMD_SERIES -DSAMD20 -DMICRO_TIMER  -I"../include/libraries/EEPROM" -I"..\include\libraries\wire" -I"..\include\libraries\spi" -I"..\include\core" -I"..\include\core\avr" -I"..\include\variants" -I"../include/core/samd20" -I"../include/core/samd20/include" -I"../include/core/samd20/include/component" -I"../include/core/samd20/include/instance" -I"../include/core/samd20/include/pio" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\arm\cmsis\5.0.1\CMSIS\Include" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\SAMD20_DFP\1.2.91\samd20\include"  -Og -fno-threadsafe-statics -fno-exceptions -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -g3 -w -mcpu=cortex-m0plus -c -std=gnu++11 --param max-inline-insns-single=500 -nostdlib -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
 	@echo Finished building: $<
 	
 
@@ -409,56 +409,56 @@ src/variants/%.o: ../src/variants/%.cpp
 
 src/core/PreprocessingAssembly/%.o: ../src/core/PreprocessingAssembly/%.S
 	@echo Building file: $<
-	@echo Invoking: ARM/GNU Preprocessing Assembler : 6.3.1
+	@echo Invoking: ARM/GNU Preprocessing Assembler : 6.2.1
 	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\arm\arm-gnu-toolchain\bin\arm-none-eabi-gcc.exe$(QUOTE) -mthumb -x assembler-with-cpp -c -mcpu=cortex-m0plus -I "C:\Program Files (x86)\Atmel\Studio\7.0\Packs\arm\cmsis\5.0.1\CMSIS\Include" -I "C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\SAMD20_DFP\1.2.91\samd20\include"  -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)" -D__SAMD20E18__ -Wa,-g   -o "$@" "$<" 
 	@echo Finished building: $<
 	
 
 src/core/PreprocessingAssembly/%.o: ../src/core/PreprocessingAssembly/%.x
 	@echo Building file: $<
-	@echo Invoking: ARM/GNU Preprocessing Assembler : 6.3.1
+	@echo Invoking: ARM/GNU Preprocessing Assembler : 6.2.1
 	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\arm\arm-gnu-toolchain\bin\arm-none-eabi-gcc.exe$(QUOTE) -mthumb -x assembler-with-cpp -c -mcpu=cortex-m0plus -I "C:\Program Files (x86)\Atmel\Studio\7.0\Packs\arm\cmsis\5.0.1\CMSIS\Include" -I "C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\SAMD20_DFP\1.2.91\samd20\include"  -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)" -D__SAMD20E18__ -Wa,-g   -o "$@" "$<" 
 	@echo Finished building: $<
 	
 
 src/core/PreprocessingAssembly/%.o: ../src/core/PreprocessingAssembly/%.X
 	@echo Building file: $<
-	@echo Invoking: ARM/GNU Preprocessing Assembler : 6.3.1
+	@echo Invoking: ARM/GNU Preprocessing Assembler : 6.2.1
 	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\arm\arm-gnu-toolchain\bin\arm-none-eabi-gcc.exe$(QUOTE) -mthumb -x assembler-with-cpp -c -mcpu=cortex-m0plus -I "C:\Program Files (x86)\Atmel\Studio\7.0\Packs\arm\cmsis\5.0.1\CMSIS\Include" -I "C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\SAMD20_DFP\1.2.91\samd20\include"  -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)" -D__SAMD20E18__ -Wa,-g   -o "$@" "$<" 
 	@echo Finished building: $<
 	
 
 src/core/PreprocessingAssembly/%.o: ../src/core/PreprocessingAssembly/%.sx
 	@echo Building file: $<
-	@echo Invoking: ARM/GNU Preprocessing Assembler : 6.3.1
+	@echo Invoking: ARM/GNU Preprocessing Assembler : 6.2.1
 	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\arm\arm-gnu-toolchain\bin\arm-none-eabi-gcc.exe$(QUOTE) -mthumb -x assembler-with-cpp -c -mcpu=cortex-m0plus -I "C:\Program Files (x86)\Atmel\Studio\7.0\Packs\arm\cmsis\5.0.1\CMSIS\Include" -I "C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\SAMD20_DFP\1.2.91\samd20\include"  -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)" -D__SAMD20E18__ -Wa,-g   -o "$@" "$<" 
 	@echo Finished building: $<
 	
 
 src/core/%.o: ../src/core/%.S
 	@echo Building file: $<
-	@echo Invoking: ARM/GNU Preprocessing Assembler : 6.3.1
+	@echo Invoking: ARM/GNU Preprocessing Assembler : 6.2.1
 	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\arm\arm-gnu-toolchain\bin\arm-none-eabi-gcc.exe$(QUOTE) -mthumb -x assembler-with-cpp -c -mcpu=cortex-m0plus -I "C:\Program Files (x86)\Atmel\Studio\7.0\Packs\arm\cmsis\5.0.1\CMSIS\Include" -I "C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\SAMD20_DFP\1.2.91\samd20\include"  -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)" -D__SAMD20E18__ -Wa,-g   -o "$@" "$<" 
 	@echo Finished building: $<
 	
 
 src/core/%.o: ../src/core/%.x
 	@echo Building file: $<
-	@echo Invoking: ARM/GNU Preprocessing Assembler : 6.3.1
+	@echo Invoking: ARM/GNU Preprocessing Assembler : 6.2.1
 	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\arm\arm-gnu-toolchain\bin\arm-none-eabi-gcc.exe$(QUOTE) -mthumb -x assembler-with-cpp -c -mcpu=cortex-m0plus -I "C:\Program Files (x86)\Atmel\Studio\7.0\Packs\arm\cmsis\5.0.1\CMSIS\Include" -I "C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\SAMD20_DFP\1.2.91\samd20\include"  -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)" -D__SAMD20E18__ -Wa,-g   -o "$@" "$<" 
 	@echo Finished building: $<
 	
 
 src/core/%.o: ../src/core/%.X
 	@echo Building file: $<
-	@echo Invoking: ARM/GNU Preprocessing Assembler : 6.3.1
+	@echo Invoking: ARM/GNU Preprocessing Assembler : 6.2.1
 	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\arm\arm-gnu-toolchain\bin\arm-none-eabi-gcc.exe$(QUOTE) -mthumb -x assembler-with-cpp -c -mcpu=cortex-m0plus -I "C:\Program Files (x86)\Atmel\Studio\7.0\Packs\arm\cmsis\5.0.1\CMSIS\Include" -I "C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\SAMD20_DFP\1.2.91\samd20\include"  -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)" -D__SAMD20E18__ -Wa,-g   -o "$@" "$<" 
 	@echo Finished building: $<
 	
 
 src/core/%.o: ../src/core/%.sx
 	@echo Building file: $<
-	@echo Invoking: ARM/GNU Preprocessing Assembler : 6.3.1
+	@echo Invoking: ARM/GNU Preprocessing Assembler : 6.2.1
 	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\arm\arm-gnu-toolchain\bin\arm-none-eabi-gcc.exe$(QUOTE) -mthumb -x assembler-with-cpp -c -mcpu=cortex-m0plus -I "C:\Program Files (x86)\Atmel\Studio\7.0\Packs\arm\cmsis\5.0.1\CMSIS\Include" -I "C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\SAMD20_DFP\1.2.91\samd20\include"  -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)" -D__SAMD20E18__ -Wa,-g   -o "$@" "$<" 
 	@echo Finished building: $<
 	
@@ -484,7 +484,7 @@ all: $(OUTPUT_FILE_PATH) $(ADDITIONAL_DEPENDENCIES)
 
 $(OUTPUT_FILE_PATH): $(OBJS) $(USER_OBJS) $(OUTPUT_FILE_DEP)
 	@echo Building target: $@
-	@echo Invoking: ARM/GNU Archiver : 6.3.1
+	@echo Invoking: ARM/GNU Archiver : 6.2.1
 	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\arm\arm-gnu-toolchain\bin\arm-none-eabi-ar.exe$(QUOTE) -r  -o$(OUTPUT_FILE_PATH_AS_ARGS) $(OBJS_AS_ARGS) $(USER_OBJS) $(LIBS) 
 	@echo Finished building target: $@
 	

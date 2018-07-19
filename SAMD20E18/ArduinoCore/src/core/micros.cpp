@@ -19,20 +19,24 @@
 #include "sam.h"
 #include <Arduino.h>
 
+#if defined( MICRO_TIMER )
 TimerCounter _timerMicros( TC0 );
 uint32_t _micros = 0;
 bool _isPaused = false;
 
-void resume()
+
+void beginMicroTimer()
+{
+    _timerMicros.begin( 1, -1, tc_mode_32_bit, false );
+}
+
+void resumeMicroTimer()
 {
     if( _isPaused ) {
-        _micros = millis() * 1000;
+        uint32_t seconds = secondsRTC();
+        uint32_t count = RTC_ROUGH_STEPS_TO_MICROS( ( ( seconds << 15 ) - stepsRTC() ) );
         
-        uint32_t count = secondsRTC() * 1000;
-        if( _micros < count )
-            count = 0;
-        else
-            count = _micros - count;
+        _micros = ( seconds * 1000000 ) + count;
 
         _timerMicros.setCount( count );
         _timerMicros.resume();
@@ -40,12 +44,45 @@ void resume()
     }
 }
 
+void pauseMicroTimer()
+{
+    if( !_isPaused ) {
+        _timerMicros.pause();
+        _isPaused = true;
+    }
+}
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+void resetMicroTimerCount()
+{
+    _timerMicros.setCount( 0 );
+}
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* MICRO_TIMER */
+
 uint32_t micros()
 {
+#if defined( MICRO_TIMER )
     if( _isPaused )
-        resume();
+        resumeMicroTimer();
     else
-        _micros += _timerMicros.getCount();
+        _micros = ( secondsRTC() * 1000000 ) + _timerMicros.getCount();
 
     return _micros;
+#else
+    return ( RTC_ROUGH_STEPS_TO_MICROS( stepsRTC() ) );
+#endif /* MICRO_TIMER */ 
+}
+
+void delayMicroseconds( uint32_t us )
+{
+    uint32_t start = micros();
+    do {
+        yield();
+    } while( micros() - start < us );
 }

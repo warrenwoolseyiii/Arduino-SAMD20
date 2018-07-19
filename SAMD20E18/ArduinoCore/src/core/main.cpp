@@ -22,7 +22,7 @@
 // Weak empty variant initialization function.
 // May be redefined by variant files.
 void initVariant() __attribute__((weak));
-void initVariant() { }
+void initVariant() {}
 
 // Initialize C library
 extern "C" void __libc_init_array(void);
@@ -30,27 +30,27 @@ extern "C" void __libc_init_array(void);
 /*
  * \brief Main entry point of Arduino application
  */
-int main( void )
+int main(void)
 {
-  init();
+   // TODO: Wiring init will be removed probabaly init();
+   initRTC();
+#if defined(MICRO_TIMER)
+   beginMicroTimer();
+#endif /* MICRO_TIMER */
+   __libc_init_array();
 
-  __libc_init_array();
+   initVariant();
 
-  initVariant();
+   delay(1);
 
-  delay(1);
-#if defined(USBCON)
-  USBDevice.init();
-  USBDevice.attach();
-#endif
+   setup();
 
-  setup();
+   for (;;)
+   {
+      loop();
+      if (serialEventRun)
+         serialEventRun();
+   }
 
-  for (;;)
-  {
-    loop();
-    if (serialEventRun) serialEventRun();
-  }
-
-  return 0;
+   return 0;
 }

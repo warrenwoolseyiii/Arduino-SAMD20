@@ -16,10 +16,8 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include "TimerCounter.h"
+#include <Arduino.h>
 #include <stddef.h>
-#include "WVariant.h"
-#include "wiring.h"
 
 #define CC_8_BIT_MAX 0xFF
 #define CC_16_BIT_MAX 0xFFFF
