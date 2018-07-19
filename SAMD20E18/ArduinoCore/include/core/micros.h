@@ -15,25 +15,23 @@
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+
 #ifndef MICROS_H_
 #define MICROS_H_
-
-#if defined( MICRO_TIMER )
-void beginMicroTimer();
-void resumeMicroTimer();
-void pauseMicroTimer();
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-void resetMicroTimerCount();
+
+int8_t initMicros();
+void pauseMicrosForSleep();
+void resumeMicrosFromSleep();
+void syncMicrosToRTC();
+uint32_t micros();
+void delayMicroseconds( uint32_t us );
+
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* MICRO_TIMER */
-
-uint32_t micros();
-void delayMicroseconds( uint32_t us );
 
 #endif /* MICROS_H_ */

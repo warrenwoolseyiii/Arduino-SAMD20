@@ -34,9 +34,7 @@ int main(void)
 {
    // TODO: Wiring init will be removed probabaly init();
    initRTC();
-#if defined(MICRO_TIMER)
-   beginMicroTimer();
-#endif /* MICRO_TIMER */
+
    __libc_init_array();
 
    initVariant();

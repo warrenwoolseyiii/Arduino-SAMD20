@@ -25,7 +25,8 @@ extern "C" {
 
 uint32_t millis()
 {
-    return RTC_EXACT_STEPS_TO_MILLIS( stepsRTC() );
+    uint64_t steps = stepsRTC();
+    return RTC_EXACT_STEPS_TO_MILLIS( steps );
 }
 
 void delay( uint32_t ms )

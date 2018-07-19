@@ -71,13 +71,17 @@ uint32_t secondsRTC()
     return _rtcSec;
 }
 
+uint32_t countRTC()
+{
+    uint32_t ticks = RTC->MODE1.COUNT.reg;
+    return ticks;
+}
+
 void RTC_IRQHandler()
 {
     // Due to millisRTC requiring this parameter to LSH 15 bits, the roll-over
     // must be handled before we LSH the MSB out of the _rtcSec value
     if( ( ++_rtcSec ) & 0x20000 ) _rtcSec = 0;
     RTC->MODE1.INTFLAG.bit.OVF = 1;
-#if defined( MICRO_TIMER )
-    resetMicroTimerCount();
-#endif /* MICRO_TIMER */
+    syncMicrosToRTC();
 }

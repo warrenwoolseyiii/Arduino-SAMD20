@@ -20,7 +20,7 @@ src\core\itoa.c
 
 src\core\main.cpp
 
-src\core\micros.cpp
+src\core\micros.c
 
 src\core\new.cpp
 

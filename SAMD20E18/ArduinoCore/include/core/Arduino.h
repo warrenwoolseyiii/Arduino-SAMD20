@@ -85,6 +85,7 @@ void loop( void ) ;
 #include "WDT.h"
 #include "NVM.h"
 #include "sleep.h"
+#include "micros.h"
 #ifdef __cplusplus
 #include "Uart.h"
 #endif
@@ -92,7 +93,6 @@ void loop( void ) ;
 // Include board variant
 #include "variant.h"
 
-#include "micros.h"
 #include "wiring.h"
 #include "wiring_digital.h"
 #include "wiring_analog.h"

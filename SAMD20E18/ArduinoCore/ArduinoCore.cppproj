@@ -179,7 +179,6 @@
       <Value>USB_MANUFACTURER="\"Arduino LLC\""</Value>
       <Value>SAMD_SERIES</Value>
       <Value>SAMD20</Value>
-      <Value>MICRO_TIMER</Value>
     </ListValues>
   </armgcc.compiler.symbols.DefSymbols>
   <armgcc.compiler.directories.IncludePaths>
@@ -220,7 +219,6 @@
       <Value>USB_MANUFACTURER="\"Arduino LLC\""</Value>
       <Value>SAMD_SERIES</Value>
       <Value>SAMD20</Value>
-      <Value>MICRO_TIMER</Value>
     </ListValues>
   </armgcccpp.compiler.symbols.DefSymbols>
   <armgcccpp.compiler.directories.IncludePaths>
@@ -310,6 +308,9 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="include\core\itoa.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="include\core\micros.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="include\core\Print.h">
@@ -471,9 +472,6 @@
     <Compile Include="include\core\samd20\include\instance\wdt.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="include\core\samd20\include\NVM.h">
-      <SubType>compile</SubType>
-    </Compile>
     <Compile Include="include\core\samd20\include\pio\samd20e14.h">
       <SubType>compile</SubType>
     </Compile>
@@ -585,7 +583,7 @@
     <Compile Include="include\core\samd20\include\system_samd20.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="include\core\samd20\micros.h">
+    <Compile Include="include\core\samd20\NVM.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="include\core\SERCOM.h">
@@ -690,7 +688,7 @@
     <Compile Include="src\core\main.cpp">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="src\core\micros.cpp">
+    <Compile Include="src\core\micros.c">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="src\core\new.cpp">

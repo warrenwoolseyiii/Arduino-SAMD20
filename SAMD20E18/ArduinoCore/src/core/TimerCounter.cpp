@@ -112,7 +112,7 @@ void TimerCounter::begin( uint32_t frequency, int8_t outputPin, TCMode_t mode,
             break;
         case tc_mode_32_bit:
             ctrlABits |= TC_CTRLA_MODE_COUNT32;
-            _timerCounter->COUNT16.CC[0].reg = (uint16_t)setDividerAndCC(
+            _timerCounter->COUNT32.CC[0].reg = (uint16_t)setDividerAndCC(
                 frequency, CC_32_BIT_MAX, ctrlABits );
             break;
         default: return;

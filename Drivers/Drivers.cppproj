@@ -40,8 +40,8 @@
         </dependencies>
       </framework-data>
     </AsfFrameworkConfig>
-    <avrtool>com.atmel.avrdbg.tool.atmelice</avrtool>
-    <avrtoolserialnumber>J41800080292</avrtoolserialnumber>
+    <avrtool>com.atmel.avrdbg.tool.powerdebugger</avrtool>
+    <avrtoolserialnumber>J51800000178</avrtoolserialnumber>
     <avrdeviceexpectedsignature>0x1000140A</avrdeviceexpectedsignature>
     <custom>
       <ToolOptions>
@@ -59,7 +59,7 @@
     <com_atmel_avrdbg_tool_atmelice>
       <ToolOptions>
         <InterfaceProperties>
-          <SwdClock>2000000</SwdClock>
+          <SwdClock>0</SwdClock>
         </InterfaceProperties>
         <InterfaceName>SWD</InterfaceName>
       </ToolOptions>
@@ -71,7 +71,7 @@
     <com_atmel_avrdbg_tool_powerdebugger>
       <ToolOptions>
         <InterfaceProperties>
-          <SwdClock>0</SwdClock>
+          <SwdClock>2000000</SwdClock>
         </InterfaceProperties>
         <InterfaceName>SWD</InterfaceName>
       </ToolOptions>

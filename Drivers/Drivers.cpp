@@ -139,18 +139,11 @@ void FXOSSPI()
     SPI1.end();
 }
 
-void testMicros()
-{
-    Serial.print( "Millis Start: " );
-    Serial.println( millis() );
-    delayMicroseconds( 1000 );
-    Serial.println( millis() );
-}
-
 void setup()
 {
     // Select the clock
     changeCPUClk( cpu_clk_dfll48 );
+    initMicros();
 
     // FXOS CS
     pinMode( FXOS_CS, OUTPUT );
@@ -173,7 +166,6 @@ void setup()
 
 void loop()
 {
-    testMicros();
     //testSleep();
 //
     //Serial.begin( 38400 );
@@ -189,4 +181,6 @@ void loop()
     //Serial.println( millis() );
     //delay( 25 );
     //Serial.end();
+    printRTC();
+    delayMicroseconds( 25000 );
 }

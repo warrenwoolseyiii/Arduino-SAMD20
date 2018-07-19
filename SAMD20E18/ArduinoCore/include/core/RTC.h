@@ -39,6 +39,7 @@ extern "C" {
 void     initRTC();
 void     disableRTC();
 uint32_t stepsRTC();
+uint32_t countRTC();
 uint32_t secondsRTC();
 
 #ifdef __cplusplus
