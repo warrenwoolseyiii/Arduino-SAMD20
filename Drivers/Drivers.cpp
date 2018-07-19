@@ -147,7 +147,6 @@ void setup()
 {
     // Select the clock
     changeCPUClk( cpu_clk_dfll48 );
-    initMicros();
 
     // FXOS CS
     pinMode( FXOS_CS, OUTPUT );

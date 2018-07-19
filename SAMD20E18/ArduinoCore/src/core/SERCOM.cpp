@@ -84,7 +84,8 @@ void SERCOM::initPads( SercomUartTXPad txPad, SercomRXPad rxPad )
 void SERCOM::resetUART()
 {
     sercom->USART.CTRLA.bit.SWRST = 1;
-    while( sercom->USART.CTRLA.bit.SWRST || sercom->USART.STATUS.bit.SYNCBUSY );
+    while( sercom->USART.CTRLA.bit.SWRST || sercom->USART.STATUS.bit.SYNCBUSY )
+        ;
 }
 
 void SERCOM::endUART()
@@ -124,8 +125,8 @@ bool SERCOM::availableDataUART()
 bool SERCOM::isUARTError()
 {
     bool rtn = sercom->USART.STATUS.reg &
-        ( SERCOM_USART_STATUS_BUFOVF | SERCOM_USART_STATUS_FERR |
-          SERCOM_USART_STATUS_PERR );
+               ( SERCOM_USART_STATUS_BUFOVF | SERCOM_USART_STATUS_FERR |
+                 SERCOM_USART_STATUS_PERR );
     return rtn;
 }
 
@@ -248,13 +249,15 @@ void SERCOM::endSPI()
 void SERCOM::enableSPI()
 {
     sercom->SPI.CTRLA.bit.ENABLE = 1;
-    while( sercom->SPI.STATUS.bit.SYNCBUSY );
+    while( sercom->SPI.STATUS.bit.SYNCBUSY )
+        ;
 }
 
 void SERCOM::disableSPI()
 {
     sercom->SPI.CTRLA.bit.ENABLE = 0;
-    while( sercom->SPI.STATUS.bit.SYNCBUSY );
+    while( sercom->SPI.STATUS.bit.SYNCBUSY )
+        ;
 }
 
 void SERCOM::setDataOrderSPI( SercomDataOrder dataOrder )
@@ -305,8 +308,9 @@ void SERCOM::setClockModeSPI( SercomSpiClockMode clockMode )
 uint8_t SERCOM::transferDataSPI( uint8_t data )
 {
     // Write data and wait for return data
-    sercom->SPI.DATA.bit.DATA = data; 
-    while( sercom->SPI.INTFLAG.bit.RXC == 0 );
+    sercom->SPI.DATA.bit.DATA = data;
+    while( sercom->SPI.INTFLAG.bit.RXC == 0 )
+        ;
 
     return sercom->SPI.DATA.bit.DATA;
 }

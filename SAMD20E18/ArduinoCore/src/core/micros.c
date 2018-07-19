@@ -125,7 +125,7 @@ void syncMicrosToRTC()
     count *= _cyclesPerUs;
     TC0->COUNT32.COUNT.reg = count;
     while( TC0->COUNT32.STATUS.bit.SYNCBUSY )
-            ;
+        ;
     resumeMicrosFromSleep();
 }
 

@@ -176,32 +176,24 @@ uint32_t TimerCounter::getCount()
 {
     uint32_t count = 0;
     switch( _mode ) {
-    case tc_mode_8_bit:
-        count = _timerCounter->COUNT8.COUNT.reg;
-        break;
-    case tc_mode_16_bit:
-        count = _timerCounter->COUNT16.COUNT.reg;
-        break;
-    case tc_mode_32_bit:
-        count = _timerCounter->COUNT32.COUNT.reg;
-        break;
+        case tc_mode_8_bit: count = _timerCounter->COUNT8.COUNT.reg; break;
+        case tc_mode_16_bit: count = _timerCounter->COUNT16.COUNT.reg; break;
+        case tc_mode_32_bit: count = _timerCounter->COUNT32.COUNT.reg; break;
     }
-    
+
     return count;
 }
 
 void TimerCounter::setCount( uint32_t count )
 {
     switch( _mode ) {
-    case tc_mode_8_bit:
-        _timerCounter->COUNT8.COUNT.reg = count & CC_8_BIT_MAX;
-        break;
-    case tc_mode_16_bit:
-        _timerCounter->COUNT16.COUNT.reg = count & CC_16_BIT_MAX;
-        break;
-    case tc_mode_32_bit:
-        _timerCounter->COUNT32.COUNT.reg = count;
-        break;
+        case tc_mode_8_bit:
+            _timerCounter->COUNT8.COUNT.reg = count & CC_8_BIT_MAX;
+            break;
+        case tc_mode_16_bit:
+            _timerCounter->COUNT16.COUNT.reg = count & CC_16_BIT_MAX;
+            break;
+        case tc_mode_32_bit: _timerCounter->COUNT32.COUNT.reg = count; break;
     }
 
     WAIT_TC_REGS_SYNC( _timerCounter )

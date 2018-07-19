@@ -21,34 +21,34 @@
 
 // Weak empty variant initialization function.
 // May be redefined by variant files.
-void initVariant() __attribute__((weak));
-void initVariant() {}
+void initVariant() __attribute__( ( weak ) );
+void initVariant()
+{}
 
 // Initialize C library
-extern "C" void __libc_init_array(void);
+extern "C" void __libc_init_array( void );
 
 /*
  * \brief Main entry point of Arduino application
  */
-int main(void)
+int main( void )
 {
-   // TODO: Wiring init will be removed probabaly init();
-   initRTC();
+    // TODO: Wiring init will be removed probabaly init();
+    initRTC();
+    initMicros();
 
-   __libc_init_array();
+    __libc_init_array();
 
-   initVariant();
+    initVariant();
 
-   delay(1);
+    delay( 1 );
 
-   setup();
+    setup();
 
-   for (;;)
-   {
-      loop();
-      if (serialEventRun)
-         serialEventRun();
-   }
+    for( ;; ) {
+        loop();
+        if( serialEventRun ) serialEventRun();
+    }
 
-   return 0;
+    return 0;
 }

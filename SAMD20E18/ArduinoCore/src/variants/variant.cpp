@@ -310,56 +310,60 @@ const PinDescription g_APinDescription[]=
 #endif
 } ;
 
-#if defined(__SAMD20E18__)
-const void* g_apTCInstances[TC_INST_NUM]={ TC0, TC1, TC2, TC3, TC4, TC5 } ;
-#elif defined(__SAMD20J18__)
-const void* g_apTCInstances[TC_INST_NUM]={ TC0, TC1, TC2, TC3, TC4, TC5, TC6, TC7 } ;
+#if defined( __SAMD20E18__ )
+const void *g_apTCInstances[TC_INST_NUM] = {TC0, TC1, TC2, TC3, TC4, TC5};
+#elif defined( __SAMD20J18__ )
+const void *g_apTCInstances[TC_INST_NUM] = {TC0, TC1, TC2, TC3,
+                                            TC4, TC5, TC6, TC7};
 #endif
 
 // Multi-serial objects instantiation
-SERCOM sercom0( SERCOM0 ) ;
-SERCOM sercom1( SERCOM1 ) ;
-SERCOM sercom2( SERCOM2 ) ;
-SERCOM sercom3( SERCOM3 ) ;
-#if defined(__SAMD20J18__)
-SERCOM sercom4( SERCOM4 ) ;
-SERCOM sercom5( SERCOM5 ) ;
+SERCOM sercom0( SERCOM0 );
+SERCOM sercom1( SERCOM1 );
+SERCOM sercom2( SERCOM2 );
+SERCOM sercom3( SERCOM3 );
+#if defined( __SAMD20J18__ )
+SERCOM sercom4( SERCOM4 );
+SERCOM sercom5( SERCOM5 );
 #endif // __SAMD20J18__
 
-#if defined(__SAMD20E18__)
-Uart Serial( &sercom3, PIN_SERIAL_RX, PIN_SERIAL_TX, PAD_SERIAL_RX, PAD_SERIAL_TX ) ;
+#if defined( __SAMD20E18__ )
+Uart Serial( &sercom3, PIN_SERIAL_RX, PIN_SERIAL_TX, PAD_SERIAL_RX,
+             PAD_SERIAL_TX );
 void SERCOM3_Handler()
 {
-  Serial.IrqHandler();
+    Serial.IrqHandler();
 }
-#elif defined(__SAMD20J18__)
-Uart Serial1( &sercom4, PIN_SERIAL1_RX, PIN_SERIAL1_TX, PAD_SERIAL1_RX, PAD_SERIAL1_TX ) ;
-Uart Serial( &sercom3, PIN_SERIAL_RX, PIN_SERIAL_TX, PAD_SERIAL_RX, PAD_SERIAL_TX ) ;
+#elif defined( __SAMD20J18__ )
+Uart        Serial1( &sercom4, PIN_SERIAL1_RX, PIN_SERIAL1_TX, PAD_SERIAL1_RX,
+              PAD_SERIAL1_TX );
+Uart        Serial( &sercom3, PIN_SERIAL_RX, PIN_SERIAL_TX, PAD_SERIAL_RX,
+             PAD_SERIAL_TX );
 
 void SERCOM4_Handler()
 {
-  Serial1.IrqHandler();
+    Serial1.IrqHandler();
 }
-  
+
 void SERCOM3_Handler()
 {
-  Serial.IrqHandler();
+    Serial.IrqHandler();
 }
 #endif
 
 // TimerCounters
-#if (defined(__SAMD20E18__) || defined(__SAMD20J18__))
+#if( defined( __SAMD20E18__ ) || defined( __SAMD20J18__ ) )
 TimerCounter Timer( TC3 );
 TimerCounter Timer1( TC4 );
 
 void TC3_Handler()
 {
-  Timer.IrqHandler();
+    Timer.IrqHandler();
 }
 
 void TC4_Handler()
 {
-  Timer1.IrqHandler();
+    Timer1.IrqHandler();
 }
 #endif /* (defined(__SAMD20E18__) || (defined(__SAMD20J18__)) */
 
@@ -369,14 +373,13 @@ void TC4_Handler()
 #ifdef SAMD20
 uint32_t __disableGlobalISR()
 {
-    volatile uint32_t ISER = *(NVIC->ISER);
-    *(NVIC->ICER) = ISER;
+    volatile uint32_t ISER = *( NVIC->ISER );
+    *( NVIC->ICER ) = ISER;
     return ISER;
 }
 
 void __enableGlobalISR( uint32_t ISER )
 {
-    *(NVIC->ISER) = ISER;
+    *( NVIC->ISER ) = ISER;
 }
 #endif /* SAMD20 */
-

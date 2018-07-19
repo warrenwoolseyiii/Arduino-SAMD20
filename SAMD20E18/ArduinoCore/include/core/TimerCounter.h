@@ -28,20 +28,20 @@ class TimerCounter
 {
   public:
     TimerCounter( Tc *timerCounter );
-    void registerISR( void ( *isr )() );
-    void deregisterISR();
-    void begin( uint32_t frequency, int8_t outputPin = -1,
-                TCMode_t mode = tc_mode_16_bit, bool useInterrupts = false );
-    void reset();
-    void end();
-    void resume();
-    void pause();
-    void IrqHandler();
+    void     registerISR( void ( *isr )() );
+    void     deregisterISR();
+    void     begin( uint32_t frequency, int8_t outputPin = -1,
+                    TCMode_t mode = tc_mode_16_bit, bool useInterrupts = false );
+    void     reset();
+    void     end();
+    void     resume();
+    void     pause();
+    void     IrqHandler();
     uint32_t getCount();
-    void setCount( uint32_t count );
+    void     setCount( uint32_t count );
 
   private:
-    bool _isPaused;
+    bool     _isPaused;
     uint32_t _maxFreq;
     Tc *     _timerCounter;
     TCMode_t _mode;
