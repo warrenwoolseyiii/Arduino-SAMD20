@@ -32,6 +32,7 @@ void initClkOut()
 
 void printRTC()
 {
+    Serial.begin( 38400 );
     uint32_t steps = stepsRTC();
     Serial.print( "Steps: " );
     Serial.println( steps );
@@ -41,6 +42,8 @@ void printRTC()
     Serial.println( millis() );
     Serial.print( "Sec: " );
     Serial.println( secondsRTC() );
+    delay( 25 );
+    Serial.end();
 }
 
 void testWDTReset()
@@ -107,6 +110,7 @@ void hardMathTest()
 void testSleep()
 {
     enableAPBBClk( PM_APBBMASK_PORT, 0 );
+    pauseMicrosForSleep();
 
     // Sleep the CPU
     sleepCPU( PM_SLEEP_STANDBY_Val );
@@ -160,13 +164,11 @@ void setup()
     // FXOS_RST
     pinMode( 3, OUTPUT );
     digitalWrite( 3, LOW );
-
-    Serial.begin( 38400 );
 }
 
 void loop()
 {
-    //testSleep();
+    testSleep();
 //
     //Serial.begin( 38400 );
     //Serial.print( "Wake: " );
@@ -182,5 +184,4 @@ void loop()
     //delay( 25 );
     //Serial.end();
     printRTC();
-    delayMicroseconds( 25000 );
 }
