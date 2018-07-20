@@ -19,6 +19,7 @@
 #include "sam.h"
 #include "clocks.h"
 #include "RTC.h"
+#include "micros.h"
 
 #define MICROS_TIMER_FREQ 1UL
 #define RTC_US_PER_COUNT 30UL
@@ -38,7 +39,6 @@ int8_t initMicros()
 
     enableAPBCClk( PM_APBCMASK_TC0, 1 );
     initGenericClk( GCLK_CLKCTRL_GEN_GCLK0_Val, GCLK_CLKCTRL_ID_TC0_TC1_Val );
-    NVIC_EnableIRQ( TC0_IRQn );
 
     // Reset
     TC0->COUNT32.CTRLA.reg = TC_CTRLA_SWRST;
@@ -97,6 +97,17 @@ int8_t initMicros()
     _isPaused = 0;
 
     return 0;
+}
+
+void endMicros()
+{
+    // Reset
+    TC0->COUNT32.CTRLA.reg = TC_CTRLA_SWRST;
+    while( TC0->COUNT32.CTRLA.bit.SWRST )
+        ;
+
+    disableGenericClk( GCLK_CLKCTRL_ID_TC0_TC1_Val );
+    enableAPBCClk( PM_APBCMASK_TC0, 0 );
 }
 
 void pauseMicrosForSleep()

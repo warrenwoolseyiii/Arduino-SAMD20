@@ -23,7 +23,7 @@ int pinPeripheral( uint32_t ulPin, EPioType ulPeripheral )
 {
     // Handle the case the pin isn't usable as PIO
     if( g_APinDescription[ulPin].ulPinType == PIO_NOT_A_PIN ) return -1;
-    
+
     // Ensure the APBBClk is enabled for PORT
     enableAPBBClk( PM_APBBMASK_PORT, 1 );
     switch( ulPeripheral ) {

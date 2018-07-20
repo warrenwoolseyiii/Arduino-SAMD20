@@ -25,9 +25,9 @@ extern "C" {
 
 #include "WVariant.h"
 
-void pinMode( uint32_t dwPin, uint32_t dwMode ) ;
-void digitalWrite( uint32_t dwPin, uint32_t dwVal ) ;
-uint8_t digitalRead( uint32_t ulPin ) ;
+void    pinMode( uint32_t dwPin, uint32_t dwMode );
+void    digitalWrite( uint32_t dwPin, uint32_t dwVal );
+uint8_t digitalRead( uint32_t ulPin );
 
 #ifdef __cplusplus
 }

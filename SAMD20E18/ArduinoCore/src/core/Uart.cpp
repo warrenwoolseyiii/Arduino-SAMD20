@@ -39,6 +39,7 @@ Uart::Uart( SERCOM *_s, uint8_t _pinRX, uint8_t _pinTX, SercomRXPad _padRX,
     uc_padTX = _padTX;
     uc_pinRTS = _pinRTS;
     uc_pinCTS = _pinCTS;
+    initialized = false;
 }
 
 void Uart::begin( unsigned long baudrate )
@@ -74,12 +75,15 @@ void Uart::begin( unsigned long baudrate, uint16_t config )
     sercom->initPads( uc_padTX, uc_padRX );
 
     sercom->enableUART();
+    initialized = true;
 }
 
 void Uart::end()
 {
-    sercom->resetUART();
-    sercom->endUART();
+    if( initialized ) {
+        sercom->resetUART();
+        sercom->endUART();
+    }
 
     pinMode( uc_pinRX, OUTPUT );
     pinMode( uc_pinTX, OUTPUT );

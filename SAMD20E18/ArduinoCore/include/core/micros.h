@@ -24,6 +24,7 @@ extern "C" {
 #endif
 
 int8_t   initMicros();
+void endMicros();
 void     pauseMicrosForSleep();
 void     resumeMicrosFromSleep();
 void     syncMicrosToRTC();

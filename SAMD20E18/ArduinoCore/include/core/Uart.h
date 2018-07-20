@@ -63,6 +63,7 @@ class Uart : public HardwareSerial
     volatile uint32_t *pul_outclrRTS;
     uint32_t           ul_pinMaskRTS;
     uint8_t            uc_pinCTS;
+    bool               initialized;
 
     SercomNumberStopBit extractNbStopBit( uint16_t config );
     SercomUartCharSize  extractCharSize( uint16_t config );

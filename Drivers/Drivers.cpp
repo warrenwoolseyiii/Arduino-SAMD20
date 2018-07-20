@@ -143,6 +143,16 @@ void FXOSSPI()
     SPI1.end();
 }
 
+void testADC()
+{
+    uint32_t vcc = analogReadVcc();
+    Serial.begin( 38400 );
+    Serial.print( "VCC: " );
+    Serial.println( vcc );
+    delay( 25 );
+    Serial.end();
+}
+
 void setup()
 {
     // Select the clock
@@ -168,19 +178,5 @@ void setup()
 void loop()
 {
     testSleep();
-//
-    //Serial.begin( 38400 );
-    //Serial.print( "Wake: " );
-    //Serial.println( millis() );
-//
-    //FXOSSPI();
-    //testEEEPROM();
-    //hardMathTest();
-    //testSPIFlash();
-//
-    //Serial.print( "Done: " );
-    //Serial.println( millis() );
-    //delay( 25 );
-    //Serial.end();
-    printRTC();
+    testADC();
 }

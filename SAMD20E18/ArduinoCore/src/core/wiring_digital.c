@@ -87,8 +87,8 @@ void pinMode( uint32_t ulPin, uint32_t ulMode )
                 ( uint32_t )( 1 << g_APinDescription[ulPin].ulPin );
             PORT->Group[g_APinDescription[ulPin].ulPort]
                 .PINCFG[g_APinDescription[ulPin].ulPin]
-                .reg &= ~( ( uint8_t )( PORT_PINCFG_INEN | PORT_PINCFG_PULLEN 
-                | PORT_PINCFG_PMUXEN ) );
+                .reg &= ~( ( uint8_t )( PORT_PINCFG_INEN | PORT_PINCFG_PULLEN |
+                                        PORT_PINCFG_PMUXEN ) );
             break;
 
         default:
