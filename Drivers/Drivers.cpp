@@ -179,4 +179,8 @@ void loop()
 {
     testSleep();
     testADC();
+    testNVMFlash();
+    testSPIFlash();
+    FXOSSPI();
+    printRTC();
 }

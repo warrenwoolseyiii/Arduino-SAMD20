@@ -25,9 +25,8 @@ extern "C" {
 void pinMode( uint32_t ulPin, uint32_t ulMode )
 {
     // Handle the case the pin isn't usable as PIO
-    if( g_APinDescription[ulPin].ulPinType == PIO_NOT_A_PIN ) {
+    if( g_APinDescription[ulPin].ulPinType == PIO_NOT_A_PIN )
         return;
-    }
 
     // Set pin mode according to chapter '22.6.3 I/O Pin Configuration'
     enableAPBBClk( PM_APBBMASK_PORT, 1 );
@@ -100,9 +99,8 @@ void pinMode( uint32_t ulPin, uint32_t ulMode )
 void digitalWrite( uint32_t ulPin, uint32_t ulVal )
 {
     // Handle the case the pin isn't usable as PIO
-    if( g_APinDescription[ulPin].ulPinType == PIO_NOT_A_PIN ) {
+    if( g_APinDescription[ulPin].ulPinType == PIO_NOT_A_PIN )
         return;
-    }
 
     enableAPBBClk( PM_APBBMASK_PORT, 1 );
     EPortType port = g_APinDescription[ulPin].ulPort;

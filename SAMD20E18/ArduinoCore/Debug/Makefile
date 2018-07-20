@@ -86,7 +86,6 @@ C_SRCS +=  \
 ../src/core/Uart.cpp \
 ../src/core/WDT.c \
 ../src/core/WInterrupts.c \
-../src/core/wiring.c \
 ../src/core/wiring_analog.c \
 ../src/core/wiring_digital.c \
 ../src/core/wiring_private.c \
@@ -135,7 +134,6 @@ src/core/Tone.o \
 src/core/Uart.o \
 src/core/WDT.o \
 src/core/WInterrupts.o \
-src/core/wiring.o \
 src/core/wiring_analog.o \
 src/core/wiring_digital.o \
 src/core/wiring_private.o \
@@ -175,7 +173,6 @@ src/core/Tone.o \
 src/core/Uart.o \
 src/core/WDT.o \
 src/core/WInterrupts.o \
-src/core/wiring.o \
 src/core/wiring_analog.o \
 src/core/wiring_digital.o \
 src/core/wiring_private.o \
@@ -215,7 +212,6 @@ src/core/Tone.d \
 src/core/Uart.d \
 src/core/WDT.d \
 src/core/WInterrupts.d \
-src/core/wiring.d \
 src/core/wiring_analog.d \
 src/core/wiring_digital.d \
 src/core/wiring_private.d \
@@ -255,7 +251,6 @@ src/core/Tone.d \
 src/core/Uart.d \
 src/core/WDT.d \
 src/core/WInterrupts.d \
-src/core/wiring.d \
 src/core/wiring_analog.d \
 src/core/wiring_digital.d \
 src/core/wiring_private.d \
@@ -281,8 +276,6 @@ LINKER_SCRIPT_DEP+=
 
 
 # AVR32/GNU C Compiler
-
-
 
 
 

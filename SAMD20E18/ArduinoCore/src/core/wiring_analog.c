@@ -23,7 +23,8 @@
 #define TCC_INST_NUM 0
 #endif /* SAMD20 */
 
-#define ADC_WAIT_SYNC while( ADC->STATUS.bit.SYNCBUSY == 1 )
+#define BAND_GAP_MV 1100
+#define ADC_WAIT_SYNC while( ADC->STATUS.bit.SYNCBUSY )
 
 #ifdef __cplusplus
 extern "C" {
@@ -36,14 +37,6 @@ static int _writeResolution = 8;
 uint32_t _ctrlB = ADC_CTRLB_PRESCALER_DIV512;
 uint32_t _inputCtrl = ADC_INPUTCTRL_GAIN_1X;
 uint32_t _ref = 0;
-
-// Wait for synchronization of registers between the clock domains
-static __inline__ void syncADC() __attribute__( ( always_inline, unused ) );
-static void            syncADC()
-{
-    while( ADC->STATUS.bit.SYNCBUSY == 1 )
-        ;
-}
 
 // Wait for synchronization of registers between the clock domains
 static __inline__ void syncDAC() __attribute__( ( always_inline, unused ) );
@@ -142,7 +135,6 @@ void analogReadResolution( int res )
         _ctrlB |= ADC_CTRLB_RESSEL_8BIT;
         _ADCResolution = 8;
     }
-    syncADC();
 }
 
 void analogWriteResolution( int res )
@@ -205,10 +197,16 @@ void analogReference( eAnalogReference mode )
     }
 }
 
+/* Reads the band gap voltage from the internal VREF component. The band gap
+ * voltage can be re-directed to an ADC input, see Data Sheet section 16.6.9.1.
+ * For more information on band gap voltage and reverse calculating to VCC see
+ * https://en.wikipedia.org/wiki/Bandgap_voltage_reference.
+ * Returns extrapolated measurement of VCC in mV.
+ */
 uint32_t analogReadVcc()
 {
     uint32_t read = 0;
-    uint32_t vcc = 0;
+    uint32_t vccMv = 0;
 
     analogReference( AR_EXTERNAL );
     analogReadResolution( 12 );
@@ -235,8 +233,8 @@ uint32_t analogReadVcc()
 
     SYSCTRL->VREF.bit.BGOUTEN = 0;
 
-    vcc = ( 1100 * 4095 ) / read;
-    return vcc;
+    vccMv = ( BAND_GAP_MV * 4095 ) / read;
+    return vccMv;
 }
 
 uint32_t analogRead( uint32_t pin )
@@ -277,6 +275,7 @@ uint32_t analogRead( uint32_t pin )
     return mapResolution( read, _ADCResolution, _readResolution );
 }
 
+// TODO: analogWrite
 // Right now, PWM output only works on the pins with
 // hardware support.  These are defined in the appropriate
 // pins_*.c file.  For the rest of the pins, we default

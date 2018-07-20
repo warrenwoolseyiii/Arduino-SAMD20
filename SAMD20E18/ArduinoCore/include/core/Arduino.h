@@ -93,7 +93,6 @@ void loop( void ) ;
 // Include board variant
 #include "variant.h"
 
-#include "wiring.h"
 #include "wiring_digital.h"
 #include "wiring_analog.h"
 #include "wiring_shift.h"

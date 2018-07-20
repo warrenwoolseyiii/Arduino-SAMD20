@@ -82,7 +82,8 @@ void handleNVMError()
 
 /* Note: user is responsible for knowing NVM erase procedures and memory spaces
  * associated with the erase row command. See Data see section 20.6.4.4 for
- * more information */
+ * more information. 
+ */
 void eraseRow( uint32_t addr )
 {
     if( !_paramsLoaded ) getNVMParams();

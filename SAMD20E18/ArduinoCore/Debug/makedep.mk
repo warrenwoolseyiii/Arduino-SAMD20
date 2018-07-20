@@ -56,8 +56,6 @@ src\core\WDT.c
 
 src\core\WInterrupts.c
 
-src\core\wiring.c
-
 src\core\wiring_analog.c
 
 src\core\wiring_digital.c

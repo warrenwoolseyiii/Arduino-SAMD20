@@ -22,7 +22,7 @@
 
 #include "Arduino.h"
 
-void tone(uint32_t _pin, uint32_t frequency, uint32_t duration = 0);
-void noTone(uint32_t _pin);
+void tone( uint32_t _pin, uint32_t frequency, uint32_t duration = 0 );
+void noTone( uint32_t _pin );
 
 #endif

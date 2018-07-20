@@ -176,6 +176,7 @@ const DeviceVectors exception_table = {
 
 extern int main( void );
 uint8_t    gRCause = 0;
+uint32_t SystemCoreClock=1000000ul ;
 
 /* This is called on processor reset to initialize the device and call main() */
 void Reset_Handler( void )

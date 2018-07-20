@@ -28,12 +28,8 @@ void initVariant()
 // Initialize C library
 extern "C" void __libc_init_array( void );
 
-/*
- * \brief Main entry point of Arduino application
- */
 int main( void )
 {
-    // TODO: Wiring init will be removed probabaly init();
     initRTC();
     initMicros();
 

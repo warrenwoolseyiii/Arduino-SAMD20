@@ -28,6 +28,20 @@ uint32_t _cyclesPerUs = 0;
 uint8_t  _isPaused = 0;
 uint32_t _micros = 0;
 
+/* Micros implementation that runs independent from the RTC. In order
+ * to save maximum power, the Systick module has been disabled so that
+ * the processor doesn't wake every ms. millis and delay implementations 
+ * are based off the RTC, however the RTC doesn't run at a high enough 
+ * frequency to provide the required resolution of micro seconds. This 
+ * implementation utilizes a 32 bit Timer Counter which is synchronized 
+ * to the RTC every time the RTC overflows, thus guaranteeing that drift between
+ * this Timer Counter and the RTC is minimized.
+ *
+ * The user can pause the micros timer before sleeping the CPU in it's deepest
+ * sleep setting, when the CPU awakes, the caller will be responsible for 
+ * restarting, and synchronizing the Timer Counter with the RTC. This can 
+ * be done by calling pauseMicrosForSleep() and syncMicrosToRTC() respectively.
+ */
 int8_t initMicros()
 {
     uint64_t ccValue;

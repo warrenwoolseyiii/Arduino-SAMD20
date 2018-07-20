@@ -53,7 +53,7 @@ void changeCPUClk( CPUClkSrc_t src )
         disableOSC8M();
     }
 
-    // if we change the clock frequency the micro timer will need to be adjusted
+    // If we change the clock frequency the micro timer will need to be adjusted
     initMicros();
     syncMicrosToRTC();
 }
