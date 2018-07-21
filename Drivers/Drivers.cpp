@@ -38,7 +38,6 @@ void initClkOut()
 
 void printRTC()
 {
-    Serial.begin( 38400 );
     uint32_t steps = stepsRTC();
     Serial.print( "Steps: " );
     Serial.println( steps );
@@ -48,8 +47,6 @@ void printRTC()
     Serial.println( millis() );
     Serial.print( "Sec: " );
     Serial.println( secondsRTC() );
-    delay( 25 );
-    Serial.end();
 }
 
 void testWDTReset()
