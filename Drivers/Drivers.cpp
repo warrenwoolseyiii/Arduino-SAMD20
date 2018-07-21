@@ -2,9 +2,15 @@
 #include <EEPROM.h>
 #include <SPIFlash.h>
 
+#define LED2        9
+#define TEST_EIC    18
+
 #define FXOS_MISO   26
 #define FXOS_CS     11
 #define FXOS_RST    3
+#define FXOS_INT1   13
+#define FXOS_INT2   14
+
 #define RFM_SS      7
 #define FLASH_SS    10
 
@@ -109,15 +115,41 @@ void hardMathTest()
 
 void testSleep()
 {
+    // Take down all modules
+    SPI.end();
+    SPI1.end();
+    Serial.end();
     enableAPBBClk( PM_APBBMASK_PORT, 0 );
     pauseMicrosForSleep();
 
     // Sleep the CPU
     sleepCPU( PM_SLEEP_STANDBY_Val );
+
+    // Bring back modules 
+    Serial.begin( 38400 );
 }
 
-void FXOSSPI()
+volatile uint32_t ISRCntr = 0;
+void sleepEICISR()
 {
+    //digitalWrite( LED2, HIGH );
+    //delay( 1 );
+    //digitalWrite( LED2, LOW );    
+    ISRCntr++;
+}
+
+bool resetDetected = false;
+void resetISR()
+{
+    resetDetected = true;
+}
+
+void testFXOSReset()
+{
+    resetDetected = false;
+    interruptlowPowerMode( false );
+    attachInterrupt( FXOS_INT1, resetISR, CHANGE );
+
     // Tri-state MISO
     pinMode( FXOS_MISO, TRI_STATE );
     delay( 10 );
@@ -126,6 +158,16 @@ void FXOSSPI()
     digitalWrite( FXOS_RST, HIGH );
     digitalWrite( FXOS_RST, LOW );
     delay( 1 );
+
+    while( !resetDetected );
+
+    detachInterrupt( FXOS_INT1 );
+    disableExternalInterrupts();
+}
+
+void FXOSSPI()
+{
+    testFXOSReset();
 
     // Set up the bus
     SPISettings _settings = SPISettings( 1000000, MSBFIRST, SPI_MODE0 );
@@ -146,17 +188,14 @@ void FXOSSPI()
 void testADC()
 {
     uint32_t vcc = analogReadVcc();
-    Serial.begin( 38400 );
     Serial.print( "VCC: " );
     Serial.println( vcc );
-    delay( 25 );
-    Serial.end();
 }
 
 void setup()
 {
     // Select the clock
-    changeCPUClk( cpu_clk_dfll48 );
+    //changeCPUClk( cpu_clk_dfll48 );
 
     // FXOS CS
     pinMode( FXOS_CS, OUTPUT );
@@ -171,16 +210,27 @@ void setup()
     digitalWrite( FLASH_SS, HIGH );
 
     // FXOS_RST
-    pinMode( 3, OUTPUT );
-    digitalWrite( 3, LOW );
+    pinMode( FXOS_RST, OUTPUT );
+    digitalWrite( FXOS_RST, LOW );
+
+    // LED2
+    pinMode( LED2, OUTPUT );
+    digitalWrite( LED2, LOW );
+
+    // Attach the low power interrupt controller for testing
+    interruptlowPowerMode( true );
+    attachInterrupt( TEST_EIC, sleepEICISR, FALLING );
 }
 
+uint32_t sec = 0;
 void loop()
 {
     testSleep();
-    testADC();
-    testNVMFlash();
-    testSPIFlash();
-    FXOSSPI();
-    printRTC();
+    if( secondsRTC() > sec ) {
+        sec = secondsRTC();
+        Serial.print( millis() );
+        Serial.print( ": " );
+        Serial.println( ISRCntr );
+        delay( 10 );
+    }
 }

@@ -36,17 +36,9 @@ extern "C" {
 
 typedef void ( *voidFuncPtr )( void );
 
+void disableExternalInterrupts();
 void interruptlowPowerMode( bool enable );
-/*
- * \brief Specifies a named Interrupt Service Routine (ISR) to call when an
- * interrupt occurs. Replaces any previous function that was attached to the
- * interrupt.
- */
 void attachInterrupt( uint32_t pin, voidFuncPtr callback, uint32_t mode );
-
-/*
- * \brief Turns off the given interrupt.
- */
 void detachInterrupt( uint32_t pin );
 
 #ifdef __cplusplus
