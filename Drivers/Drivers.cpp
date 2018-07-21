@@ -217,6 +217,9 @@ void setup()
     // Attach the low power interrupt controller for testing
     interruptlowPowerMode( true );
     attachInterrupt( TEST_EIC, sleepEICISR, FALLING );
+
+    // Init SPI Flash
+    flash.initialize();
 }
 
 uint32_t sec = 0;
@@ -230,4 +233,6 @@ void loop()
         Serial.println( ISRCntr );
         delay( 10 );
     }
+
+    testSPIFlash();
 }
