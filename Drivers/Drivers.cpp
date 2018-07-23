@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <EEPROM.h>
 #include <SPIFlash.h>
+#include <FXOS8700.h>
 
 #define LED2        9
 #define TEST_EIC    18
@@ -141,45 +142,13 @@ void resetISR()
     resetDetected = true;
 }
 
-void testFXOSReset()
+void testFXOS()
 {
-    resetDetected = false;
-    interruptlowPowerMode( false );
-    attachInterrupt( FXOS_INT1, resetISR, CHANGE );
-
-    // Tri-state MISO
-    pinMode( FXOS_MISO, TRI_STATE );
-    delay( 10 );
-
-    // Reset the FXOS
-    digitalWrite( FXOS_RST, HIGH );
-    digitalWrite( FXOS_RST, LOW );
-    delay( 1 );
-
-    while( !resetDetected );
-
-    detachInterrupt( FXOS_INT1 );
-    disableExternalInterrupts();
-}
-
-void FXOSSPI()
-{
-    testFXOSReset();
-
-    // Set up the bus
-    SPISettings _settings = SPISettings( 1000000, MSBFIRST, SPI_MODE0 );
-    SPI1.beginTransaction( _settings );
-
-    // Read WHO_AM_I
-    uint8_t tx[3] = { ( 0x0D & 0x7F ), ( 0x0D & 0x80 ) , 0xFF };
-    digitalWrite( FXOS_CS, LOW );
-
-    for( uint8_t i = 0; i < 3; i++)
-        buff[i] = SPI1.transfer( tx[i] );
-
-    digitalWrite( FXOS_CS, HIGH );
-    SPI1.endTransaction();
-    SPI1.end();
+    if( fxos.initialize() ) {
+        Serial.println( "FXOS Success" );
+        Serial.print( "Temp: " );
+        Serial.println( fxos.getTemperature() );
+    }
 }
 
 void testADC()
@@ -226,13 +195,7 @@ uint32_t sec = 0;
 void loop()
 {
     testSleep();
-    if( secondsRTC() > sec ) {
-        sec = secondsRTC();
-        Serial.print( millis() );
-        Serial.print( ": " );
-        Serial.println( ISRCntr );
-        delay( 10 );
-    }
-
     testSPIFlash();
+    testFXOS();
+    delay( 10 );
 }
