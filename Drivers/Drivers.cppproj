@@ -155,7 +155,7 @@
     <ListValues>
       <Value>DEBUG</Value>
       <Value>SAMD</Value>
-      <Value>FXOS_EN=1 -DFXOS_CS_PIN=11 -DFXOS_SCK_PIN=25 -DFXOS_MOSI_PIN=24 -DFXOS_MISO=26 -DFXOS_RST_PIN=3 -DFXOS_INT1_PIN=13 -DFXOS_INT2_PIN=14</Value>
+      <Value>FXOS_EN=1 -DFXOS_CS_PIN=11 -DFXOS_SCK_PIN=25 -DFXOS_MOSI_PIN=24 -DFXOS_MISO_PIN=26 -DFXOS_RST_PIN=3 -DFXOS_INT1_PIN=13 -DFXOS_INT2_PIN=14 -DFXOS_ISR_NUM=FXOS_INT1_PIN -DFXOS_ODR=ODR_200HZ -DFXOS_OSR=MOSR_6 -DFXOS_SLEEP_OSR=MSOSR_4</Value>
     </ListValues>
   </armgcc.compiler.symbols.DefSymbols>
   <armgcc.compiler.directories.IncludePaths>
@@ -187,7 +187,7 @@
     <ListValues>
       <Value>DEBUG</Value>
       <Value>SAMD</Value>
-      <Value>FXOS_EN=1 -DFXOS_CS_PIN=11 -DFXOS_SCK_PIN=25 -DFXOS_MOSI_PIN=24 -DFXOS_MISO_PIN=26 -DFXOS_RST_PIN=3 -DFXOS_INT1_PIN=13 -DFXOS_INT2_PIN=14</Value>
+      <Value>FXOS_EN=1 -DFXOS_CS_PIN=11 -DFXOS_SCK_PIN=25 -DFXOS_MOSI_PIN=24 -DFXOS_MISO_PIN=26 -DFXOS_RST_PIN=3 -DFXOS_INT1_PIN=13 -DFXOS_INT2_PIN=14 -DFXOS_ISR_NUM=FXOS_INT1_PIN -DFXOS_ODR=ODR_200HZ -DFXOS_OSR=MOSR_6 -DFXOS_SLEEP_OSR=MSOSR_4</Value>
     </ListValues>
   </armgcccpp.compiler.symbols.DefSymbols>
   <armgcccpp.compiler.directories.IncludePaths>
