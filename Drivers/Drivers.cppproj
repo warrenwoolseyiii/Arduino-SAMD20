@@ -177,6 +177,7 @@
       <Value>../../../Flume/Flume_AMR/lib</Value>
       <Value>../../../Flume/Flume_AMR/lib/SPIFlash</Value>
       <Value>../../../Flume/Flume_AMR/lib/FXOS8700</Value>
+      <Value>../../../Flume/Flume_AMR/lib/include</Value>
     </ListValues>
   </armgcc.compiler.directories.IncludePaths>
   <armgcc.compiler.optimization.level>Optimize (-O1)</armgcc.compiler.optimization.level>
@@ -209,6 +210,7 @@
       <Value>../../../Flume/Flume_AMR/lib</Value>
       <Value>../../../Flume/Flume_AMR/lib/SPIFlash</Value>
       <Value>../../../Flume/Flume_AMR/lib/FXOS8700</Value>
+      <Value>../../../Flume/Flume_AMR/lib/include</Value>
     </ListValues>
   </armgcccpp.compiler.directories.IncludePaths>
   <armgcccpp.compiler.optimization.level>Optimize (-O1)</armgcccpp.compiler.optimization.level>
@@ -250,6 +252,14 @@
     <Folder Include="Device_Startup\" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\Flume\Flume_AMR\lib\Flume\PacketBuilder.cpp">
+      <SubType>compile</SubType>
+      <Link>PacketBuilder.cpp</Link>
+    </Compile>
+    <Compile Include="..\..\Flume\Flume_AMR\lib\Flume\PacketBuilder.h">
+      <SubType>compile</SubType>
+      <Link>PacketBuilder.h</Link>
+    </Compile>
     <Compile Include="..\..\Flume\Flume_AMR\lib\FXOS8700\FXOS8700.cpp">
       <SubType>compile</SubType>
       <Link>FXOS8700.cpp</Link>
