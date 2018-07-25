@@ -155,11 +155,19 @@ void testFXOS()
     }
 }
 
-void testADC()
+void testReadVCC()
 {
     uint32_t vcc = analogReadVcc();
     Serial.print( "VCC: " );
     Serial.println( vcc );
+}
+
+void testReadAnalog()
+{
+    analogReference( AR_EXTERNAL );
+    uint32_t val = analogRead( A5 );
+    Serial.print( "Pin A5: " );
+    Serial.println( val );
 }
 
 void setup()
@@ -209,6 +217,8 @@ void loop()
     testFXOS();
     testEEEPROM();
     testNVMFlash();
+    testReadVCC();
+    testReadAnalog();
     printRTC();
     delay( 25 );
 }
