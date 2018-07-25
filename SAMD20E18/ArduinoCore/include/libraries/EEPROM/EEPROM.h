@@ -19,39 +19,8 @@
 #define EEPROM_H_
 
 #include <stdint.h>
-#include <Arduino.h>
-
-// class NVMFlash
-//{
-// public:
-// uint32_t minimumEraseSize;
-// uint32_t EEEPROMSize;
-// uint32_t startAddr;
-//
-// NVMFlash()
-//{
-// NVMParams_t params = getNVMParams();
-// minimumEraseSize = params.rowSize;
-// EEEPROMSize = params.eepromSize;
-// startAddr = params.nvmTotalSize - EEEPROMSize;
-//}
-//
-// void read( const volatile void *flash_ptr, void *data, uint32_t size )
-//{
-// readFlash( flash_ptr, data, size );
-//}
-//
-// void erase( uint32_t addr )
-//{
-// eraseRow( addr );
-//}
-//
-// void write( const volatile void *flash_ptr, const void *data,
-// uint32_t size )
-//{
-// writeFlash( flash_ptr, data, size );
-//}
-//};
+#include <stdlib.h>
+#include <string.h>
 
 class EEEPROM
 {
