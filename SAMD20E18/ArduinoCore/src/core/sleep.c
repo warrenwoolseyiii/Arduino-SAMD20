@@ -55,5 +55,5 @@ void changeCPUClk( CPUClkSrc_t src )
 
     // If we change the clock frequency the micro timer will need to be adjusted
     initMicros();
-    syncMicrosToRTC();
+    syncMicrosToRTC( 1 );
 }

@@ -27,7 +27,7 @@ int8_t   initMicros();
 void endMicros();
 void     pauseMicrosForSleep();
 void     resumeMicrosFromSleep();
-void     syncMicrosToRTC();
+void     syncMicrosToRTC( uint8_t overFlow );
 uint32_t micros();
 void     delayMicroseconds( uint32_t us );
 

@@ -83,5 +83,5 @@ void RTC_IRQHandler()
     // must be handled before we LSH the MSB out of the _rtcSec value
     if( ( ++_rtcSec ) & 0x20000 ) _rtcSec = 0;
     RTC->MODE1.INTFLAG.bit.OVF = 1;
-    syncMicrosToRTC();
+    syncMicrosToRTC( 1 );
 }

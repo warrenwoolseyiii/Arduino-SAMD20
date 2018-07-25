@@ -18,6 +18,8 @@
 SPIFlash flash( FLASH_SS, 0x1F44 );
 EEEPROM<NVMFlash> eeeprom;
 uint8_t buff[256];
+uint8_t typeFlags = 0;
+Buffer_t txBuff;
 
 void initClkOut()
 {
@@ -40,14 +42,18 @@ void initClkOut()
 void printRTC()
 {
     uint32_t steps = stepsRTC();
+    uint32_t mil = millis();
+    uint32_t mi = micros();
+    uint32_t sec = secondsRTC();
+
     Serial.print( "Steps: " );
     Serial.println( steps );
     Serial.print( "Micros: " );
-    Serial.println( micros() );
+    Serial.println( mi );
     Serial.print( "Millis: " );
-    Serial.println( millis() );
+    Serial.println( mil );
     Serial.print( "Sec: " );
-    Serial.println( secondsRTC() );
+    Serial.println( sec );
 }
 
 void testWDTReset()
@@ -163,6 +169,9 @@ void setup()
     // Select the clock
     //changeCPUClk( cpu_clk_dfll48 );
 
+    // Initialize Packet Builder
+    PacketBuilder::InitPacketBuilder( &typeFlags, &txBuff );
+
     // FXOS CS
     pinMode( FXOS_CS, OUTPUT );
     digitalWrite( FXOS_CS, HIGH );
@@ -187,7 +196,7 @@ void setup()
     interruptlowPowerMode( true );
     attachInterrupt( TEST_EIC, sleepEICISR, FALLING );
 
-    // Init SPI Flash
+    // Initialize SPI Flash
     flash.initialize();
 }
 
@@ -197,5 +206,8 @@ void loop()
     testSleep();
     testSPIFlash();
     testFXOS();
-    delay( 10 );
+    testEEEPROM();
+    testNVMFlash();
+    printRTC();
+    delay( 25 );
 }

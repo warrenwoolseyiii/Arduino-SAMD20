@@ -217,7 +217,7 @@ void detachInterrupt( uint32_t pin )
 void EIC_Handler( void )
 {
     // Re-synchronize micros
-    syncMicrosToRTC();
+    syncMicrosToRTC( 0 );
 
     // Calling the routine directly from -here- takes about 1us
     // Depending on where you are in the list it will take longer

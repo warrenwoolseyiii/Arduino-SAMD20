@@ -144,14 +144,16 @@ void resumeMicrosFromSleep()
     }
 }
 
-void syncMicrosToRTC()
+void syncMicrosToRTC( uint8_t overFlow )
 {
-    uint32_t count = RTC_US_PER_COUNT * countRTC();
-    count *= _cyclesPerUs;
-    TC0->COUNT32.COUNT.reg = count;
-    while( TC0->COUNT32.STATUS.bit.SYNCBUSY )
+    if( overFlow || _isPaused ) {
+        uint32_t count = RTC_US_PER_COUNT * countRTC();
+        count *= _cyclesPerUs;
+        TC0->COUNT32.COUNT.reg = count;
+        while( TC0->COUNT32.STATUS.bit.SYNCBUSY )
         ;
-    resumeMicrosFromSleep();
+        resumeMicrosFromSleep();
+    }
 }
 
 uint32_t micros()
