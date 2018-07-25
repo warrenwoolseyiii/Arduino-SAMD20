@@ -16,7 +16,7 @@
 #define FLASH_SS    10
 
 SPIFlash flash( FLASH_SS, 0x1F44 );
-EEEPROM<NVMFlash> eeeprom;
+EEEPROM eeeprom;
 uint8_t buff[256];
 uint8_t typeFlags = 0;
 Buffer_t txBuff;
@@ -198,6 +198,9 @@ void setup()
 
     // Initialize SPI Flash
     flash.initialize();
+
+    // Initialize EEPROM
+    eeeprom.begin();
 }
 
 uint32_t sec = 0;

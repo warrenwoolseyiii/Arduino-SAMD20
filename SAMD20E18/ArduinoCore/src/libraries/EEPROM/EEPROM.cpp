@@ -30,18 +30,22 @@
  * and erase load on each individual Flash memory page.
  */
 #include "EEPROM.h"
+#include "NVM.h"
 
-EEEPROM<NVMFlash>::EEEPROM()
+EEEPROM::EEEPROM()
+{}
+
+void EEEPROM::begin()
 {
-    _flashMem = NVMFlash();
+    NVMParams_t params = getNVMParams();
 
     // Flash page characteristics
-    _minFlashPageSize = _flashMem.minimumEraseSize;
+    _minFlashPageSize = params.rowSize;
     _effectivePageSize = _minFlashPageSize - 1;
-    _flashEEEPROMStartAddr = _flashMem.startAddr;
+    _flashEEEPROMStartAddr = params.nvmTotalSize - params.eepromSize;
 
     // Usable memory space
-    _useableMemSize = _flashMem.EEEPROMSize;
+    _useableMemSize = params.eepromSize;
     _numUsableBanks = _useableMemSize / _minFlashPageSize;
     _EEEPROMSize = ( _numUsableBanks / 2 ) * _effectivePageSize;
 
@@ -51,12 +55,12 @@ EEEPROM<NVMFlash>::EEEPROM()
     _nextBankUp = 0;
 }
 
-uint16_t EEEPROM<NVMFlash>::getSize()
+uint16_t EEEPROM::getSize()
 {
     return _EEEPROMSize;
 }
 
-void EEEPROM<NVMFlash>::write( uint16_t addr, void *data, uint16_t size )
+void EEEPROM::write( uint16_t addr, void *data, uint16_t size )
 {
     if( addr + size > _EEEPROMSize ) return;
 
@@ -84,8 +88,8 @@ void EEEPROM<NVMFlash>::write( uint16_t addr, void *data, uint16_t size )
     uint32_t flashWriteAddr, flashEraseAddr;
     flashWriteAddr = getNextEmptyBankAddr();
     flashEraseAddr = getFlashAddr( addr );
-    _flashMem.erase( flashEraseAddr );
-    _flashMem.write( (void *)flashWriteAddr, cache, _minFlashPageSize );
+    eraseRow( flashEraseAddr );
+    writeFlash( (void *)flashWriteAddr, cache, _minFlashPageSize );
 
     // Free the cache and continue the write if necessary.
     free( cache );
@@ -95,7 +99,7 @@ void EEEPROM<NVMFlash>::write( uint16_t addr, void *data, uint16_t size )
                size - writeSize );
 }
 
-void EEEPROM<NVMFlash>::read( uint16_t addr, void *data, uint16_t size )
+void EEEPROM::read( uint16_t addr, void *data, uint16_t size )
 {
     if( addr + size > _EEEPROMSize ) return;
 
@@ -108,12 +112,12 @@ void EEEPROM<NVMFlash>::read( uint16_t addr, void *data, uint16_t size )
 
     // Perform the read and continue if necessary
     uint32_t flashAddr = getFlashAddr( addr );
-    _flashMem.read( (void *)flashAddr, data, readSize );
+    readFlash( (void *)flashAddr, data, readSize );
     if( remainingBankSize < size )
         read( addr + readSize, (uint8_t *)data + readSize, size - readSize );
 }
 
-void EEEPROM<NVMFlash>::erase( uint16_t addr, uint16_t size )
+void EEEPROM::erase( uint16_t addr, uint16_t size )
 {
     uint8_t *data = (uint8_t *)malloc( size );
     if( data == NULL ) return;
@@ -122,10 +126,10 @@ void EEEPROM<NVMFlash>::erase( uint16_t addr, uint16_t size )
     free( data );
 }
 
-void EEEPROM<NVMFlash>::retrieveBankStatus()
+void EEEPROM::retrieveBankStatus()
 {
     for( uint8_t i = 0; i < _numUsableBanks; i++ ) {
-        _flashMem.read(
+        readFlash(
             (void *)( _flashEEEPROMStartAddr + ( i * _minFlashPageSize ) ),
             &_bankStatus[i], 1 );
     }
@@ -133,7 +137,7 @@ void EEEPROM<NVMFlash>::retrieveBankStatus()
     _bankUpToDate = true;
 }
 
-uint32_t EEEPROM<NVMFlash>::getNextEmptyBankAddr()
+uint32_t EEEPROM::getNextEmptyBankAddr()
 {
     uint32_t addr = _flashEEEPROMStartAddr;
 
@@ -149,7 +153,7 @@ uint32_t EEEPROM<NVMFlash>::getNextEmptyBankAddr()
     return addr;
 }
 
-uint32_t EEEPROM<NVMFlash>::getFlashAddr( uint16_t eeepromAddr )
+uint32_t EEEPROM::getFlashAddr( uint16_t eeepromAddr )
 {
     uint8_t  bankId = eeepromAddr / _effectivePageSize;
     uint32_t addr = _flashEEEPROMStartAddr;

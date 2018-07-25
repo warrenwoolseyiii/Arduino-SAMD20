@@ -15,61 +15,55 @@
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+#ifndef EEPROM_H_
+#define EEPROM_H_
+
 #include <stdint.h>
 #include <Arduino.h>
 
-class NVMFlash
-{
-  public:
-    uint32_t minimumEraseSize;
-    uint32_t EEEPROMSize;
-    uint32_t startAddr;
+// class NVMFlash
+//{
+// public:
+// uint32_t minimumEraseSize;
+// uint32_t EEEPROMSize;
+// uint32_t startAddr;
+//
+// NVMFlash()
+//{
+// NVMParams_t params = getNVMParams();
+// minimumEraseSize = params.rowSize;
+// EEEPROMSize = params.eepromSize;
+// startAddr = params.nvmTotalSize - EEEPROMSize;
+//}
+//
+// void read( const volatile void *flash_ptr, void *data, uint32_t size )
+//{
+// readFlash( flash_ptr, data, size );
+//}
+//
+// void erase( uint32_t addr )
+//{
+// eraseRow( addr );
+//}
+//
+// void write( const volatile void *flash_ptr, const void *data,
+// uint32_t size )
+//{
+// writeFlash( flash_ptr, data, size );
+//}
+//};
 
-    NVMFlash()
-    {
-        NVMParams_t params = getNVMParams();
-        minimumEraseSize = params.rowSize;
-        EEEPROMSize = params.eepromSize;
-        startAddr = params.nvmTotalSize - EEEPROMSize;
-    }
-
-    void read( const volatile void *flash_ptr, void *data, uint32_t size )
-    {
-        readFlash( flash_ptr, data, size );
-    }
-
-    void erase( uint32_t addr )
-    {
-        eraseRow( addr );
-    }
-
-    void write( const volatile void *flash_ptr, const void *data,
-                uint32_t size )
-    {
-        writeFlash( flash_ptr, data, size );
-    }
-};
-
-template <class T> class EEEPROM
-{
-  public:
-    EEEPROM(){};
-
-  private:
-    T _flashMem;
-};
-
-template <> class EEEPROM<NVMFlash>
+class EEEPROM
 {
   public:
     EEEPROM();
+    void     begin();
     uint16_t getSize();
     void     write( uint16_t addr, void *data, uint16_t size );
     void     read( uint16_t addr, void *data, uint16_t size );
     void     erase( uint16_t addr, uint16_t size );
 
   private:
-    NVMFlash _flashMem;
     uint16_t _minFlashPageSize, _effectivePageSize;
     uint16_t _useableMemSize, _EEEPROMSize;
     uint8_t  _numUsableBanks, _nextBankUp;
@@ -81,3 +75,5 @@ template <> class EEEPROM<NVMFlash>
     uint32_t getNextEmptyBankAddr();
     uint32_t getFlashAddr( uint16_t eeepromAddr );
 };
+
+#endif /* EEPROM_H_ */
