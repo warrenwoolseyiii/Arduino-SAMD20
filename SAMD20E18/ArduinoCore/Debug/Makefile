@@ -43,7 +43,6 @@ SUBDIRS :=  \
 ../include/core/samd20/include/instance \
 ../include/core/samd20/include/pio \
 ../include/libraries/ \
-../include/libraries/EEPROM \
 ../include/libraries/spi/ \
 ../include/libraries/wire/ \
 ../include/variants/ \
@@ -52,7 +51,6 @@ SUBDIRS :=  \
 ../src/core/avr/ \
 ../src/core/PreprocessingAssembly/ \
 ../src/libraries/ \
-../src/libraries/EEPROM \
 ../src/libraries/spi/ \
 ../src/libraries/wire/ \
 ../src/variants/ \
@@ -66,6 +64,7 @@ C_SRCS +=  \
 ../src/core/clocks.c \
 ../src/core/cortex_handlers.c \
 ../src/core/delay.c \
+../src/core/EEPROM.cpp \
 ../src/core/hooks.c \
 ../src/core/IPAddress.cpp \
 ../src/core/itoa.c \
@@ -92,7 +91,6 @@ C_SRCS +=  \
 ../src/core/wiring_shift.c \
 ../src/core/WMath.cpp \
 ../src/core/WString.cpp \
-../src/libraries/EEPROM/EEPROM.cpp \
 ../src/libraries/spi/SPI.cpp \
 ../src/libraries/wire/Wire.cpp \
 ../src/variants/variant.cpp
@@ -112,6 +110,7 @@ src/core/avr/dtostrf.o \
 src/core/clocks.o \
 src/core/cortex_handlers.o \
 src/core/delay.o \
+src/core/EEPROM.o \
 src/core/hooks.o \
 src/core/IPAddress.o \
 src/core/itoa.o \
@@ -140,7 +139,6 @@ src/core/wiring_private.o \
 src/core/wiring_shift.o \
 src/core/WMath.o \
 src/core/WString.o \
-src/libraries/EEPROM/EEPROM.o \
 src/libraries/spi/SPI.o \
 src/libraries/wire/Wire.o \
 src/variants/variant.o
@@ -151,6 +149,7 @@ src/core/avr/dtostrf.o \
 src/core/clocks.o \
 src/core/cortex_handlers.o \
 src/core/delay.o \
+src/core/EEPROM.o \
 src/core/hooks.o \
 src/core/IPAddress.o \
 src/core/itoa.o \
@@ -179,7 +178,6 @@ src/core/wiring_private.o \
 src/core/wiring_shift.o \
 src/core/WMath.o \
 src/core/WString.o \
-src/libraries/EEPROM/EEPROM.o \
 src/libraries/spi/SPI.o \
 src/libraries/wire/Wire.o \
 src/variants/variant.o
@@ -190,6 +188,7 @@ src/core/avr/dtostrf.d \
 src/core/clocks.d \
 src/core/cortex_handlers.d \
 src/core/delay.d \
+src/core/EEPROM.d \
 src/core/hooks.d \
 src/core/IPAddress.d \
 src/core/itoa.d \
@@ -218,7 +217,6 @@ src/core/wiring_private.d \
 src/core/wiring_shift.d \
 src/core/WMath.d \
 src/core/WString.d \
-src/libraries/EEPROM/EEPROM.d \
 src/libraries/spi/SPI.d \
 src/libraries/wire/Wire.d \
 src/variants/variant.d
@@ -229,6 +227,7 @@ src/core/avr/dtostrf.d \
 src/core/clocks.d \
 src/core/cortex_handlers.d \
 src/core/delay.d \
+src/core/EEPROM.d \
 src/core/hooks.d \
 src/core/IPAddress.d \
 src/core/itoa.d \
@@ -257,7 +256,6 @@ src/core/wiring_private.d \
 src/core/wiring_shift.d \
 src/core/WMath.d \
 src/core/WString.d \
-src/libraries/EEPROM/EEPROM.d \
 src/libraries/spi/SPI.d \
 src/libraries/wire/Wire.d \
 src/variants/variant.d
@@ -365,13 +363,6 @@ src/core/avr/%.o: ../src/core/avr/%.c
 	@echo Building file: $<
 	@echo Invoking: ARM/GNU C Compiler : 6.3.1
 	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\arm\arm-gnu-toolchain\bin\arm-none-eabi-gcc.exe$(QUOTE)  -x c -mthumb -D__SAMD20E18__ -DDEBUG -DF_CPU=48000000L -DARDUINO=10805 -DARDUINO_SAMD_E -DARDUINO_ARCH_SAMD -DUSB_VID=0x2341 -DUSB_PID=0x804f -DUSB_PRODUCT="\"Arduino MKRZero\"" -DUSB_MANUFACTURER="\"Arduino LLC\"" -DSAMD_SERIES -DSAMD20  -I"../include/libraries/EEPROM" -I"..\include\libraries\wire" -I"..\include\libraries\spi" -I"..\include\core" -I"..\include\core\avr" -I"..\include\variants" -I"../include/core/samd20" -I"../include/core/samd20/include" -I"../include/core/samd20/include/component" -I"../include/core/samd20/include/instance" -I"../include/core/samd20/include/pio" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\arm\cmsis\5.0.1\CMSIS\Include" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\SAMD20_DFP\1.2.91\samd20\include"  -Os -fno-threadsafe-statics -fno-exceptions -ffunction-sections -fdata-sections -g3 -w -mcpu=cortex-m0plus -c -std=gnu11 --param max-inline-insns-single=500 -nostdlib -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
-	@echo Finished building: $<
-	
-
-src/libraries/EEPROM/%.o: ../src/libraries/EEPROM/%.cpp
-	@echo Building file: $<
-	@echo Invoking: ARM/GNU C Compiler : 6.3.1
-	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\arm\arm-gnu-toolchain\bin\arm-none-eabi-g++.exe$(QUOTE) -mthumb -D__SAMD20E18__ -DDEBUG -DF_CPU=48000000L -DARDUINO=10805 -DARDUINO_SAMD_E -DARDUINO_ARCH_SAMD -DUSB_VID=0x2341 -DUSB_PID=0x804f -DUSB_PRODUCT="\"Arduino MKRZero\"" -DUSB_MANUFACTURER="\"Arduino LLC\"" -DSAMD_SERIES -DSAMD20  -I"../include/libraries/EEPROM" -I"..\include\libraries\wire" -I"..\include\libraries\spi" -I"..\include\core" -I"..\include\core\avr" -I"..\include\variants" -I"../include/core/samd20" -I"../include/core/samd20/include" -I"../include/core/samd20/include/component" -I"../include/core/samd20/include/instance" -I"../include/core/samd20/include/pio" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\arm\cmsis\5.0.1\CMSIS\Include" -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\SAMD20_DFP\1.2.91\samd20\include"  -Os -fno-threadsafe-statics -fno-exceptions -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -g3 -w -mcpu=cortex-m0plus -c -std=gnu++11 --param max-inline-insns-single=500 -nostdlib -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
 	@echo Finished building: $<
 	
 

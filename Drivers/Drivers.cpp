@@ -1,5 +1,4 @@
 #include <Arduino.h>
-#include <EEPROM.h>
 #include <SPIFlash.h>
 #include <FXOS8700.h>
 
@@ -16,7 +15,6 @@
 #define FLASH_SS    10
 
 SPIFlash flash( FLASH_SS, 0x1F44 );
-EEEPROM eeeprom;
 uint8_t buff[256];
 uint8_t typeFlags = 0;
 Buffer_t txBuff;
@@ -95,16 +93,16 @@ void testSPIFlash()
 void testEEEPROM()
 {
     for( uint16_t i = 0; i < 256; i++ ) buff[i] = i & 0xFF;
-    eeeprom.write( 0, buff, 64 );
-    eeeprom.write( 64, &buff[64], 64 );
-    eeeprom.write( 200, buff, 256 );
+    EEPROM.write( 0, buff, 64 );
+    EEPROM.write( 64, &buff[64], 64 );
+    EEPROM.write( 200, buff, 256 );
 
     memset( buff, 0, 256 );
-    eeeprom.read( 0, buff, 128 );
-    eeeprom.read( 200, buff, 256 );
+    EEPROM.read( 0, buff, 128 );
+    EEPROM.read( 200, buff, 256 );
 
-    eeeprom.erase( 200, 128 );
-    eeeprom.read( 200, buff, 256 );
+    EEPROM.erase( 200, 128 );
+    EEPROM.read( 200, buff, 256 );
 }
 
 void hardMathTest()
@@ -200,7 +198,7 @@ void setup()
     flash.initialize();
 
     // Initialize EEPROM
-    eeeprom.begin();
+    EEPROM.begin();
 }
 
 uint32_t sec = 0;

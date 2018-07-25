@@ -42,6 +42,7 @@
 #include "SERCOM.h"
 #include "Uart.h"
 #include "TimerCounter.h"
+#include "EEPROM.h"
 #endif // __cplusplus
 
 #ifdef __cplusplus
@@ -173,6 +174,8 @@ extern SERCOM sercom3;
 
 extern TimerCounter Timer;
 extern TimerCounter Timer1;
+
+extern EEEPROM EEPROM;
 
 extern Uart Serial;
 #endif /* __cplusplus */

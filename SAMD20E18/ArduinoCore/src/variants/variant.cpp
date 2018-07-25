@@ -340,3 +340,6 @@ void TC4_Handler()
 {
     Timer1.IrqHandler();
 }
+
+// Emulated EEPROM
+EEEPROM EEPROM;

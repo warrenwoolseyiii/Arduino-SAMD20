@@ -301,6 +301,9 @@
     <Compile Include="include\core\delay.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="include\core\EEPROM.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="include\core\HardwareSerial.h">
       <SubType>compile</SubType>
     </Compile>
@@ -643,9 +646,6 @@
     <Compile Include="include\core\WVariant.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="include\libraries\EEPROM\EEPROM.h">
-      <SubType>compile</SubType>
-    </Compile>
     <Compile Include="include\libraries\spi\SPI.h">
       <SubType>compile</SubType>
     </Compile>
@@ -671,6 +671,9 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="src\core\delay.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\core\EEPROM.cpp">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="src\core\hooks.c">
@@ -757,9 +760,6 @@
     <Compile Include="src\core\WString.cpp">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="src\libraries\EEPROM\EEPROM.cpp">
-      <SubType>compile</SubType>
-    </Compile>
     <Compile Include="src\libraries\spi\SPI.cpp">
       <SubType>compile</SubType>
     </Compile>
@@ -781,7 +781,6 @@
     <Folder Include="include\core\samd20\include\instance" />
     <Folder Include="include\core\samd20\include\pio" />
     <Folder Include="include\libraries\" />
-    <Folder Include="include\libraries\EEPROM" />
     <Folder Include="include\libraries\spi\" />
     <Folder Include="include\libraries\wire\" />
     <Folder Include="include\variants\" />
@@ -790,7 +789,6 @@
     <Folder Include="src\core\avr\" />
     <Folder Include="src\core\PreprocessingAssembly\" />
     <Folder Include="src\libraries\" />
-    <Folder Include="src\libraries\EEPROM" />
     <Folder Include="src\libraries\spi\" />
     <Folder Include="src\libraries\wire\" />
     <Folder Include="src\variants\" />

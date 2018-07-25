@@ -78,6 +78,7 @@ void loop( void ) ;
 #include "HardwareSerial.h"
 #include "pulse.h"
 #include "TimerCounter.h"
+#include "EEPROM.h"
 #endif
 #include "delay.h"
 #include "clocks.h"

@@ -12,6 +12,8 @@ src\core\cortex_handlers.c
 
 src\core\delay.c
 
+src\core\EEPROM.cpp
+
 src\core\hooks.c
 
 src\core\IPAddress.cpp
@@ -67,8 +69,6 @@ src\core\wiring_shift.c
 src\core\WMath.cpp
 
 src\core\WString.cpp
-
-src\libraries\EEPROM\EEPROM.cpp
 
 src\libraries\spi\SPI.cpp
 
