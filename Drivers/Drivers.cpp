@@ -122,6 +122,8 @@ void testSleep()
     SPI1.end();
     Serial.end();
     if( Timer.isActive() ) Timer.pause();
+    if( Timer1.isActive() ) Timer1.pause();
+    digitalWrite( LED2, LOW );
     enableAPBBClk( PM_APBBMASK_PORT, 0 );
     pauseMicrosForSleep();
 
@@ -131,6 +133,7 @@ void testSleep()
     // Bring back modules
     Serial.begin( 38400 );
     if( Timer.isActive() ) Timer.resume();
+    if( Timer1.isActive() ) Timer1.resume();
 }
 
 volatile uint32_t ISRCntr = 0;
@@ -179,7 +182,11 @@ void testReadAnalog()
 volatile uint32_t timerISRCntr = 0;
 void              timerCntrISR()
 {
-    digitalWrite( LED2, ( timerISRCntr % 2 ) );
+    //digitalWrite( LED2, ( timerISRCntr % 2 ) );
+    if( ( timerISRCntr % 2 )  )
+        PORT->Group[0].OUTCLR.reg = ( 1 << 22 );
+    else
+        PORT->Group[0].OUTSET.reg = ( 1 << 22 );
     timerISRCntr++;
 }
 
