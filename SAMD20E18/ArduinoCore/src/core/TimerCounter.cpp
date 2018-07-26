@@ -16,8 +16,10 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include <Arduino.h>
-#include <stddef.h>
+#include "TimerCounter.h"
+#include "wiring_private.h"
+#include "clocks.h"
+#include "WVariant.h"
 
 #define CC_8_BIT_MAX 0xFF
 #define CC_16_BIT_MAX 0xFFFF
@@ -90,7 +92,7 @@ void TimerCounter::deregisterISR()
     isrPtr = NULL;
 }
 
-void TimerCounter::begin( uint32_t frequency, int8_t outputPin, TCMode_t mode,
+void TimerCounter::begin( uint32_t frequency, bool output, TCMode_t mode,
                           bool useInterrupts )
 {
     _maxFreq = SystemCoreClock / 2;
@@ -100,6 +102,16 @@ void TimerCounter::begin( uint32_t frequency, int8_t outputPin, TCMode_t mode,
     enableAPBCClk( _APBCMask, 1 );
     initGenericClk( GCLK_CLKCTRL_GEN_GCLK0_Val, _clkID );
     if( useInterrupts ) NVIC_EnableIRQ( (IRQn_Type)_irqn );
+    if( output ) {
+        switch( _tcNum ) {
+        case 3:
+            pinPeripheral( 3, PIO_TIMER );
+            break;
+        case 4:
+            pinPeripheral( 9, PIO_TIMER_ALT );
+            break;
+        }
+    }
 
     // SWRST
     reset();

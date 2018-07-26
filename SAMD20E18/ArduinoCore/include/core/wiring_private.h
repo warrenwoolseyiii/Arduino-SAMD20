@@ -28,8 +28,8 @@ extern "C" {
 
 // Includes Atmel CMSIS
 #include "sam.h"
-
 #include "wiring_constants.h"
+#include "WVariant.h"
 
 int pinPeripheral( uint32_t ulPin, EPioType ulPeripheral );
 

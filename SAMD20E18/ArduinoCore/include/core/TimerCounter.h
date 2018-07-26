@@ -30,7 +30,7 @@ class TimerCounter
     TimerCounter( Tc *timerCounter );
     void     registerISR( void ( *isr )() );
     void     deregisterISR();
-    void     begin( uint32_t frequency, int8_t outputPin = -1,
+    void     begin( uint32_t frequency, bool output = false,
                     TCMode_t mode = tc_mode_16_bit, bool useInterrupts = false );
     void     reset();
     void     end();

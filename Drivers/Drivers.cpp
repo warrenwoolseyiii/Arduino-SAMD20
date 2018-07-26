@@ -201,8 +201,8 @@ void testTimerCounters( uint8_t size )
         Timer.begin( 20000, -1, tc_mode_16_bit, true );
     }
     if( size == 32 ) {
-        Timer1.registerISR( timerCntrISR );
-        Timer1.begin( 20000, -1, tc_mode_32_bit, true );
+        //Timer1.registerISR( timerCntrISR );
+        Timer1.begin( 20000, true, tc_mode_32_bit, false );
     }
 }
 
