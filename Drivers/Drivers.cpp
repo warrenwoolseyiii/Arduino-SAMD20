@@ -121,8 +121,10 @@ void testSleep()
     SPI.end();
     SPI1.end();
     Serial.end();
-    if( Timer2.isActive() ) Timer2.pause();
+    if( Timer.isActive() ) Timer.pause();
     if( Timer1.isActive() ) Timer1.pause();
+    if( Timer2.isActive() ) Timer2.pause();
+    if( Timer3.isActive() ) Timer3.pause();
     digitalWrite( LED2, LOW );
     enableAPBBClk( PM_APBBMASK_PORT, 0 );
     pauseMicrosForSleep();
@@ -132,14 +134,15 @@ void testSleep()
 
     // Bring back modules
     Serial.begin( 38400 );
-    if( Timer2.isActive() ) Timer2.resume();
+    if( Timer.isActive() ) Timer.resume();
     if( Timer1.isActive() ) Timer1.resume();
+    if( Timer2.isActive() ) Timer2.resume();
+    if( Timer3.isActive() ) Timer3.resume();
 }
 
 volatile uint32_t ISRCntr = 0;
 void              sleepEICISR()
 {
-    // digitalWrite( LED2, ( ISRCntr % 2 ) );
     ISRCntr++;
 }
 
@@ -187,8 +190,13 @@ void              timerCntrISR()
 
 void testTimerCounters()
 {
-    Timer1.registerISR( timerCntrISR );
+    Timer2.registerISR( timerCntrISR );
     Timer2.begin( 20000, true, tc_mode_32_bit, true );
+}
+
+void testPWM()
+{
+    Timer1.beginPWM( 5000, 25 );
 }
 
 void setup()
@@ -227,6 +235,7 @@ void setup()
 
     // Setup Timer Counter
     testTimerCounters();
+    testPWM();
 }
 
 uint32_t sec = 0;

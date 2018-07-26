@@ -83,17 +83,19 @@ void TimerCounter::deregisterISR()
 
 void TimerCounter::beginPWM( uint32_t frequency, uint8_t dutyCycle )
 {
-    begin( frequency );
+    begin( frequency / 2, false, tc_mode_16_bit, false );
     pause();
 
     // Set wave generation
     _timerCounter->COUNT16.CTRLA.bit.WAVEGEN = TC_CTRLA_WAVEGEN_MPWM_Val;
+    waitRegSync();
 
     // Set duty cycle
     uint32_t cc0 = _timerCounter->COUNT16.CC[0].reg;
     uint32_t cc1 = ( ( cc0 << 8 ) * dutyCycle ) / 100;
     cc1 >>= 8;
     _timerCounter->COUNT16.CC[1].reg = cc1;
+    waitRegSync();
 
     switch( _tcNum ) {
         case 2: pinPeripheral( 6, PIO_TIMER_ALT ); break;
