@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015 Arduino LLC.  All right reserved.
+  Written by Warren Woolsey
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -24,9 +24,6 @@
 #define CC_32_BIT_MAX 0xFFFFFFFF
 
 #define TIMER_NVIC_PRIORITY ( ( 1 << __NVIC_PRIO_BITS ) - 1 )
-#define WAIT_TC_REGS_SYNC( x )              \
-    while( x->COUNT16.STATUS.bit.SYNCBUSY ) \
-        ;
 
 TimerCounter::TimerCounter( Tc *timerCounter )
 {
@@ -36,41 +33,51 @@ TimerCounter::TimerCounter( Tc *timerCounter )
         _APBCMask = PM_APBCMASK_TC0;
         _clkID = GCLK_CLKCTRL_ID_TC0_TC1_Val;
         _irqn = (uint32_t)TC0_IRQn;
+        _tcNum = 0;
     }
     else if( _timerCounter == TC1 ) {
         _APBCMask = PM_APBCMASK_TC1;
         _clkID = GCLK_CLKCTRL_ID_TC0_TC1_Val;
         _irqn = (uint32_t)TC1_IRQn;
+        _tcNum = 1;
     }
     else if( _timerCounter == TC2 ) {
         _APBCMask = PM_APBCMASK_TC2;
         _clkID = GCLK_CLKCTRL_ID_TC2_TC3_Val;
         _irqn = (uint32_t)TC2_IRQn;
+        _tcNum = 2;
     }
     else if( _timerCounter == TC3 ) {
         _APBCMask = PM_APBCMASK_TC3;
         _clkID = GCLK_CLKCTRL_ID_TC2_TC3_Val;
         _irqn = (uint32_t)TC3_IRQn;
+        _tcNum = 3;
     }
     else if( _timerCounter == TC4 ) {
         _APBCMask = PM_APBCMASK_TC4;
         _clkID = GCLK_CLKCTRL_ID_TC4_TC5_Val;
         _irqn = (uint32_t)TC4_IRQn;
+        _tcNum = 4;
     }
     else if( _timerCounter == TC5 ) {
         _APBCMask = PM_APBCMASK_TC5;
         _clkID = GCLK_CLKCTRL_ID_TC4_TC5_Val;
         _irqn = (uint32_t)TC5_IRQn;
+        _tcNum = 5;
     }
     else {
         _APBCMask = 0;
         _clkID = 0;
         _irqn = 0;
+        _tcNum = -1;
     }
 
     isrPtr = NULL;
     _mode = tc_mode_16_bit;
+    _ccVal = 0;
+    _ctrlA = 0;
     _isPaused = false;
+    _isActive = false;
 }
 
 void TimerCounter::registerISR( void ( *isr )() )
@@ -97,52 +104,106 @@ void TimerCounter::begin( uint32_t frequency, int8_t outputPin, TCMode_t mode,
     // SWRST
     reset();
 
-    // Configure clock pre-scaler and compare capture value
-    uint32_t ctrlABits = 0;
     switch( mode ) {
         case tc_mode_8_bit:
-            ctrlABits |= TC_CTRLA_MODE_COUNT8;
-            _timerCounter->COUNT8.CC[0].reg =
-                (uint8_t)setDividerAndCC( frequency, CC_8_BIT_MAX, ctrlABits );
+            _ctrlA = TC_CTRLA_MODE_COUNT8;
+
+            // Configure period, and pre-scalers
+            setDividerAndCC( frequency, CC_8_BIT_MAX );
+            _timerCounter->COUNT8.CC[0].reg = (uint8_t)_ccVal;
+            waitRegSync();
+
+            // Enable compare capture interrupt 0
+            if( useInterrupts ) _timerCounter->COUNT8.INTENSET.bit.MC0 = 1;
+
+            // Allow continuous reads
+            _timerCounter->COUNT8.READREQ.bit.RCONT = 1;
+
+            // Enable the module and interrupts
+            _ctrlA |= TC_CTRLA_ENABLE;
+            _timerCounter->COUNT8.CTRLA.reg = _ctrlA;
+            waitRegSync();
+
             break;
         case tc_mode_16_bit:
-            ctrlABits |= TC_CTRLA_MODE_COUNT16;
-            _timerCounter->COUNT16.CC[0].reg = (uint16_t)setDividerAndCC(
-                frequency, CC_16_BIT_MAX, ctrlABits );
+            _ctrlA = TC_CTRLA_MODE_COUNT16;
+
+            // Configure period, and pre-scalers
+            setDividerAndCC( frequency, CC_16_BIT_MAX );
+            _timerCounter->COUNT16.CC[0].reg = (uint16_t)_ccVal;
+            waitRegSync();
+
+            // Enable compare capture interrupt 0
+            if( useInterrupts ) _timerCounter->COUNT16.INTENSET.bit.MC0 = 1;
+
+            // Allow continuous reads
+            _timerCounter->COUNT16.READREQ.bit.RCONT = 1;
+
+            // Enable the module and interrupts
+            _ctrlA |= TC_CTRLA_ENABLE;
+            _timerCounter->COUNT16.CTRLA.reg = _ctrlA;
+            waitRegSync();
+
             break;
         case tc_mode_32_bit:
-            ctrlABits |= TC_CTRLA_MODE_COUNT32;
-            _timerCounter->COUNT32.CC[0].reg = (uint16_t)setDividerAndCC(
-                frequency, CC_32_BIT_MAX, ctrlABits );
+            if( ( _tcNum % 2 ) != 0 ) return;
+
+            _ctrlA = TC_CTRLA_MODE_COUNT32;
+
+            // Configure period, and pre-scalers
+            setDividerAndCC( frequency, CC_32_BIT_MAX );
+            _timerCounter->COUNT32.CC[0].reg = (uint8_t)_ccVal;
+            waitRegSync();
+
+            // Enable compare capture interrupt 0
+            if( useInterrupts ) _timerCounter->COUNT32.INTENSET.bit.MC0 = 1;
+
+            // Allow continuous reads
+            _timerCounter->COUNT32.READREQ.bit.RCONT = 1;
+
+            // Enable the module and interrupts
+            _ctrlA |= TC_CTRLA_ENABLE;
+            _timerCounter->COUNT32.CTRLA.reg = _ctrlA;
+            waitRegSync();
+
             break;
         default: return;
     }
-    WAIT_TC_REGS_SYNC( _timerCounter )
 
-    if( useInterrupts ) {
-        _timerCounter->COUNT16.INTENSET.bit.MC0 =
-            1; // Enable compare capture interrupt 0
-    }
-
-    // Allow continuous reads
-    _timerCounter->COUNT16.READREQ.bit.RCONT = 1;
-
-    // Enable the module and interrupts
-    _timerCounter->COUNT16.CTRLA.bit.ENABLE = 1;
-    WAIT_TC_REGS_SYNC( _timerCounter )
+    _isActive = true;
 }
 
 void TimerCounter::reset()
 {
-    _timerCounter->COUNT16.CTRLA.reg = TC_CTRLA_SWRST;
-    while( _timerCounter->COUNT16.CTRLA.bit.SWRST )
-        ;
+    switch( _mode ) {
+        case tc_mode_8_bit:
+            _timerCounter->COUNT8.CTRLA.reg = TC_CTRLA_SWRST;
+            while( _timerCounter->COUNT8.CTRLA.bit.SWRST )
+                ;
+            break;
+        case tc_mode_16_bit:
+            _timerCounter->COUNT16.CTRLA.reg = TC_CTRLA_SWRST;
+            while( _timerCounter->COUNT16.CTRLA.bit.SWRST )
+                ;
+            break;
+        case tc_mode_32_bit:
+            if( ( _tcNum % 2 ) == 0 ) {
+                _timerCounter->COUNT32.CTRLA.reg = TC_CTRLA_SWRST;
+                while( _timerCounter->COUNT32.CTRLA.bit.SWRST )
+                    ;
+            }
+            break;
+    }
+
+    _ctrlA = 0;
+    _ccVal = 0;
     _isPaused = false;
 }
 
 void TimerCounter::end()
 {
     reset();
+    _isActive = false;
 
     NVIC_DisableIRQ( (IRQn_Type)_irqn );
     disableGenericClk( _clkID );
@@ -152,23 +213,53 @@ void TimerCounter::end()
 void TimerCounter::resume()
 {
     if( _isPaused ) {
-        _timerCounter->COUNT16.CTRLA.bit.ENABLE = 1;
-        WAIT_TC_REGS_SYNC( _timerCounter )
+        _isPaused = false;
+        switch( _mode ) {
+            case tc_mode_8_bit:
+                _timerCounter->COUNT8.CTRLA.bit.ENABLE = 1;
+                break;
+            case tc_mode_16_bit:
+                _timerCounter->COUNT16.CTRLA.bit.ENABLE = 1;
+                break;
+            case tc_mode_32_bit:
+                if( ( _tcNum % 2 ) == 0 )
+                    _timerCounter->COUNT32.CTRLA.bit.ENABLE = 1;
+                break;
+        }
+
+        waitRegSync();
     }
 }
 
 void TimerCounter::pause()
 {
     if( !_isPaused ) {
-        _timerCounter->COUNT16.CTRLA.bit.ENABLE = 0;
-        WAIT_TC_REGS_SYNC( _timerCounter )
         _isPaused = true;
+        switch( _mode ) {
+            case tc_mode_8_bit:
+                _timerCounter->COUNT8.CTRLA.bit.ENABLE = 0;
+                break;
+            case tc_mode_16_bit:
+                _timerCounter->COUNT16.CTRLA.bit.ENABLE = 0;
+                break;
+            case tc_mode_32_bit:
+                if( ( _tcNum % 2 ) == 0 )
+                    _timerCounter->COUNT32.CTRLA.bit.ENABLE = 0;
+                break;
+        }
+
+        waitRegSync();
     }
 }
 
 void TimerCounter::IrqHandler()
 {
-    _timerCounter->COUNT16.INTFLAG.bit.MC0 = 1;
+    switch( _mode ) {
+        case tc_mode_8_bit: _timerCounter->COUNT8.INTFLAG.bit.MC0 = 1; break;
+        case tc_mode_16_bit: _timerCounter->COUNT16.INTFLAG.bit.MC0 = 1; break;
+        case tc_mode_32_bit: _timerCounter->COUNT32.INTFLAG.bit.MC0 = 1; break;
+    }
+
     if( isrPtr != NULL ) isrPtr();
 }
 
@@ -196,30 +287,23 @@ void TimerCounter::setCount( uint32_t count )
         case tc_mode_32_bit: _timerCounter->COUNT32.COUNT.reg = count; break;
     }
 
-    WAIT_TC_REGS_SYNC( _timerCounter )
+    waitRegSync();
 }
 
-uint32_t TimerCounter::setDividerAndCC( uint32_t freq, uint16_t maxCC,
-                                        uint32_t ctrlA )
+void TimerCounter::setDividerAndCC( uint32_t freq, uint16_t maxCC )
 {
-    /* _timerCounter type Tc is a union between TcCount8, TcCount16, TcCount32.
-     * Each struct points to the same memory locations except for COUNT and CC.
-     * See more about unions at any reputable source of C / C++ language
-     * documentation, or in the definition in tc.h
-     */
-    uint32_t ccValue;
     uint32_t preScaleBits = 0;
 
-    ctrlA |= TC_CTRLA_WAVEGEN_MFRQ; // Toggle mode
+    _ctrlA |= TC_CTRLA_WAVEGEN_MFRQ; // Toggle mode
 
-    ccValue = _maxFreq / freq - 1;
+    _ccVal = _maxFreq / freq - 1;
     preScaleBits = TC_CTRLA_PRESCALER_DIV1;
 
     uint8_t i = 0;
 
     while( i <= 9 ) {
-        ccValue = _maxFreq / freq / ( 2 << i ) - 1;
-        if( ccValue < maxCC ) break;
+        _ccVal = _maxFreq / freq / ( 2 << i ) - 1;
+        if( _ccVal < maxCC ) break;
         i++;
         if( i == 4 || i == 6 ||
             i == 8 ) // DIV32 DIV128 and DIV512 are not available
@@ -237,9 +321,24 @@ uint32_t TimerCounter::setDividerAndCC( uint32_t freq, uint16_t maxCC,
         default: break;
     }
 
-    ctrlA |= preScaleBits;
-    _timerCounter->COUNT16.CTRLA.reg |= ctrlA;
-    WAIT_TC_REGS_SYNC( _timerCounter );
+    _ctrlA |= preScaleBits;
+}
 
-    return ccValue;
+void TimerCounter::waitRegSync()
+{
+    switch( _mode ) {
+        case tc_mode_8_bit:
+            while( _timerCounter->COUNT8.STATUS.bit.SYNCBUSY )
+                ;
+            break;
+        case tc_mode_16_bit:
+            while( _timerCounter->COUNT16.STATUS.bit.SYNCBUSY )
+                ;
+            break;
+        case tc_mode_32_bit:
+            if( ( _tcNum % 2 ) == 0 )
+                while( _timerCounter->COUNT32.STATUS.bit.SYNCBUSY )
+                    ;
+            break;
+    }
 }

@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015 Arduino LLC.  All right reserved.
+  Written by Warren Woolsey
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -39,17 +39,26 @@ class TimerCounter
     void     IrqHandler();
     uint32_t getCount();
     void     setCount( uint32_t count );
+    bool     isActive()
+    {
+        return _isActive;
+    }
 
   private:
+    int8_t   _tcNum;
     bool     _isPaused;
+    bool     _isActive;
     uint32_t _maxFreq;
+    uint32_t _ccVal;
+    uint32_t _ctrlA;
     Tc *     _timerCounter;
     TCMode_t _mode;
     uint32_t _APBCMask;
     uint32_t _clkID;
     uint32_t _irqn;
     void ( *isrPtr )();
-    uint32_t setDividerAndCC( uint32_t freq, uint16_t maxCC, uint32_t ctrlA );
+    void setDividerAndCC( uint32_t freq, uint16_t maxCC );
+    void waitRegSync();
 };
 
 #endif /* TIMERCOUNTER_H_ */

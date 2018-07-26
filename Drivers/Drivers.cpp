@@ -2,21 +2,21 @@
 #include <SPIFlash.h>
 #include <FXOS8700.h>
 
-#define LED2        9
-#define TEST_EIC    18
+#define LED2 9
+#define TEST_EIC 18
 
-#define FXOS_MISO   26
-#define FXOS_CS     11
-#define FXOS_RST    3
-#define FXOS_INT1   13
-#define FXOS_INT2   14
+#define FXOS_MISO 26
+#define FXOS_CS 11
+#define FXOS_RST 3
+#define FXOS_INT1 13
+#define FXOS_INT2 14
 
-#define RFM_SS      7
-#define FLASH_SS    10
+#define RFM_SS 7
+#define FLASH_SS 10
 
 SPIFlash flash( FLASH_SS, 0x1F44 );
-uint8_t buff[256];
-uint8_t typeFlags = 0;
+uint8_t  buff[256];
+uint8_t  typeFlags = 0;
 Buffer_t txBuff;
 
 void initClkOut()
@@ -85,7 +85,7 @@ void testSPIFlash()
 
     for( uint16_t i = 0; i < 256; i++ ) buff[i] = i & 0xFF;
     flash.writeBytes( 0, buff, 256 );
-    
+
     memset( buff, 0, 256 );
     flash.readBytes( 0, buff, 256 );
 }
@@ -121,23 +121,29 @@ void testSleep()
     SPI.end();
     SPI1.end();
     Serial.end();
+    if( Timer.isActive() ) Timer.pause();
     enableAPBBClk( PM_APBBMASK_PORT, 0 );
     pauseMicrosForSleep();
 
     // Sleep the CPU
     sleepCPU( PM_SLEEP_STANDBY_Val );
 
-    // Bring back modules 
+    // Bring back modules
     Serial.begin( 38400 );
+    if( Timer.isActive() ) Timer.resume();
 }
 
 volatile uint32_t ISRCntr = 0;
-void sleepEICISR()
+void              sleepEICISR()
 {
-    //digitalWrite( LED2, HIGH );
-    //delay( 1 );
-    //digitalWrite( LED2, LOW );    
+    // digitalWrite( LED2, ( ISRCntr % 2 ) );
     ISRCntr++;
+}
+
+void testEIC()
+{
+    interruptlowPowerMode( true );
+    attachInterrupt( TEST_EIC, sleepEICISR, FALLING );
 }
 
 bool resetDetected = false;
@@ -170,10 +176,25 @@ void testReadAnalog()
     Serial.println( val );
 }
 
+volatile uint32_t timerISRCntr = 0;
+void              timerCntrISR()
+{
+    //digitalWrite( LED2, ( timerISRCntr % 2 ) );
+    timerISRCntr++;
+}
+
+void testTimerCounters( uint8_t size )
+{
+    if( size == 8 ) {
+        Timer.registerISR( timerCntrISR );
+        Timer.begin( 20000, -1, tc_mode_8_bit, true );
+    }
+}
+
 void setup()
 {
     // Select the clock
-    //changeCPUClk( cpu_clk_dfll48 );
+    // changeCPUClk( cpu_clk_dfll48 );
 
     // Initialize Packet Builder
     PacketBuilder::InitPacketBuilder( &typeFlags, &txBuff );
@@ -198,19 +219,18 @@ void setup()
     pinMode( LED2, OUTPUT );
     digitalWrite( LED2, LOW );
 
-    // Attach the low power interrupt controller for testing
-    interruptlowPowerMode( true );
-    attachInterrupt( TEST_EIC, sleepEICISR, FALLING );
-
     // Initialize SPI Flash
     flash.initialize();
 
     // Initialize EEPROM
     EEPROM.begin();
+
+    // Setup Timer Counter
+    testTimerCounters( 8 );
 }
 
 uint32_t sec = 0;
-void loop()
+void     loop()
 {
     testSleep();
     testSPIFlash();
