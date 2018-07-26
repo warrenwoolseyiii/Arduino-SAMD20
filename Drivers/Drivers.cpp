@@ -121,7 +121,7 @@ void testSleep()
     SPI.end();
     SPI1.end();
     Serial.end();
-    if( Timer.isActive() ) Timer.pause();
+    if( Timer2.isActive() ) Timer2.pause();
     if( Timer1.isActive() ) Timer1.pause();
     digitalWrite( LED2, LOW );
     enableAPBBClk( PM_APBBMASK_PORT, 0 );
@@ -132,7 +132,7 @@ void testSleep()
 
     // Bring back modules
     Serial.begin( 38400 );
-    if( Timer.isActive() ) Timer.resume();
+    if( Timer2.isActive() ) Timer2.resume();
     if( Timer1.isActive() ) Timer1.resume();
 }
 
@@ -193,16 +193,16 @@ void              timerCntrISR()
 void testTimerCounters( uint8_t size )
 {
     if( size == 8 ) {
-        Timer.registerISR( timerCntrISR );
-        Timer.begin( 20000, -1, tc_mode_8_bit, true );
+        Timer1.registerISR( timerCntrISR );
+        Timer1.begin( 20000, -1, tc_mode_8_bit, true );
     }
     if( size == 16 ) {
-        Timer.registerISR( timerCntrISR );
-        Timer.begin( 20000, -1, tc_mode_16_bit, true );
+        Timer1.registerISR( timerCntrISR );
+        Timer1.begin( 20000, -1, tc_mode_16_bit, true );
     }
     if( size == 32 ) {
         //Timer1.registerISR( timerCntrISR );
-        Timer1.begin( 20000, true, tc_mode_32_bit, false );
+        Timer2.begin( 20000, true, tc_mode_32_bit, false );
     }
 }
 

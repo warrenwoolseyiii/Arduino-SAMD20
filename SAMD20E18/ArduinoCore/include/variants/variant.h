@@ -174,6 +174,8 @@ extern SERCOM sercom3;
 
 extern TimerCounter Timer;
 extern TimerCounter Timer1;
+extern TimerCounter Timer2;
+extern TimerCounter Timer3;
 
 extern EEEPROM EEPROM;
 

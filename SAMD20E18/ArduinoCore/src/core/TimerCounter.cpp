@@ -31,19 +31,7 @@ TimerCounter::TimerCounter( Tc *timerCounter )
 {
     _timerCounter = timerCounter;
 
-    if( _timerCounter == TC0 ) {
-        _APBCMask = PM_APBCMASK_TC0;
-        _clkID = GCLK_CLKCTRL_ID_TC0_TC1_Val;
-        _irqn = (uint32_t)TC0_IRQn;
-        _tcNum = 0;
-    }
-    else if( _timerCounter == TC1 ) {
-        _APBCMask = PM_APBCMASK_TC1;
-        _clkID = GCLK_CLKCTRL_ID_TC0_TC1_Val;
-        _irqn = (uint32_t)TC1_IRQn;
-        _tcNum = 1;
-    }
-    else if( _timerCounter == TC2 ) {
+    if( _timerCounter == TC2 ) {
         _APBCMask = PM_APBCMASK_TC2;
         _clkID = GCLK_CLKCTRL_ID_TC2_TC3_Val;
         _irqn = (uint32_t)TC2_IRQn;
@@ -104,12 +92,10 @@ void TimerCounter::begin( uint32_t frequency, bool output, TCMode_t mode,
     if( useInterrupts ) NVIC_EnableIRQ( (IRQn_Type)_irqn );
     if( output ) {
         switch( _tcNum ) {
-        case 3:
-            pinPeripheral( 3, PIO_TIMER );
-            break;
-        case 4:
-            pinPeripheral( 9, PIO_TIMER_ALT );
-            break;
+            case 2: pinPeripheral( 5, PIO_TIMER_ALT ); break;
+            case 3: pinPeripheral( 3, PIO_TIMER ); break;
+            case 4: pinPeripheral( 9, PIO_TIMER_ALT ); break;
+            case 5: pinPeripheral( 1, PIO_TIMER_ALT ); break;
         }
     }
 

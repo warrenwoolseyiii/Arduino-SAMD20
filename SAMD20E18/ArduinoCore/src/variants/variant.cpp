@@ -181,14 +181,14 @@ const PinDescription g_APinDescription[]=
   // ----------------------
   // 0/1 - SERCOM/UART (Serial1)
   { PORTA, 25, PIO_SERCOM, (PIN_ATTR_DIGITAL), No_ADC_Channel, NOT_ON_PWM, NOT_ON_TIMER, EXTERNAL_INT_13 }, // RX: SERCOM3/PAD[3]
-  { PORTA, 24, PIO_SERCOM, (PIN_ATTR_DIGITAL), No_ADC_Channel, NOT_ON_PWM, NOT_ON_TIMER, EXTERNAL_INT_12 }, // TX: SERCOM3/PAD[2]
+  { PORTA, 24, PIO_SERCOM, (PIN_ATTR_DIGITAL), No_ADC_Channel, PWM5_CH0, TC5_CH0, EXTERNAL_INT_12 }, // TX: SERCOM3/PAD[2]
 
   // 2..12
   // Digital Low
   { PORTA, 11, PIO_DIGITAL, (PIN_ATTR_DIGITAL), No_ADC_Channel, NOT_ON_PWM, NOT_ON_TIMER, EXTERNAL_INT_11 }, 
   { PORTA, 14, PIO_DIGITAL, (PIN_ATTR_DIGITAL), No_ADC_Channel, PWM3_CH0, TC3_CH0, EXTERNAL_INT_14 }, 
   { PORTA, 15, PIO_DIGITAL, (PIN_ATTR_DIGITAL), No_ADC_Channel, NOT_ON_PWM, NOT_ON_TIMER, EXTERNAL_INT_15 }, 
-  { PORTA, 16, PIO_DIGITAL, (PIN_ATTR_DIGITAL), No_ADC_Channel, NOT_ON_PWM, NOT_ON_TIMER, EXTERNAL_INT_0 }, 
+  { PORTA, 16, PIO_DIGITAL, (PIN_ATTR_DIGITAL), No_ADC_Channel, PWM2_CH0, TC2_CH0, EXTERNAL_INT_0 }, 
   { PORTA, 17, PIO_DIGITAL, (PIN_ATTR_DIGITAL), No_ADC_Channel, NOT_ON_PWM, NOT_ON_TIMER, EXTERNAL_INT_1 }, 
   { PORTA, 18, PIO_DIGITAL, (PIN_ATTR_DIGITAL), No_ADC_Channel, NOT_ON_PWM, NOT_ON_TIMER, EXTERNAL_INT_2 },
 
@@ -328,17 +328,29 @@ void SERCOM3_Handler()
 }
 
 // Timer counter objects
-TimerCounter Timer( TC3 );
-TimerCounter Timer1( TC4 );
+TimerCounter Timer( TC2 );
+TimerCounter Timer1( TC3 );
+TimerCounter Timer2( TC4 );
+TimerCounter Timer3( TC5 );
 
-void TC3_Handler()
+void TC2_Handler()
 {
     Timer.IrqHandler();
 }
 
-void TC4_Handler()
+void TC3_Handler()
 {
     Timer1.IrqHandler();
+}
+
+void TC4_Handler()
+{
+    Timer2.IrqHandler();
+}
+
+void TC5_Handler()
+{
+    Timer3.IrqHandler();
 }
 
 // Emulated EEPROM
