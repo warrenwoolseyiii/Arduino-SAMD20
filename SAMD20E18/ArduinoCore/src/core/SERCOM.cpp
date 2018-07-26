@@ -29,6 +29,7 @@
 SERCOM::SERCOM( Sercom *s )
 {
     sercom = s;
+    _mode = MODE_NONE;
 }
 
 /* 	=========================
@@ -37,6 +38,8 @@ SERCOM::SERCOM( Sercom *s )
  */
 void SERCOM::initUART( SercomUartMode mode, uint32_t baudrate )
 {
+    if( _mode < MODE_NONE ) takeDownMode();
+    _mode = MODE_UART;
     enableSERCOM();
     resetUART();
 
@@ -197,6 +200,8 @@ void SERCOM::disableDataRegisterEmptyInterruptUART()
 void SERCOM::initSPI( SercomSpiTXPad mosi, SercomRXPad miso,
                       SercomSpiCharSize charSize, SercomDataOrder dataOrder )
 {
+    if( _mode < MODE_NONE ) takeDownMode();
+    _mode = MODE_SPI;
     enableSERCOM();
     resetSPI();
 
@@ -337,64 +342,33 @@ uint8_t SERCOM::calculateBaudrateSynchronous( uint32_t baudrate )
 void SERCOM::resetWIRE()
 {
     // I2CM OR I2CS, no matter SWRST is the same bit.
-
     // Setting the Software bit to 1
     sercom->I2CM.CTRLA.bit.SWRST = 1;
-
-#ifndef SAMD20
-    // Wait both bits Software Reset from CTRLA and SYNCBUSY are equal to 0
-    while( sercom->I2CM.CTRLA.bit.SWRST || sercom->I2CM.SYNCBUSY.bit.SWRST )
-        ;
-#else
     while( sercom->I2CM.CTRLA.bit.SWRST || sercom->I2CM.STATUS.bit.SYNCBUSY )
         ;
-#endif /* SAMD20 */
 }
 
 void SERCOM::enableWIRE()
 {
     // I2C Master and Slave modes share the ENABLE bit function.
-
     // Enable the I2C master mode
     sercom->I2CM.CTRLA.bit.ENABLE = 1;
-
-#ifndef SAMD20
-    while( sercom->I2CM.SYNCBUSY.bit.ENABLE != 0 )
-#else
     while( sercom->I2CM.STATUS.bit.SYNCBUSY )
-#endif /* SAMD20 */
-    {
-        // Waiting the enable bit from SYNCBUSY is equal to 0;
-    }
+        ;
 
     // Setting bus idle mode
     sercom->I2CM.STATUS.bit.BUSSTATE = 1;
-
-#ifndef SAMD20
-    while( sercom->I2CM.SYNCBUSY.bit.SYSOP != 0 )
-#else
     while( sercom->I2CM.STATUS.bit.SYNCBUSY )
-#endif /* SAMD20 */
-    {
-        // Wait the SYSOP bit from SYNCBUSY coming back to 0
-    }
+        ;
 }
 
 void SERCOM::disableWIRE()
 {
     // I2C Master and Slave modes share the ENABLE bit function.
-
     // Enable the I2C master mode
     sercom->I2CM.CTRLA.bit.ENABLE = 0;
-
-#ifndef SAMD20
-    while( sercom->I2CM.SYNCBUSY.bit.ENABLE != 0 )
-#else
     while( sercom->I2CM.STATUS.bit.SYNCBUSY )
-#endif /* SAMD20 */
-    {
-        // Waiting the enable bit from SYNCBUSY is equal to 0;
-    }
+        ;
 }
 
 void SERCOM::endWire()
@@ -405,6 +379,9 @@ void SERCOM::endWire()
 
 void SERCOM::initSlaveWIRE( uint8_t ucAddress, bool enableGeneralCall )
 {
+    if( _mode < MODE_NONE ) takeDownMode();
+    _mode = MODE_WIRE;
+
     enableSERCOM();
     resetWIRE();
 
@@ -425,18 +402,15 @@ void SERCOM::initSlaveWIRE( uint8_t ucAddress, bool enableGeneralCall )
                                 SERCOM_I2CS_INTENSET_AMATCH | // Address Match
                                 SERCOM_I2CS_INTENSET_DRDY;    // Data Ready
 
-#ifndef SAMD20
-    while( sercom->I2CM.SYNCBUSY.bit.SYSOP != 0 )
-#else
     while( sercom->I2CM.STATUS.bit.SYNCBUSY )
-#endif /* SAMD20 */
-    {
-        // Wait the SYSOP bit from SYNCBUSY to come back to 0
-    }
+        ;
 }
 
 void SERCOM::initMasterWIRE( uint32_t baudrate )
 {
+    if( _mode < MODE_NONE ) takeDownMode();
+    _mode = MODE_WIRE;
+
     enableSERCOM();
     resetWIRE();
 
@@ -486,15 +460,8 @@ void SERCOM::prepareCommandBitsWire( uint8_t cmd )
 {
     if( isMasterWIRE() ) {
         sercom->I2CM.CTRLB.bit.CMD = cmd;
-
-#ifndef SAMD20
-        while( sercom->I2CM.SYNCBUSY.bit.SYSOP )
-#else
         while( sercom->I2CM.STATUS.bit.SYNCBUSY )
-#endif /* SAMD20 */
-        {
-            // Waiting for synchronization
-        }
+            ;
     }
     else {
         sercom->I2CS.CTRLB.bit.CMD = cmd;
@@ -733,4 +700,15 @@ void SERCOM::disableSERCOM()
     NVIC_DisableIRQ( (IRQn_Type)irqn );
     enableAPBCClk( apbMask, 0 );
     disableGenericClk( id );
+}
+
+void SERCOM::takeDownMode()
+{
+    switch( _mode ) {
+        case MODE_WIRE: endWire(); break;
+        case MODE_UART: endUART(); break;
+        case MODE_SPI: endSPI(); break;
+        case MODE_NONE:
+        default: break; _mode = MODE_NONE;
+    }
 }

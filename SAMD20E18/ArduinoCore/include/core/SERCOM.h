@@ -115,6 +115,13 @@ typedef enum {
     WIRE_MASTER_NACK_ACTION
 } SercomMasterAckActionWire;
 
+typedef enum {
+    MODE_WIRE = 0,
+    MODE_UART = 1,
+    MODE_SPI = 2,
+    MODE_NONE = 3
+} SercomMode;
+
 class SERCOM
 {
   public:
@@ -191,11 +198,13 @@ class SERCOM
     uint8_t readDataWIRE( void );
 
   private:
-    Sercom * sercom;
-    uint8_t  calculateBaudrateSynchronous( uint32_t baudrate );
-    uint32_t division( uint32_t dividend, uint32_t divisor );
-    void     enableSERCOM();
-    void     disableSERCOM();
+    Sercom *   sercom;
+    SercomMode _mode;
+    uint8_t    calculateBaudrateSynchronous( uint32_t baudrate );
+    uint32_t   division( uint32_t dividend, uint32_t divisor );
+    void       enableSERCOM();
+    void       disableSERCOM();
+    void       takeDownMode();
 };
 
 #endif
