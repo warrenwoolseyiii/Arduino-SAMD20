@@ -82,8 +82,7 @@ ADDITIONAL_DEPENDENCIES:=
 
 OUTPUT_FILE_DEP:= ./makedep.mk
 
-LIB_DEP+=  \
-C:/Users/budge/Repositories/Arduino-SAMD20/SAMD20E18/ArduinoCore/Debug/libArduinoCore.a
+LIB_DEP+= 
 
 LINKER_SCRIPT_DEP+=  \
 ../Device_Startup/samd20e18_flash.ld \

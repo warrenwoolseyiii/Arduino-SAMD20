@@ -44,6 +44,7 @@ class TimerCounter
     {
         return _isActive;
     }
+    void setPWMDutyCycle( uint8_t dutyCycle );
 
   private:
     int8_t   _tcNum;

@@ -90,12 +90,8 @@ void TimerCounter::beginPWM( uint32_t frequency, uint8_t dutyCycle )
     _timerCounter->COUNT16.CTRLA.bit.WAVEGEN = TC_CTRLA_WAVEGEN_MPWM_Val;
     waitRegSync();
 
-    // Set duty cycle
-    uint32_t cc0 = _timerCounter->COUNT16.CC[0].reg;
-    uint32_t cc1 = ( ( cc0 << 8 ) * dutyCycle ) / 100;
-    cc1 >>= 8;
-    _timerCounter->COUNT16.CC[1].reg = cc1;
-    waitRegSync();
+    // Duty cycle
+    setPWMDutyCycle( dutyCycle );
 
     switch( _tcNum ) {
         case 2: pinPeripheral( 6, PIO_TIMER_ALT ); break;
@@ -319,6 +315,16 @@ void TimerCounter::setCount( uint32_t count )
         case tc_mode_32_bit: _timerCounter->COUNT32.COUNT.reg = count; break;
     }
 
+    waitRegSync();
+}
+
+void TimerCounter::setPWMDutyCycle( uint8_t dutyCycle )
+{
+    // Set duty cycle
+    uint32_t cc0 = _timerCounter->COUNT16.CC[0].reg;
+    uint32_t cc1 = ( ( cc0 << 8 ) * dutyCycle ) / 100;
+    cc1 >>= 8;
+    _timerCounter->COUNT16.CC[1].reg = cc1;
     waitRegSync();
 }
 

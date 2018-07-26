@@ -238,7 +238,7 @@ void setup()
     testPWM();
 }
 
-uint32_t sec = 0;
+uint8_t dutyCycle = 25;
 void     loop()
 {
     testSleep();
@@ -249,5 +249,9 @@ void     loop()
     testReadVCC();
     testReadAnalog();
     printRTC();
+
+    if( ++dutyCycle > 100 ) dutyCycle = 1;
+    Timer1.setPWMDutyCycle(dutyCycle );
+
     delay( 25 );
 }
