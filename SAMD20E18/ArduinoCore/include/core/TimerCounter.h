@@ -30,6 +30,7 @@ class TimerCounter
     TimerCounter( Tc *timerCounter );
     void     registerISR( void ( *isr )() );
     void     deregisterISR();
+    void     beginPWM( uint32_t frequency, uint8_t dutyCycle );
     void     begin( uint32_t frequency, bool output = false,
                     TCMode_t mode = tc_mode_16_bit, bool useInterrupts = false );
     void     reset();

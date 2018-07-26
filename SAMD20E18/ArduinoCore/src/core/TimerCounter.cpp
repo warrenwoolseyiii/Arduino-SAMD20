@@ -18,6 +18,7 @@
 
 #include "TimerCounter.h"
 #include "wiring_private.h"
+#include "wiring_digital.h"
 #include "clocks.h"
 #include "WVariant.h"
 
@@ -78,6 +79,30 @@ void TimerCounter::registerISR( void ( *isr )() )
 void TimerCounter::deregisterISR()
 {
     isrPtr = NULL;
+}
+
+void TimerCounter::beginPWM( uint32_t frequency, uint8_t dutyCycle )
+{
+    begin( frequency );
+    pause();
+
+    // Set wave generation
+    _timerCounter->COUNT16.CTRLA.bit.WAVEGEN = TC_CTRLA_WAVEGEN_MPWM_Val;
+
+    // Set duty cycle
+    uint32_t cc0 = _timerCounter->COUNT16.CC[0].reg;
+    uint32_t cc1 = ( ( cc0 << 8 ) * dutyCycle ) / 100;
+    cc1 >>= 8;
+    _timerCounter->COUNT16.CC[1].reg = cc1;
+
+    switch( _tcNum ) {
+        case 2: pinPeripheral( 6, PIO_TIMER_ALT ); break;
+        case 3: pinPeripheral( 4, PIO_TIMER ); break;
+        case 4: pinPeripheral( 10, PIO_TIMER_ALT ); break;
+        case 5: pinPeripheral( 0, PIO_TIMER_ALT ); break;
+    }
+
+    resume();
 }
 
 void TimerCounter::begin( uint32_t frequency, bool output, TCMode_t mode,
@@ -202,6 +227,13 @@ void TimerCounter::end()
 {
     reset();
     _isActive = false;
+
+    switch( _tcNum ) {
+        case 2: pinMode( 5, TRI_STATE ); break;
+        case 3: pinMode( 3, TRI_STATE ); break;
+        case 4: pinMode( 9, TRI_STATE ); break;
+        case 5: pinMode( 1, TRI_STATE ); break;
+    }
 
     NVIC_DisableIRQ( (IRQn_Type)_irqn );
     disableGenericClk( _clkID );
