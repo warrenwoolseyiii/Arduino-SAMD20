@@ -179,7 +179,7 @@ void testReadAnalog()
 volatile uint32_t timerISRCntr = 0;
 void              timerCntrISR()
 {
-    //digitalWrite( LED2, ( timerISRCntr % 2 ) );
+    digitalWrite( LED2, ( timerISRCntr % 2 ) );
     timerISRCntr++;
 }
 
@@ -188,6 +188,14 @@ void testTimerCounters( uint8_t size )
     if( size == 8 ) {
         Timer.registerISR( timerCntrISR );
         Timer.begin( 20000, -1, tc_mode_8_bit, true );
+    }
+    if( size == 16 ) {
+        Timer.registerISR( timerCntrISR );
+        Timer.begin( 20000, -1, tc_mode_16_bit, true );
+    }
+    if( size == 32 ) {
+        Timer1.registerISR( timerCntrISR );
+        Timer1.begin( 20000, -1, tc_mode_32_bit, true );
     }
 }
 
@@ -226,7 +234,7 @@ void setup()
     EEPROM.begin();
 
     // Setup Timer Counter
-    testTimerCounters( 8 );
+    testTimerCounters( 32 );
 }
 
 uint32_t sec = 0;
