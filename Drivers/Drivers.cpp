@@ -202,7 +202,7 @@ void testPWM()
 void setup()
 {
     // Select the clock
-    // changeCPUClk( cpu_clk_dfll48 );
+    changeCPUClk( cpu_clk_dfll48 );
 
     // Initialize Packet Builder
     PacketBuilder::InitPacketBuilder( &typeFlags, &txBuff );
@@ -233,8 +233,7 @@ void setup()
     // Initialize EEPROM
     EEPROM.begin();
 
-    // Setup Timer Counter
-    testTimerCounters();
+    // Setup PWM
     testPWM();
 }
 
@@ -251,6 +250,7 @@ void     loop()
     printRTC();
 
     PWMChannel1.setDutyCycle( ++dutyCycle );
+    tone( 2, 5000, 2 );
 
-    delay( 25 );
+    delay( 2500 );
 }

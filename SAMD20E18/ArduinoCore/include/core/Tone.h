@@ -16,13 +16,12 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#pragma once
+#ifndef TONE_H_
+#define TONE_H_
 
-#ifdef __cplusplus
+#include "TimerCounter.h"
+#include "delay.h"
 
-#include "Arduino.h"
+bool tone( uint8_t channel, uint32_t frequency, uint32_t durationSeconds );
 
-void tone( uint32_t _pin, uint32_t frequency, uint32_t duration = 0 );
-void noTone( uint32_t _pin );
-
-#endif
+#endif /* TONE_H_ */
