@@ -333,6 +333,12 @@ TimerCounter Timer1( TC3 );
 TimerCounter Timer2( TC4 );
 TimerCounter Timer3( TC5 );
 
+// PWM objects
+PWM PWMChannel0( &Timer );
+PWM PWMChannel1( &Timer1 );
+PWM PWMChannel2( &Timer2 );
+PWM PWMChannel3( &Timer3 );
+
 void TC2_Handler()
 {
     Timer.IrqHandler();

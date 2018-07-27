@@ -79,6 +79,7 @@ void loop( void ) ;
 #include "pulse.h"
 #include "TimerCounter.h"
 #include "EEPROM.h"
+#include "PWM.h"
 #endif
 #include "delay.h"
 #include "clocks.h"

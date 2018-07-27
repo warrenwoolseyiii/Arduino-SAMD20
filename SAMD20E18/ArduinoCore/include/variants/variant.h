@@ -43,6 +43,7 @@
 #include "Uart.h"
 #include "TimerCounter.h"
 #include "EEPROM.h"
+#include "PWM.h"
 #endif // __cplusplus
 
 #ifdef __cplusplus
@@ -176,6 +177,11 @@ extern TimerCounter Timer;
 extern TimerCounter Timer1;
 extern TimerCounter Timer2;
 extern TimerCounter Timer3;
+
+extern PWM PWMChannel0;
+extern PWM PWMChannel1;
+extern PWM PWMChannel2;
+extern PWM PWMChannel3;
 
 extern EEEPROM EEPROM;
 

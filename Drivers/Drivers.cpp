@@ -196,7 +196,7 @@ void testTimerCounters()
 
 void testPWM()
 {
-    Timer1.beginPWM( 5000, 25 );
+    PWMChannel1.begin( 5000, 25 );
 }
 
 void setup()
@@ -250,8 +250,7 @@ void     loop()
     testReadAnalog();
     printRTC();
 
-    if( ++dutyCycle > 100 ) dutyCycle = 1;
-    Timer1.setPWMDutyCycle(dutyCycle );
+    PWMChannel1.setDutyCycle( ++dutyCycle );
 
     delay( 25 );
 }

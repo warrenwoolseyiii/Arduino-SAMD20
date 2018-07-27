@@ -74,6 +74,7 @@ C_SRCS +=  \
 ../src/core/NVM.c \
 ../src/core/Print.cpp \
 ../src/core/pulse.c \
+../src/core/PWM.cpp \
 ../src/core/Reset.cpp \
 ../src/core/RTC.c \
 ../src/core/SERCOM.cpp \
@@ -122,6 +123,7 @@ src/core/PreprocessingAssembly/pulse_asm.o \
 src/core/Print.o \
 src/core/pulse.o \
 src/core/pulse_asm.o \
+src/core/PWM.o \
 src/core/Reset.o \
 src/core/RTC.o \
 src/core/SERCOM.o \
@@ -161,6 +163,7 @@ src/core/PreprocessingAssembly/pulse_asm.o \
 src/core/Print.o \
 src/core/pulse.o \
 src/core/pulse_asm.o \
+src/core/PWM.o \
 src/core/Reset.o \
 src/core/RTC.o \
 src/core/SERCOM.o \
@@ -200,6 +203,7 @@ src/core/PreprocessingAssembly/pulse_asm.d \
 src/core/Print.d \
 src/core/pulse.d \
 src/core/pulse_asm.d \
+src/core/PWM.d \
 src/core/Reset.d \
 src/core/RTC.d \
 src/core/SERCOM.d \
@@ -239,6 +243,7 @@ src/core/PreprocessingAssembly/pulse_asm.d \
 src/core/Print.d \
 src/core/pulse.d \
 src/core/pulse_asm.d \
+src/core/PWM.d \
 src/core/Reset.d \
 src/core/RTC.d \
 src/core/SERCOM.d \
@@ -274,6 +279,8 @@ LINKER_SCRIPT_DEP+=
 
 
 # AVR32/GNU C Compiler
+
+
 
 
 

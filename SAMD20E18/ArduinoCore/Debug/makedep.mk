@@ -36,6 +36,8 @@ src\core\pulse.c
 
 src\core\pulse_asm.S
 
+src\core\PWM.cpp
+
 src\core\Reset.cpp
 
 src\core\RTC.c
