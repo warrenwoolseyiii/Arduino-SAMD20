@@ -316,6 +316,9 @@
     <Compile Include="include\core\micros.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="include\core\NVM.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="include\core\Print.h">
       <SubType>compile</SubType>
     </Compile>
@@ -323,6 +326,9 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="include\core\pulse.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="include\core\PWM.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="include\core\Reset.h">
@@ -584,12 +590,6 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="include\core\samd20\include\system_samd20.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="include\core\samd20\NVM.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="include\core\samd20\PWM.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="include\core\SERCOM.h">
