@@ -328,7 +328,7 @@ void TimerCounter::setPWMDutyCycle( uint8_t dutyCycle )
     waitRegSync();
 }
 
-void TimerCounter::setDividerAndCC( uint32_t freq, uint16_t maxCC )
+void TimerCounter::setDividerAndCC( uint32_t freq, uint32_t maxCC )
 {
     uint32_t preScaleBits = 0;
 

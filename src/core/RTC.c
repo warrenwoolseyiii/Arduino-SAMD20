@@ -19,6 +19,7 @@
 #include "RTC.h"
 #include "clocks.h"
 #include "sam.h"
+#include "micros.h"
 
 #define RTC_WAIT_SYNC while( RTC->MODE1.STATUS.bit.SYNCBUSY )
 

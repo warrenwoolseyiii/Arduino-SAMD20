@@ -59,7 +59,7 @@ inline void loadADCFactoryCal()
  * by calling changeCPUClk() in the application, which will allow them to run the DFLL
  * at 48 MHz or the OSCM8 at a lower speed.
  */
-inline void LowPowerSysInit( void )
+void LowPowerSysInit( )
 {
     NVMCTRL->CTRLB.bit.RWS = NVMCTRL_CTRLB_RWS_HALF_Val;
     resetGCLK();

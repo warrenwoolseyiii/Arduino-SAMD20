@@ -59,7 +59,7 @@ class TimerCounter
     uint32_t _clkID;
     uint32_t _irqn;
     void ( *isrPtr )();
-    void setDividerAndCC( uint32_t freq, uint16_t maxCC );
+    void setDividerAndCC( uint32_t freq, uint32_t maxCC );
     void waitRegSync();
 };
 

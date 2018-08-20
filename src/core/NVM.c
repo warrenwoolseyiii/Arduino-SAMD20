@@ -19,6 +19,7 @@
 #include "NVM.h"
 #include "clocks.h"
 #include "sam.h"
+#include <string.h>
 
 #define MAX_BOOT_SIZE 32768ul
 #define MAX_EEPROM_SIZE 16384ul

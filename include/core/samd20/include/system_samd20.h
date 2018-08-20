@@ -38,7 +38,7 @@ extern "C" {
 
 extern uint32_t SystemCoreClock;   /*!< System Clock Frequency (Core Clock)  */
 
-void LowPowerSysInit(void);
+void LowPowerSysInit();
 
 #ifdef __cplusplus
 }

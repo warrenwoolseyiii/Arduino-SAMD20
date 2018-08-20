@@ -20,6 +20,7 @@
 #include "clocks.h"
 #include "RTC.h"
 #include "micros.h"
+#include "Arduino.h"
 
 #define MICROS_TIMER_FREQ 1UL
 #define RTC_US_PER_COUNT 30UL
