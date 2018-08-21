@@ -1,16 +1,15 @@
 ################################################################################
 # Automatically-generated file. Do not edit!
 ################################################################################
+include .local/config.mk
+
 USER_OBJS :=
 
 LIBS := 
 PROJ := 
 
-PROJ_DIR := /mnt/c/Users/budge/Repositories/Arduino-SAMD20
-BUILD_DIR := /mnt/c/Users/budge/Repositories/Arduino-SAMD20/build
-CMSIS_DIR := /home/warren/arm-sdk/devicePack/arm/cmsis/5.0.1/CMSIS/Include
-ATMEL_DFP := /home/warren/arm-sdk/devicePack/atmel/SAMD20_DFP/1.2.91/samd20/include
-TOOLCHAIN_PATH := /home/warren/arm-sdk/toolchain/gcc-arm-none-eabi-7-2018-q2-update/bin
+PROJ_DIR = $(PWD)
+BUILD_DIR := build
 
 O_SRCS := 
 C_SRCS := 
@@ -26,7 +25,6 @@ C_DEPS_AS_ARGS :=
 EXECUTABLES := 
 OUTPUT_FILE_PATH :=
 OUTPUT_FILE_PATH_AS_ARGS :=
-AVR_APP_PATH :=$$$AVR_APP_PATH$$$
 QUOTE := 
 ADDITIONAL_DEPENDENCIES:=
 OUTPUT_FILE_DEP:=
@@ -451,9 +449,11 @@ endif
 endif
 
 # Add inputs and outputs from these tool invocations to the build variables 
+directories: 
+	mkdir build
 
 # All Target
-all: $(OUTPUT_FILE_PATH) $(ADDITIONAL_DEPENDENCIES)
+all: directories $(OUTPUT_FILE_PATH) $(ADDITIONAL_DEPENDENCIES)
 
 
 $(OUTPUT_FILE_PATH): $(OBJS) $(USER_OBJS) $(OUTPUT_FILE_DEP)
@@ -469,8 +469,5 @@ $(OUTPUT_FILE_PATH): $(OBJS) $(USER_OBJS) $(OUTPUT_FILE_DEP)
 
 # Other Targets
 clean:
-	cd ../build
-	rm -rf ../build/*.a
-	rm -rf ../build/*.o
-	rm -rf ../build/*.d
+	rm -rf build
 	
