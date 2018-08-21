@@ -5,7 +5,7 @@ This project was forked from the ArduinoCore-samd project which supports the Ard
 There are two ways to utilize the SAMD20 Arduino core. All stable release binaries are tagged in github. You can also build the binary from the source and/or modify it for your own usage by cloning this project! 
 
 ## Releases
-Insert the release list here.
+[releases](https://github.com/FlumeTech/Arduino-SAMD20/releases)
 
 ## Building
 ### MakeFile
