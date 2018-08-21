@@ -1,0 +1,5 @@
+*.*~
+.local/
+build/*.o
+build/*.a
+build/*.d
