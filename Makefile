@@ -8,6 +8,10 @@ USER_OBJS :=
 LIBS := 
 PROJ := 
 
+CMSIS_DIR := $(SDK_PATH)/devicePack/arm/cmsis/5.0.1/CMSIS/Include
+ATMEL_DFP := $(SDK_PATH)/devicePack/atmel/SAMD20_DFP/1.2.91/samd20/include
+TOOLCHAIN_PATH := $(SDK_PATH)/toolchain/bin
+
 PROJ_DIR = $(PWD)
 BUILD_DIR := build
 
