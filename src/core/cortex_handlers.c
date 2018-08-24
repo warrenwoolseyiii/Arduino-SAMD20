@@ -175,7 +175,8 @@ const DeviceVectors exception_table = {
 #endif                   // SAMD20
 };
 
-extern int main( void );
+extern int main();
+extern void LowPowerSysInit();
 uint8_t    gRCause = 0;
 uint32_t SystemCoreClock=1000000ul ;
 

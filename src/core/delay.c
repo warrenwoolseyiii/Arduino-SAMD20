@@ -19,10 +19,6 @@
 #include "delay.h"
 #include "Arduino.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 uint32_t millis()
 {
     uint64_t steps = stepsRTC();
@@ -39,7 +35,3 @@ void delay( uint32_t ms )
         yield();
     } while( stepsRTC() - start < steps );
 }
-
-#ifdef __cplusplus
-}
-#endif
