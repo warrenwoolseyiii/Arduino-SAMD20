@@ -33,9 +33,9 @@ typedef uint16_t word;
 // some libraries and sketches depend on this AVR stuff,
 // assuming Arduino.h or WProgram.h automatically includes it...
 //
-#include "avr/pgmspace.h"
-#include "avr/interrupt.h"
-#include "avr/io.h"
+#include "pgmspace.h"
+#include "interrupt.h"
+#include "io.h"
 
 #include "binary.h"
 #include "itoa.h"
