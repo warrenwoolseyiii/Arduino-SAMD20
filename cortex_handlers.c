@@ -17,9 +17,9 @@
 */
 
 #include <sam.h>
-#include <variant.h>
 #include <stdio.h>
 #include <system_samd20.h>
+#include "variant.h"
 
 /* RTOS Hooks */
 extern void svcHook( void );
