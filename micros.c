@@ -25,22 +25,22 @@
 #define MICROS_TIMER_FREQ 1UL
 #define RTC_US_PER_COUNT 30UL
 
-uint32_t _cyclesPerUs = 0;
-uint8_t  _isPaused = 0;
-uint32_t _micros = 0;
+uint32_t          _cyclesPerUs = 0;
+uint8_t           _isPaused = 0;
+volatile uint32_t _micros = 0;
 
 /* Micros implementation that runs independent from the RTC. In order
  * to save maximum power, the Systick module has been disabled so that
- * the processor doesn't wake every ms. millis and delay implementations 
- * are based off the RTC, however the RTC doesn't run at a high enough 
- * frequency to provide the required resolution of micro seconds. This 
- * implementation utilizes a 32 bit Timer Counter which is synchronized 
+ * the processor doesn't wake every ms. millis and delay implementations
+ * are based off the RTC, however the RTC doesn't run at a high enough
+ * frequency to provide the required resolution of micro seconds. This
+ * implementation utilizes a 32 bit Timer Counter which is synchronized
  * to the RTC every time the RTC overflows, thus guaranteeing that drift between
  * this Timer Counter and the RTC is minimized.
  *
  * The user can pause the micros timer before sleeping the CPU in it's deepest
- * sleep setting, when the CPU awakes, the caller will be responsible for 
- * restarting, and synchronizing the Timer Counter with the RTC. This can 
+ * sleep setting, when the CPU awakes, the caller will be responsible for
+ * restarting, and synchronizing the Timer Counter with the RTC. This can
  * be done by calling pauseMicrosForSleep() and syncMicrosToRTC() respectively.
  */
 int8_t initMicros()
@@ -148,27 +148,26 @@ void resumeMicrosFromSleep()
 void syncMicrosToRTC( uint8_t overFlow )
 {
     if( overFlow || _isPaused ) {
-        uint32_t count = RTC_US_PER_COUNT * countRTC();
-        count *= _cyclesPerUs;
-        TC0->COUNT32.COUNT.reg = count;
+        TC0->COUNT32.COUNT.reg = _cyclesPerUs * RTC_US_PER_COUNT * countRTC();
         while( TC0->COUNT32.STATUS.bit.SYNCBUSY )
-        ;
+            ;
         resumeMicrosFromSleep();
     }
 }
 
-uint32_t micros()
+volatile uint32_t micros()
 {
-    uint32_t count = TC0->COUNT32.COUNT.reg;
-    count /= _cyclesPerUs;
-    _micros = ( secondsRTC() * 1000000UL ) + count;
+    _micros = ( secondsRTC() * 1000000UL ) +
+              ( TC0->COUNT32.COUNT.reg ) / _cyclesPerUs;
     return _micros;
 }
 
 void delayMicroseconds( uint32_t us )
 {
-    uint32_t start = micros();
+    int64_t start, count;
+    start = micros();
     do {
         yield();
-    } while( ( micros() - start ) < us );
+        count = micros();
+    } while( ( count - start ) < us );
 }

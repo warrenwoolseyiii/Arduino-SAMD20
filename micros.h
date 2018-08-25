@@ -23,13 +23,13 @@
 extern "C" {
 #endif
 
-int8_t   initMicros();
-void endMicros();
-void     pauseMicrosForSleep();
-void     resumeMicrosFromSleep();
-void     syncMicrosToRTC( uint8_t overFlow );
-uint32_t micros();
-void     delayMicroseconds( uint32_t us );
+int8_t            initMicros();
+void              endMicros();
+void              pauseMicrosForSleep();
+void              resumeMicrosFromSleep();
+void              syncMicrosToRTC( uint8_t overFlow );
+volatile uint32_t micros();
+void              delayMicroseconds( uint32_t us );
 
 #ifdef __cplusplus
 }
