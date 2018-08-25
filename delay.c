@@ -27,11 +27,13 @@ uint32_t millis()
 
 void delay( uint32_t ms )
 {
-    uint32_t steps = RTC_EXACT_MILLIS_TO_STEPS( ms );
+    int64_t start, steps, count;
+    steps = RTC_EXACT_MILLIS_TO_STEPS( ms );
     if( ms == 1 ) steps++;
-    uint32_t start = stepsRTC();
+    start = stepsRTC();
 
     do {
         yield();
-    } while( stepsRTC() - start < steps );
+        count = stepsRTC();
+    } while( ( count - start ) < steps );
 }

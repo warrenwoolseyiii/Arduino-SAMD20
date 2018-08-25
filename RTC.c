@@ -16,9 +16,9 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#include <sam.h>
 #include "RTC.h"
 #include "clocks.h"
-#include "sam.h"
 #include "micros.h"
 
 #define RTC_WAIT_SYNC while( RTC->MODE1.STATUS.bit.SYNCBUSY )
@@ -61,21 +61,19 @@ void disableRTC()
     _rtcSec = 0;
 }
 
-uint32_t stepsRTC()
+volatile uint32_t stepsRTC()
 {
-    uint32_t ticks = RTC->MODE1.COUNT.reg;
-    return ( _rtcSec << 15 ) | ticks;
+    return ( _rtcSec << 15 ) | RTC->MODE1.COUNT.reg;
 }
 
-uint32_t secondsRTC()
+volatile uint32_t secondsRTC()
 {
     return _rtcSec;
 }
 
 uint32_t countRTC()
 {
-    uint32_t ticks = RTC->MODE1.COUNT.reg;
-    return ticks;
+    return RTC->MODE1.COUNT.reg;
 }
 
 void RTC_IRQHandler()
@@ -83,5 +81,6 @@ void RTC_IRQHandler()
     // Due to millisRTC requiring this parameter to LSH 15 bits, the roll-over
     // must be handled before we LSH the MSB out of the _rtcSec value
     if( ( ++_rtcSec ) & 0x20000 ) _rtcSec = 0;
+    RTC->MODE1.INTFLAG.bit.OVF = 1;
     syncMicrosToRTC( 1 );
 }
