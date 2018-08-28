@@ -22,6 +22,9 @@
 #include "micros.h"
 #include "Arduino.h"
 
+// TODO: Hot fix on micros, remove this later
+#include "delay.h"
+
 #define MICROS_TIMER_FREQ 1UL
 #define RTC_US_PER_COUNT 30UL
 
@@ -164,10 +167,12 @@ volatile uint32_t micros()
 
 void delayMicroseconds( uint32_t us )
 {
-    int64_t start, count;
-    start = micros();
-    do {
-        yield();
-        count = micros();
-    } while( ( count - start ) < us );
+    //int64_t start, count;
+    //start = micros();
+    //do {
+        //yield();
+        //count = micros();
+    //} while( ( count - start ) < us );
+    // TODO: Hot fix on micros, remove this later
+    delayUs( us );
 }
