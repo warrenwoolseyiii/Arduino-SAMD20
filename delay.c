@@ -37,3 +37,16 @@ void delay( uint32_t ms )
         count = stepsRTC();
     } while( ( count - start ) < steps );
 }
+
+void delayUs( uint32_t us )
+{
+    int64_t start, steps, count;
+    steps = RTC_ROUGH_MICROS_TO_STEPS( us );
+    if( steps == 0 ) steps = 1;
+    start = stepsRTC();
+
+    do {
+        yield();
+        count = stepsRTC();
+    } while( ( count - start ) < steps );
+}

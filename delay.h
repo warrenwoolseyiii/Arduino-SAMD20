@@ -28,6 +28,7 @@ extern "C" {
 
 uint32_t millis();
 void     delay( uint32_t ms );
+void     delayUs( uint32_t us );
 
 #ifdef __cplusplus
 }
