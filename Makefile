@@ -37,69 +37,50 @@ LINKER_SCRIPT_DEP:=
 
 # Every subdirectory with source files must be described here
 SUBDIRS :=  \
-$(PROJ_DIR)/ \
-$(PROJ_DIR)/include/ \
-$(PROJ_DIR)/include/core/ \
-$(PROJ_DIR)/include/core/avr/ \
-$(PROJ_DIR)/include/core/samd20/ \
-$(PROJ_DIR)/include/core/samd20/include/ \
-$(PROJ_DIR)/include/core/samd20/include/component/ \
-$(PROJ_DIR)/include/core/samd20/include/instance/ \
-$(PROJ_DIR)/include/core/samd20/include/pio/ \
-$(PROJ_DIR)/include/libraries/ \
-$(PROJ_DIR)/include/libraries/spi/ \
-$(PROJ_DIR)/include/variants/ \
-$(PROJ_DIR)/src/ \
-$(PROJ_DIR)/src/core/ \
-$(PROJ_DIR)/src/core/avr/ \
-$(PROJ_DIR)/src/core/PreprocessingAssembly/ \
-$(PROJ_DIR)/src/libraries/ \
-$(PROJ_DIR)/src/libraries/spi/ \
-$(PROJ_DIR)/src/variants/ \
+$(PROJ_DIR)/
 
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS +=  \
-$(PROJ_DIR)/src/core/abi.cpp \
-$(PROJ_DIR)/src/core/avr/dtostrf.c \
-$(PROJ_DIR)/src/core/clocks.c \
-$(PROJ_DIR)/src/core/cortex_handlers.c \
-$(PROJ_DIR)/src/core/delay.c \
-$(PROJ_DIR)/src/core/EEPROM.cpp \
-$(PROJ_DIR)/src/core/hooks.c \
-$(PROJ_DIR)/src/core/IPAddress.cpp \
-$(PROJ_DIR)/src/core/itoa.c \
-$(PROJ_DIR)/src/core/main.cpp \
-$(PROJ_DIR)/src/core/micros.c \
-$(PROJ_DIR)/src/core/new.cpp \
-$(PROJ_DIR)/src/core/NVM.c \
-$(PROJ_DIR)/src/core/Print.cpp \
-$(PROJ_DIR)/src/core/pulse.c \
-$(PROJ_DIR)/src/core/PWM.cpp \
-$(PROJ_DIR)/src/core/Reset.cpp \
-$(PROJ_DIR)/src/core/RTC.c \
-$(PROJ_DIR)/src/core/SERCOM.cpp \
-$(PROJ_DIR)/src/core/sleep.c \
-$(PROJ_DIR)/src/core/startup.c \
-$(PROJ_DIR)/src/core/Stream.cpp \
-$(PROJ_DIR)/src/core/TimerCounter.cpp \
-$(PROJ_DIR)/src/core/Tone.cpp \
-$(PROJ_DIR)/src/core/Uart.cpp \
-$(PROJ_DIR)/src/core/WDT.c \
-$(PROJ_DIR)/src/core/WInterrupts.c \
-$(PROJ_DIR)/src/core/wiring_analog.c \
-$(PROJ_DIR)/src/core/wiring_digital.c \
-$(PROJ_DIR)/src/core/wiring_private.c \
-$(PROJ_DIR)/src/core/wiring_shift.c \
-$(PROJ_DIR)/src/core/WMath.cpp \
-$(PROJ_DIR)/src/core/WString.cpp \
-$(PROJ_DIR)/src/libraries/spi/SPI.cpp \
-$(PROJ_DIR)/src/variants/variant.cpp
+$(PROJ_DIR)/abi.cpp \
+$(PROJ_DIR)/avr/dtostrf.c \
+$(PROJ_DIR)/clocks.c \
+$(PROJ_DIR)/cortex_handlers.c \
+$(PROJ_DIR)/delay.c \
+$(PROJ_DIR)/EEPROM.cpp \
+$(PROJ_DIR)/hooks.c \
+$(PROJ_DIR)/IPAddress.cpp \
+$(PROJ_DIR)/itoa.c \
+$(PROJ_DIR)/main.cpp \
+$(PROJ_DIR)/micros.c \
+$(PROJ_DIR)/new.cpp \
+$(PROJ_DIR)/NVM.c \
+$(PROJ_DIR)/Print.cpp \
+$(PROJ_DIR)/pulse.c \
+$(PROJ_DIR)/PWM.cpp \
+$(PROJ_DIR)/Reset.cpp \
+$(PROJ_DIR)/RTC.c \
+$(PROJ_DIR)/SERCOM.cpp \
+$(PROJ_DIR)/sleep.c \
+$(PROJ_DIR)/startup.c \
+$(PROJ_DIR)/Stream.cpp \
+$(PROJ_DIR)/TimerCounter.cpp \
+$(PROJ_DIR)/Tone.cpp \
+$(PROJ_DIR)/Uart.cpp \
+$(PROJ_DIR)/WDT.c \
+$(PROJ_DIR)/WInterrupts.c \
+$(PROJ_DIR)/wiring_analog.c \
+$(PROJ_DIR)/wiring_digital.c \
+$(PROJ_DIR)/wiring_private.c \
+$(PROJ_DIR)/wiring_shift.c \
+$(PROJ_DIR)/WMath.cpp \
+$(PROJ_DIR)/WString.cpp \
+$(PROJ_DIR)/SPI.cpp \
+$(PROJ_DIR)/variant.cpp
 
 
 PREPROCESSING_SRCS +=  \
-$(PROJ_DIR)/src/core/PreprocessingAssembly/pulse_asm.S \
-$(PROJ_DIR)/src/core/pulse_asm.S
+$(PROJ_DIR)/pulse_asm.S
 
 
 ASM_SRCS += 
@@ -344,101 +325,48 @@ LINKER_SCRIPT_DEP+=
 
 
 
-$(BUILD_DIR)/%.o: $(PROJ_DIR)/src/core/%.c
+$(BUILD_DIR)/%.o: $(PROJ_DIR)/%.c
 	@echo Building file: $<
 	@echo Invoking: ARM/GNU C Compiler : 6.3.1
-	$(TOOLCHAIN_PATH)/arm-none-eabi-gcc -x c -mthumb -D__SAMD20E18__ -DDEBUG -DARDUINO_SAMD_E -DARDUINO_ARCH_SAMD -DUSB_VID=0x2341 -DUSB_PID=0x804f -DUSB_PRODUCT="Arduino MKRZero" -DUSB_MANUFACTURER="Arduino LLC" -DSAMD_SERIES -DSAMD20  -I$(CMSIS_DIR) -I$(ATMEL_DFP) -I$(PROJ_DIR)/include/core -I$(PROJ_DIR)/include/core/samd20 -I$(PROJ_DIR)/include/core/samd20/include -I$(PROJ_DIR)/include/core/samd20/include/component -I$(PROJ_DIR)/include/core/samd20/include/instance -I$(PROJ_DIR)/include/core/samd20/include/pio -I$(PROJ_DIR)/include/libraries/spi -I$(PROJ_DIR)/include/variants  -O1 -ffunction-sections -mlong-calls -g3 -Wall -mcpu=cortex-m0plus -c -std=gnu99 -MD -MP -MF $(@:%.o=%.d) -MT$(@:%.o=%.d) -MT$(@:%.o=%.o)   -o $@ $< 
+	$(TOOLCHAIN_PATH)/arm-none-eabi-gcc -x c -mthumb -D__SAMD20E18__ -DDEBUG -DARDUINO_SAMD_E -DARDUINO_ARCH_SAMD -DUSB_VID=0x2341 -DUSB_PID=0x804f -DUSB_PRODUCT="Arduino MKRZero" -DUSB_MANUFACTURER="Arduino LLC" -DSAMD_SERIES -DSAMD20  -I$(CMSIS_DIR) -I$(ATMEL_DFP) -I$(PROJ_DIR) -O1 -ffunction-sections -mlong-calls -g3 -Wall -mcpu=cortex-m0plus -c -std=gnu99 -MD -MP -MF $(@:%.o=%.d) -MT$(@:%.o=%.d) -MT$(@:%.o=%.o)   -o $@ $< 
 	@echo Finished building: $<
 	
 
-$(BUILD_DIR)/%.o: $(PROJ_DIR)/src/core/%.cpp
+$(BUILD_DIR)/%.o: $(PROJ_DIR)/%.cpp
 	@echo Building file: $<
 	@echo Invoking: ARM/GNU C Compiler : 6.3.1
-	$(TOOLCHAIN_PATH)/arm-none-eabi-g++ -mthumb -D__SAMD20E18__ -DDEBUG -DARDUINO_SAMD_E -DARDUINO_ARCH_SAMD -DUSB_VID=0x2341 -DUSB_PID=0x804f -DUSB_PRODUCT="Arduino MKRZero" -DUSB_MANUFACTURER="Arduino LLC" -DSAMD_SERIES -DSAMD20  -I$(CMSIS_DIR) -I$(ATMEL_DFP) -I$(PROJ_DIR)/include/variants -I$(PROJ_DIR)/include/core -I$(PROJ_DIR)/include/core/samd20 -I$(PROJ_DIR)/include/core/samd20/include -I$(PROJ_DIR)/include/core/samd20/include/component -I$(PROJ_DIR)/include/core/samd20/include/instance -I$(PROJ_DIR)/include/core/samd20/include/pio -I$(PROJ_DIR)/include/libraries/spi  -O1 -ffunction-sections -fno-rtti -fno-exceptions -mlong-calls -g3 -Wall -mcpu=cortex-m0plus -c -MD -MP -MF $(@:%.o=%.d) -MT$(@:%.o=%.d) -MT$(@:%.o=%.o)   -o $@ $< 
+	$(TOOLCHAIN_PATH)/arm-none-eabi-g++ -mthumb -D__SAMD20E18__ -DDEBUG -DARDUINO_SAMD_E -DARDUINO_ARCH_SAMD -DUSB_VID=0x2341 -DUSB_PID=0x804f -DUSB_PRODUCT="Arduino MKRZero" -DUSB_MANUFACTURER="Arduino LLC" -DSAMD_SERIES -DSAMD20  -I$(CMSIS_DIR) -I$(ATMEL_DFP) -I$(PROJ_DIR) -O1 -ffunction-sections -fno-rtti -fno-exceptions -mlong-calls -g3 -Wall -mcpu=cortex-m0plus -c -MD -MP -MF $(@:%.o=%.d) -MT$(@:%.o=%.d) -MT$(@:%.o=%.o)   -o $@ $< 
 	@echo Finished building: $<
-	
-
-$(BUILD_DIR)/%.o: $(PROJ_DIR)/src/core/avr/%.c
-	@echo Building file: $<
-	@echo Invoking: ARM/GNU C Compiler : 6.3.1
-	$(TOOLCHAIN_PATH)/arm-none-eabi-gcc -x c -mthumb -D__SAMD20E18__ -DDEBUG -DARDUINO_SAMD_E -DARDUINO_ARCH_SAMD -DUSB_VID=0x2341 -DUSB_PID=0x804f -DUSB_PRODUCT="Arduino MKRZero" -DUSB_MANUFACTURER="Arduino LLC" -DSAMD_SERIES -DSAMD20  -I$(CMSIS_DIR) -I$(ATMEL_DFP) -I$(PROJ_DIR)/include/core -I$(PROJ_DIR)/include/core/samd20 -I$(PROJ_DIR)/include/core/samd20/include -I$(PROJ_DIR)/include/core/samd20/include/component -I$(PROJ_DIR)/include/core/samd20/include/instance -I$(PROJ_DIR)/include/core/samd20/include/pio -I$(PROJ_DIR)/include/libraries/spi -I$(PROJ_DIR)/include/variants  -O1 -ffunction-sections -mlong-calls -g3 -Wall -mcpu=cortex-m0plus -c -std=gnu99 -MD -MP -MF $(@:%.o=%.d) -MT$(@:%.o=%.d) -MT$(@:%.o=%.o)   -o $@ $< 
-	@echo Finished building: $<
-	
-
-$(BUILD_DIR)/%.o: $(PROJ_DIR)/src/libraries/spi/%.cpp
-	@echo Building file: $<
-	@echo Invoking: ARM/GNU C Compiler : 6.3.1
-	$(TOOLCHAIN_PATH)/arm-none-eabi-g++ -mthumb -D__SAMD20E18__ -DDEBUG -DARDUINO_SAMD_E -DARDUINO_ARCH_SAMD -DUSB_VID=0x2341 -DUSB_PID=0x804f -DUSB_PRODUCT="Arduino MKRZero" -DUSB_MANUFACTURER="Arduino LLC" -DSAMD_SERIES -DSAMD20  -I$(CMSIS_DIR) -I$(ATMEL_DFP) -I$(PROJ_DIR)/include/variants -I$(PROJ_DIR)/include/core -I$(PROJ_DIR)/include/core/samd20 -I$(PROJ_DIR)/include/core/samd20/include -I$(PROJ_DIR)/include/core/samd20/include/component -I$(PROJ_DIR)/include/core/samd20/include/instance -I$(PROJ_DIR)/include/core/samd20/include/pio -I$(PROJ_DIR)/include/libraries/spi  -O1 -ffunction-sections -fno-rtti -fno-exceptions -mlong-calls -g3 -Wall -mcpu=cortex-m0plus -c -MD -MP -MF $(@:%.o=%.d) -MT$(@:%.o=%.d) -MT$(@:%.o=%.o)   -o $@ $< 
-	@echo Finished building: $<
-	
-
-$(BUILD_DIR)/%.o: $(PROJ_DIR)/src/variants/%.cpp
-	@echo Building file: $<
-	@echo Invoking: ARM/GNU C Compiler : 6.3.1
-	$(TOOLCHAIN_PATH)/arm-none-eabi-g++ -mthumb -D__SAMD20E18__ -DDEBUG -DARDUINO_SAMD_E -DARDUINO_ARCH_SAMD -DUSB_VID=0x2341 -DUSB_PID=0x804f -DUSB_PRODUCT="Arduino MKRZero" -DUSB_MANUFACTURER="Arduino LLC" -DSAMD_SERIES -DSAMD20  -I$(CMSIS_DIR) -I$(ATMEL_DFP) -I$(PROJ_DIR)/include/variants -I$(PROJ_DIR)/include/core -I$(PROJ_DIR)/include/core/samd20 -I$(PROJ_DIR)/include/core/samd20/include -I$(PROJ_DIR)/include/core/samd20/include/component -I$(PROJ_DIR)/include/core/samd20/include/instance -I$(PROJ_DIR)/include/core/samd20/include/pio -I$(PROJ_DIR)/include/libraries/spi  -O1 -ffunction-sections -fno-rtti -fno-exceptions -mlong-calls -g3 -Wall -mcpu=cortex-m0plus -c -MD -MP -MF $(@:%.o=%.d) -MT$(@:%.o=%.d) -MT$(@:%.o=%.o)   -o $@ $< 
-	@echo Finished building: $<
-	
-
 
 
 # AVR32/GNU Preprocessing Assembler
 
-$(BUILD_DIR)/%.o: $(PROJ_DIR)/src/core/PreprocessingAssembly/%.S
+$(BUILD_DIR)/%.o: $(PROJ_DIR)/%.S
 	@echo Building file: $<
 	@echo Invoking: ARM/GNU Preprocessing Assembler : 6.3.1
 	$(TOOLCHAIN_PATH)/arm-none-eabi-gcc -mthumb -x assembler-with-cpp -c -mcpu=cortex-m0plus -I $(CMSIS_DIR) -I $(ATMEL_DFP)  -MD -MP -MF $(@:%.o=%.d) -MT$(@:%.o=%.d) -MT$(@:%.o=%.o) -D__SAMD20E18__ -Wa,-g   -o $@ $< 
 	@echo Finished building: $<
 	
 
-$(BUILD_DIR)/%.o: $(PROJ_DIR)/src/core/PreprocessingAssembly/%.x
+$(BUILD_DIR)/%.o: $(PROJ_DIR)/%.x
 	@echo Building file: $<
 	@echo Invoking: ARM/GNU Preprocessing Assembler : 6.3.1
 	$(TOOLCHAIN_PATH)/arm-none-eabi-gcc -mthumb -x assembler-with-cpp -c -mcpu=cortex-m0plus -I $(CMSIS_DIR) -I $(ATMEL_DFP)  -MD -MP -MF $(@:%.o=%.d) -MT$(@:%.o=%.d) -MT$(@:%.o=%.o) -D__SAMD20E18__ -Wa,-g   -o $@ $< 
 	@echo Finished building: $<
 	
 
-$(BUILD_DIR)/%.o:: $(PROJ_DIR)/src/core/PreprocessingAssembly/%.X
+$(BUILD_DIR)/%.o:: $(PROJ_DIR)/%.X
 	@echo Building file: $<
 	@echo Invoking: ARM/GNU Preprocessing Assembler : 6.3.1
 	$(TOOLCHAIN_PATH)/arm-none-eabi-gcc -mthumb -x assembler-with-cpp -c -mcpu=cortex-m0plus -I $(CMSIS_DIR) -I $(ATMEL_DFP)  -MD -MP -MF $(@:%.o=%.d) -MT$(@:%.o=%.d) -MT$(@:%.o=%.o) -D__SAMD20E18__ -Wa,-g   -o $@ $< 
 	@echo Finished building: $<
 	
 
-$(BUILD_DIR)/%.o:: $(PROJ_DIR)/src/core/PreprocessingAssembly/%.sx
+$(BUILD_DIR)/%.o:: $(PROJ_DIR)/%.sx
 	@echo Building file: $<
 	@echo Invoking: ARM/GNU Preprocessing Assembler : 6.3.1
 	$(TOOLCHAIN_PATH)/arm-none-eabi-gcc -mthumb -x assembler-with-cpp -c -mcpu=cortex-m0plus -I $(CMSIS_DIR) -I $(ATMEL_DFP)  -MD -MP -MF $(@:%.o=%.d) -MT$(@:%.o=%.d) -MT$(@:%.o=%.o) -D__SAMD20E18__ -Wa,-g   -o $@ $< 
 	@echo Finished building: $<
-	
-
-$(BUILD_DIR)/%.o: $(PROJ_DIR)/src/core/%.S
-	@echo Building file: $<
-	@echo Invoking: ARM/GNU Preprocessing Assembler : 6.3.1
-	$(TOOLCHAIN_PATH)/arm-none-eabi-gcc -mthumb -x assembler-with-cpp -c -mcpu=cortex-m0plus -I $(CMSIS_DIR) -I $(ATMEL_DFP)  -MD -MP -MF $(@:%.o=%.d) -MT$(@:%.o=%.d) -MT$(@:%.o=%.o) -D__SAMD20E18__ -Wa,-g   -o $@ $< 
-	@echo Finished building: $<
-	
-
-$(BUILD_DIR)/%.o: $(PROJ_DIR)/src/core/%.x
-	@echo Building file: $<
-	@echo Invoking: ARM/GNU Preprocessing Assembler : 6.3.1
-	$(TOOLCHAIN_PATH)/arm-none-eabi-gcc -mthumb -x assembler-with-cpp -c -mcpu=cortex-m0plus -I $(CMSIS_DIR) -I $(ATMEL_DFP)  -MD -MP -MF $(@:%.o=%.d) -MT$(@:%.o=%.d) -MT$(@:%.o=%.o) -D__SAMD20E18__ -Wa,-g   -o $@ $< 
-	@echo Finished building: $<
-	
-
-$(BUILD_DIR)/%.o: $(PROJ_DIR)/src/core/%.X
-	@echo Building file: $<
-	@echo Invoking: ARM/GNU Preprocessing Assembler : 6.3.1
-	$(TOOLCHAIN_PATH)/arm-none-eabi-gcc -mthumb -x assembler-with-cpp -c -mcpu=cortex-m0plus -I $(CMSIS_DIR) -I $(ATMEL_DFP)  -MD -MP -MF $(@:%.o=%.d) -MT$(@:%.o=%.d) -MT$(@:%.o=%.o) -D__SAMD20E18__ -Wa,-g   -o $@ $< 
-	@echo Finished building: $<
-	
-
-$(BUILD_DIR)/%.o: $(PROJ_DIR)/src/core/%.sx
-	@echo Building file: $<
-	@echo Invoking: ARM/GNU Preprocessing Assembler : 6.3.1
-	$(TOOLCHAIN_PATH)/arm-none-eabi-gcc -mthumb -x assembler-with-cpp -c -mcpu=cortex-m0plus -I $(CMSIS_DIR) -I $(ATMEL_DFP)  -MD -MP -MF $(@:%.o=%.d) -MT$(@:%.o=%.d) -MT$(@:%.o=%.o) -D__SAMD20E18__ -Wa,-g   -o $@ $< 
-	@echo Finished building: $<
-	
-
 
 
 # AVR32/GNU Assembler
