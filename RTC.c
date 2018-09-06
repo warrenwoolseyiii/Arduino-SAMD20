@@ -83,22 +83,32 @@ volatile int64_t secondsRTC()
 void delayRTCSteps( int64_t steps )
 {
     int64_t start = RTC_STEPS;
-	int64_t delta = 0;
-    while( 1 ) {
-        delta = RTC_STEPS - start;
-		if( ( delta - steps ) > 999 ) {}
-		else if( delta >= steps ) break;
-	}
+    while( ( RTC_STEPS - start ) < steps )
+        ;
 }
 
-uint8_t eventOccurred = 0;
+/* When the RTC rolls over we need to ensure the COUNT register is reset to zero
+ * AND that it reads as such. The SAMD20 uses a bus synchronization scheme to
+ * allow continuous reading of the COUNT register. However, during tight loops
+ * such as a delay scheme or a while( millis() ) loop, the synchronization may
+ * not happen every RTC tick. This can cause some serious underflow, overflow
+ * problems during looping. In order to prevent this, on the overflow interrupt
+ * we force the COUNT register to 0, then we force the read setup to ensure that
+ * the bus has synchronized during the rollover */
+volatile uint32_t _forceRead = 0;
 
 void RTC_IRQHandler()
 {
+    // Force the COUNT register to 0
+    RTC_WAIT_SYNC;
+    RTC->MODE1.COUNT.reg = 0;
+
     // Due to millisRTC requiring this parameter to LSH 15 bits, the roll-over
     // must be handled before we LSH the MSB out of the _rtcSec value
-	eventOccurred = 1;
     if( ( ++_rtcSec ) & RTC_MAX_STEPS ) _rtcSec = 0;
     RTC->MODE1.INTFLAG.bit.OVF = 1;
-    // syncMicrosToRTC( 1 );
+
+    // Force the bus to synchronize
+    RTC_SET_READS;
+    _forceRead = RTC->MODE1.COUNT.reg;
 }
