@@ -21,9 +21,18 @@
 #include "clocks.h"
 #include "micros.h"
 
+#define RTC_MAX_STEPS 0x40000000000
 #define RTC_WAIT_SYNC while( RTC->MODE1.STATUS.bit.SYNCBUSY )
+#define RTC_SET_READS                     \
+    {                                     \
+        RTC->MODE1.READREQ.bit.RCONT = 1; \
+        RTC->MODE1.READREQ.bit.RREQ = 1;  \
+        RTC_WAIT_SYNC;                    \
+    }
 
-volatile uint32_t _rtcSec = 0;
+volatile int64_t _rtcSec = 0;
+
+#define RTC_STEPS ( ( _rtcSec << 15 ) | RTC->MODE1.COUNT.reg )
 
 /* Initializes the RTC with a 32768 Hz input clock source. The resolution of the
  * RTC module is therefore 30.5 uS. The RTC interrupt is set to trigger an
@@ -47,7 +56,7 @@ void initRTC()
     RTC_WAIT_SYNC;
 
     // Enable continuous read of the count register
-    RTC->MODE1.READREQ.bit.RCONT = 1;
+    RTC_SET_READS;
 }
 
 void disableRTC()
@@ -61,26 +70,29 @@ void disableRTC()
     _rtcSec = 0;
 }
 
-volatile uint32_t stepsRTC()
+volatile int64_t stepsRTC()
 {
-    return ( _rtcSec << 15 ) | RTC->MODE1.COUNT.reg;
+    return RTC_STEPS;
 }
 
-volatile uint32_t secondsRTC()
+volatile int64_t secondsRTC()
 {
     return _rtcSec;
 }
 
-uint32_t countRTC()
+void delayRTCSteps( uint32_t steps )
 {
-    return RTC->MODE1.COUNT.reg;
+    int64_t start = RTC_STEPS;
+    do {
+        __NOP();
+    } while( ( RTC_STEPS - start ) < steps );
 }
 
 void RTC_IRQHandler()
 {
     // Due to millisRTC requiring this parameter to LSH 15 bits, the roll-over
     // must be handled before we LSH the MSB out of the _rtcSec value
-    if( ( ++_rtcSec ) & 0x20000 ) _rtcSec = 0;
+    if( ( ++_rtcSec ) & RTC_MAX_STEPS ) _rtcSec = 0;
     RTC->MODE1.INTFLAG.bit.OVF = 1;
-    syncMicrosToRTC( 1 );
+    // syncMicrosToRTC( 1 );
 }

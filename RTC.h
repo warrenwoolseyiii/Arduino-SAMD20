@@ -36,12 +36,11 @@
 extern "C" {
 #endif
 
-void     initRTC();
-void     disableRTC();
-volatile uint32_t stepsRTC();
-uint32_t countRTC();
-volatile uint32_t secondsRTC();
-
+void             initRTC();
+void             disableRTC();
+volatile int64_t stepsRTC();
+volatile int64_t secondsRTC();
+void             delayRTCSteps( uint32_t steps );
 #ifdef __cplusplus
 }
 #endif
