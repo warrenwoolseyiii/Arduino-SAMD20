@@ -80,18 +80,24 @@ volatile int64_t secondsRTC()
     return _rtcSec;
 }
 
-void delayRTCSteps( uint32_t steps )
+void delayRTCSteps( int64_t steps )
 {
     int64_t start = RTC_STEPS;
-    do {
-        __NOP();
-    } while( ( RTC_STEPS - start ) < steps );
+	int64_t delta = 0;
+    while( 1 ) {
+        delta = RTC_STEPS - start;
+		if( ( delta - steps ) > 999 ) {}
+		else if( delta >= steps ) break;
+	}
 }
+
+uint8_t eventOccurred = 0;
 
 void RTC_IRQHandler()
 {
     // Due to millisRTC requiring this parameter to LSH 15 bits, the roll-over
     // must be handled before we LSH the MSB out of the _rtcSec value
+	eventOccurred = 1;
     if( ( ++_rtcSec ) & RTC_MAX_STEPS ) _rtcSec = 0;
     RTC->MODE1.INTFLAG.bit.OVF = 1;
     // syncMicrosToRTC( 1 );

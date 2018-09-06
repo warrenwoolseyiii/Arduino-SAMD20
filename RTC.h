@@ -40,7 +40,7 @@ void             initRTC();
 void             disableRTC();
 volatile int64_t stepsRTC();
 volatile int64_t secondsRTC();
-void             delayRTCSteps( uint32_t steps );
+void             delayRTCSteps( int64_t steps );
 #ifdef __cplusplus
 }
 #endif
