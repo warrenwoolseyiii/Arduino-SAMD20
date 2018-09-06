@@ -17,36 +17,19 @@
 */
 
 #include "delay.h"
-#include "Arduino.h"
+#include "RTC.h"
 
-uint32_t millis()
+uint64_t millis()
 {
-    uint64_t steps = stepsRTC();
-    return RTC_EXACT_STEPS_TO_MILLIS( steps );
+    return RTC_EXACT_STEPS_TO_MILLIS( stepsRTC() );
 }
 
 void delay( uint32_t ms )
 {
-    int64_t start, steps, count;
-    steps = RTC_EXACT_MILLIS_TO_STEPS( ms );
-    if( ms == 1 ) steps++;
-    start = stepsRTC();
-
-    do {
-        yield();
-        count = stepsRTC();
-    } while( ( count - start ) < steps );
+    delayRTCSteps( RTC_EXACT_MILLIS_TO_STEPS( ms ) );
 }
 
 void delayUs( uint32_t us )
 {
-    int64_t start, steps, count;
-    steps = RTC_ROUGH_MICROS_TO_STEPS( us );
-    if( steps == 0 ) steps = 1;
-    start = stepsRTC();
-
-    do {
-        yield();
-        count = stepsRTC();
-    } while( ( count - start ) < steps );
+    delayRTCSteps( RTC_ROUGH_MICROS_TO_STEPS( us ) );
 }

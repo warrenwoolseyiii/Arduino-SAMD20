@@ -26,7 +26,7 @@
 extern "C" {
 #endif
 
-uint32_t millis();
+uint64_t millis();
 void     delay( uint32_t ms );
 void     delayUs( uint32_t us );
 
