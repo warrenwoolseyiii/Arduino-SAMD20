@@ -31,7 +31,7 @@ extern "C" void __libc_init_array( void );
 int main( void )
 {
     initRTC();
-    initMicros();
+    // initMicros();
 
     __libc_init_array();
 

@@ -28,8 +28,3 @@ void delay( uint32_t ms )
 {
     delayRTCSteps( RTC_EXACT_MILLIS_TO_STEPS( ms ) );
 }
-
-void delayUs( uint32_t us )
-{
-    delayRTCSteps( RTC_ROUGH_MICROS_TO_STEPS( us ) );
-}

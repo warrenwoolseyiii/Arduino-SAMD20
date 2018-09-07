@@ -82,8 +82,10 @@ void disableExternalInterrupts()
 void interruptlowPowerMode( bool en )
 {
     disableExternalInterrupts();
-    if( en ) __initialize( 1 );
-    else __initialize( 0 );
+    if( en )
+        __initialize( 1 );
+    else
+        __initialize( 0 );
 }
 
 /*
@@ -217,7 +219,7 @@ void detachInterrupt( uint32_t pin )
 void EIC_Handler( void )
 {
     // Re-synchronize micros
-    syncMicrosToRTC( 0 );
+    // syncMicrosToRTC( 0 );
 
     // Calling the routine directly from -here- takes about 1us
     // Depending on where you are in the list it will take longer

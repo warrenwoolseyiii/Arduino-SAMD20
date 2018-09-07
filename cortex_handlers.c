@@ -79,7 +79,7 @@ void TCC1_Handler( void ) __attribute__( ( weak, alias( "Dummy_Handler" ) ) );
 void TCC2_Handler( void ) __attribute__( ( weak, alias( "Dummy_Handler" ) ) );
 #else
 #if( defined( __SAMD20E18__ ) || defined( __SAMD20J18__ ) )
-void TC0_Handler( void ) __attribute__( ( weak, alias( "Dummy_Handler" ) ) );
+void TC0_Handler( void );
 void TC1_Handler( void ) __attribute__( ( weak, alias( "Dummy_Handler" ) ) );
 void TC2_Handler( void ) __attribute__( ( weak, alias( "Dummy_Handler" ) ) );
 #endif // __SAMD20E18__ || __SAMD20J18__
@@ -175,10 +175,10 @@ const DeviceVectors exception_table = {
 #endif                   // SAMD20
 };
 
-extern int main();
+extern int  main();
 extern void LowPowerSysInit();
-uint8_t    gRCause = 0;
-uint32_t SystemCoreClock=1000000ul ;
+uint8_t     gRCause = 0;
+uint32_t    SystemCoreClock = 1000000ul;
 
 /* This is called on processor reset to initialize the device and call main() */
 void Reset_Handler( void )
@@ -217,4 +217,11 @@ extern void RTC_IRQHandler( void );
 void RTC_Handler( void )
 {
     RTC_IRQHandler();
+}
+
+extern void micros_IRQHandler( void );
+
+void TC0_Handler( void )
+{
+    micros_IRQHandler();
 }

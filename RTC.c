@@ -111,4 +111,7 @@ void RTC_IRQHandler()
     // Force the bus to synchronize
     RTC_SET_READS;
     _forceRead = RTC->MODE1.COUNT.reg;
+	
+	// Synchronize micros
+	//syncMicrosToRTC( 1 );
 }
