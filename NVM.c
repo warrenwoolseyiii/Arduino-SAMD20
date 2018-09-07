@@ -30,7 +30,7 @@
     {                                        \
         while( !NVMCTRL->INTFLAG.bit.READY ) \
             ;                                \
-    \
+        NVMCTRL->INTFLAG.bit.READY = 1;      \
 }
 
 uint8_t     _paramsLoaded = 0;
@@ -77,7 +77,8 @@ NVMParams_t getNVMParams()
 
 void handleNVMError()
 {
-
+    // TODO: Commented this out because of a compilation warning
+    //NVMCTRL->INTFLAG.bit.ERROR = 1;
 }
 
 /* Note: user is responsible for knowing NVM erase procedures and memory spaces

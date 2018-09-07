@@ -27,10 +27,23 @@
 
 #define MICROS_TIMER_FREQ 1UL
 #define RTC_US_PER_COUNT 30UL
+#define MICROS_IN_SEC 1000000UL
+#define MICROS_WAIT_SYNC                          \
+    {                                             \
+        while( TC0->COUNT32.STATUS.bit.SYNCBUSY ) \
+            ;                                     \
+    }
+#define MICROS_SET_READ                     \
+    {                                       \
+        TC0->COUNT32.READREQ.bit.RCONT = 1; \
+        TC0->COUNT32.READREQ.bit.RREQ = 1;  \
+        MICROS_WAIT_SYNC;                   \
+    }
 
-uint32_t          _cyclesPerUs = 0;
-uint8_t           _isPaused = 0;
-volatile uint32_t _micros = 0;
+uint32_t         _cyclesPerUs = 0;
+uint8_t          _isPaused = 0;
+uint8_t          _microsIsInit = 0;
+volatile int64_t _microsSec = 0;
 
 /* Micros implementation that runs independent from the RTC. In order
  * to save maximum power, the Systick module has been disabled so that
@@ -53,10 +66,11 @@ int8_t initMicros()
     uint32_t ctrlA = 0;
     uint32_t _maxFreq = SystemCoreClock / 2;
 
-    if( _maxFreq < 1000000UL ) return -1;
+    if( _maxFreq < MICROS_IN_SEC ) return -1;
 
     enableAPBCClk( PM_APBCMASK_TC0, 1 );
     initGenericClk( GCLK_CLKCTRL_GEN_GCLK0_Val, GCLK_CLKCTRL_ID_TC0_TC1_Val );
+    NVIC_EnableIRQ( TC0_IRQn );
 
     // Reset
     TC0->COUNT32.CTRLA.reg = TC_CTRLA_SWRST;
@@ -73,7 +87,7 @@ int8_t initMicros()
     uint8_t i = 0;
 
     while( i <= 9 ) {
-        ccValue = _maxFreq / MICROS_TIMER_FREQ / ( 2 << i ) - 1;
+        ccValue = ( ( _maxFreq / MICROS_TIMER_FREQ / ( 2 << i ) ) * 2 ) - 1;
         if( ccValue < 0xFFFFFFFF ) break;
         i++;
         if( i == 4 || i == 6 ||
@@ -95,30 +109,30 @@ int8_t initMicros()
     // Set CTRLA
     ctrlA |= preScaleBits;
     TC0->COUNT32.CTRLA.reg |= ctrlA;
-    while( TC0->COUNT32.STATUS.bit.SYNCBUSY )
-        ;
+    MICROS_WAIT_SYNC;
 
     // Set CC
-    _cyclesPerUs = ( ccValue + 1 ) / 500000UL;
+    _cyclesPerUs = ( ccValue + 1 ) / ( MICROS_IN_SEC / 2 );
     TC0->COUNT32.CC[0].reg = (uint32_t)ccValue;
-    while( TC0->COUNT32.STATUS.bit.SYNCBUSY )
-        ;
+    MICROS_WAIT_SYNC;
 
     // Allow continuous reads
-    TC0->COUNT32.READREQ.bit.RCONT = 1;
+    MICROS_SET_READ;
+    TC0->COUNT32.INTENSET.bit.MC0 = 1;
 
     // Enable the module and interrupts
     TC0->COUNT32.CTRLA.bit.ENABLE = 1;
-    while( TC0->COUNT32.STATUS.bit.SYNCBUSY )
-        ;
+    MICROS_WAIT_SYNC;
 
     _isPaused = 0;
+    _microsIsInit = 1;
 
     return 0;
 }
 
 void endMicros()
 {
+    NVIC_DisableIRQ( TC0_IRQn );
     // Reset
     TC0->COUNT32.CTRLA.reg = TC_CTRLA_SWRST;
     while( TC0->COUNT32.CTRLA.bit.SWRST )
@@ -131,9 +145,10 @@ void endMicros()
 void pauseMicrosForSleep()
 {
     if( !_isPaused ) {
+        NVIC_DisableIRQ( TC0_IRQn );
+
         TC0->COUNT32.CTRLA.bit.ENABLE = 0;
-        while( TC0->COUNT32.STATUS.bit.SYNCBUSY )
-            ;
+        MICROS_WAIT_SYNC;
         _isPaused = 1;
     }
 }
@@ -141,38 +156,63 @@ void pauseMicrosForSleep()
 void resumeMicrosFromSleep()
 {
     if( _isPaused ) {
+        NVIC_EnableIRQ( TC0_IRQn );
+
         TC0->COUNT32.CTRLA.bit.ENABLE = 1;
-        while( TC0->COUNT32.STATUS.bit.SYNCBUSY )
-            ;
+        MICROS_WAIT_SYNC;
         _isPaused = 0;
     }
 }
 
+volatile uint32_t microsForceRead;
+
 void syncMicrosToRTC( uint8_t overFlow )
 {
     if( overFlow || _isPaused ) {
-        TC0->COUNT32.COUNT.reg = _cyclesPerUs * RTC_US_PER_COUNT * countRTC();
-        while( TC0->COUNT32.STATUS.bit.SYNCBUSY )
-            ;
         resumeMicrosFromSleep();
+
+        uint32_t counts = RTC->MODE1.COUNT.reg;
+        counts *= ( _cyclesPerUs * RTC_US_PER_COUNT );
+
+        MICROS_WAIT_SYNC;
+        TC0->COUNT32.COUNT.reg = counts;
+
+        MICROS_SET_READ;
+        microsForceRead = TC0->COUNT32.COUNT.reg;
     }
 }
 
-volatile uint32_t micros()
+int64_t micros()
 {
-    _micros = ( secondsRTC() * 1000000UL ) +
-              ( TC0->COUNT32.COUNT.reg ) / _cyclesPerUs;
-    return _micros;
+    int64_t mics;
+    if( _microsIsInit )
+        mics = ( ( _microsSec * 1000000UL ) +
+                 ( TC0->COUNT32.COUNT.reg ) / _cyclesPerUs );
+    else
+        mics = RTC_ROUGH_STEPS_TO_MICROS( stepsRTC() );
+    return mics;
 }
 
 void delayMicroseconds( uint32_t us )
 {
-    //int64_t start, count;
-    //start = micros();
-    //do {
-        //yield();
-        //count = micros();
-    //} while( ( count - start ) < us );
-    // TODO: Hot fix on micros, remove this later
-    delayUs( us );
+    if( _microsIsInit ) {
+        int64_t start = micros();
+        while( ( micros() - start ) < us )
+            ;
+    }
+    else
+        delayRTCSteps( RTC_ROUGH_MICROS_TO_STEPS( us ) );
+}
+
+void micros_IRQHandler()
+{
+    // test = TC0->COUNT32.COUNT.reg;
+    // MICROS_WAIT_SYNC;
+    // TC0->COUNT32.COUNT.reg = 0;
+
+    _microsSec++;
+    TC0->COUNT32.INTFLAG.bit.MC0 = 1;
+
+    // MICROS_SET_READ;
+    // microsForceRead = TC0->COUNT32.COUNT.reg;
 }

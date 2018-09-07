@@ -21,9 +21,18 @@
 #include "clocks.h"
 #include "micros.h"
 
+#define RTC_MAX_STEPS 0x40000000000
 #define RTC_WAIT_SYNC while( RTC->MODE1.STATUS.bit.SYNCBUSY )
+#define RTC_SET_READS                     \
+    {                                     \
+        RTC->MODE1.READREQ.bit.RCONT = 1; \
+        RTC->MODE1.READREQ.bit.RREQ = 1;  \
+        RTC_WAIT_SYNC;                    \
+    }
 
-volatile uint32_t _rtcSec = 0;
+volatile int64_t _rtcSec = 0;
+
+#define RTC_STEPS ( ( _rtcSec << 15 ) | RTC->MODE1.COUNT.reg )
 
 /* Initializes the RTC with a 32768 Hz input clock source. The resolution of the
  * RTC module is therefore 30.5 uS. The RTC interrupt is set to trigger an
@@ -47,7 +56,7 @@ void initRTC()
     RTC_WAIT_SYNC;
 
     // Enable continuous read of the count register
-    RTC->MODE1.READREQ.bit.RCONT = 1;
+    RTC_SET_READS;
 }
 
 void disableRTC()
@@ -61,26 +70,48 @@ void disableRTC()
     _rtcSec = 0;
 }
 
-volatile uint32_t stepsRTC()
+volatile int64_t stepsRTC()
 {
-    return ( _rtcSec << 15 ) | RTC->MODE1.COUNT.reg;
+    return RTC_STEPS;
 }
 
-volatile uint32_t secondsRTC()
+volatile int64_t secondsRTC()
 {
     return _rtcSec;
 }
 
-uint32_t countRTC()
+void delayRTCSteps( int64_t steps )
 {
-    return RTC->MODE1.COUNT.reg;
+    int64_t start = RTC_STEPS;
+    while( ( RTC_STEPS - start ) < steps )
+        ;
 }
+
+/* When the RTC rolls over we need to ensure the COUNT register is reset to zero
+ * AND that it reads as such. The SAMD20 uses a bus synchronization scheme to
+ * allow continuous reading of the COUNT register. However, during tight loops
+ * such as a delay scheme or a while( millis() ) loop, the synchronization may
+ * not happen every RTC tick. This can cause some serious underflow, overflow
+ * problems during looping. In order to prevent this, on the overflow interrupt
+ * we force the COUNT register to 0, then we force the read setup to ensure that
+ * the bus has synchronized during the rollover */
+volatile uint32_t _forceRead = 0;
 
 void RTC_IRQHandler()
 {
+    // Force the COUNT register to 0
+    RTC_WAIT_SYNC;
+    RTC->MODE1.COUNT.reg = 0;
+
     // Due to millisRTC requiring this parameter to LSH 15 bits, the roll-over
     // must be handled before we LSH the MSB out of the _rtcSec value
-    if( ( ++_rtcSec ) & 0x20000 ) _rtcSec = 0;
+    if( ( ++_rtcSec ) & RTC_MAX_STEPS ) _rtcSec = 0;
     RTC->MODE1.INTFLAG.bit.OVF = 1;
-    syncMicrosToRTC( 1 );
+
+    // Force the bus to synchronize
+    RTC_SET_READS;
+    _forceRead = RTC->MODE1.COUNT.reg;
+	
+	// Synchronize micros
+	//syncMicrosToRTC( 1 );
 }
