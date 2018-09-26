@@ -69,7 +69,7 @@ void disableRTC()
     _rtcSec = 0;
 }
 
-volatile int64_t stepsRTC()
+int64_t stepsRTC()
 {
     uint16_t count;
     int ovf = 0;
