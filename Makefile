@@ -87,8 +87,8 @@ CCFLAGS += \
 	-DSAMD_SERIES \
 	-DSAMD20
 
-CFLAGS += -O1 -ffunction-sections -mlong-calls -g3 -Wall -std=gnu99
-CXXFLAGS += -O1 -ffunction-sections -fno-rtti -fno-exceptions -mlong-calls -g3 -Wall
+CFLAGS += -Og -ffunction-sections -mlong-calls -g3 -Wall -std=gnu99
+CXXFLAGS += -Og -ffunction-sections -fno-rtti -fno-exceptions -mlong-calls -g3 -Wall
 
 DEPENDS = -MD -MP -MF $(@:%.o=%.d) -MT$(@:%.o=%.d) -MT$(@:%.o=%.o)
 

@@ -163,4 +163,14 @@ extern SPIClass SPI5;
 #define SPI_CLOCK_DIV128 255
 #endif
 
+#if F_CPU == 8000000
+#define SPI_CLOCK_DIV2 1
+#define SPI_CLOCK_DIV4 2
+#define SPI_CLOCK_DIV8 4
+#define SPI_CLOCK_DIV16 8
+#define SPI_CLOCK_DIV32 16
+#define SPI_CLOCK_DIV64 32
+#define SPI_CLOCK_DIV128 64
+#endif
+
 #endif
