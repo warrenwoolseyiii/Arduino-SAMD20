@@ -156,7 +156,3 @@ $(OUTPUT_FILE_PATH): $(OBJS)
 # Other Targets
 clean:
 	rm -rf build
-<<<<<<< HEAD
-	
-=======
->>>>>>> develop
