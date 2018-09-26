@@ -38,8 +38,8 @@ extern "C" {
 
 void             initRTC();
 void             disableRTC();
-volatile int64_t stepsRTC();
-volatile int64_t secondsRTC();
+int64_t          stepsRTC();
+int64_t          secondsRTC();
 void             delayRTCSteps( int64_t steps );
 #ifdef __cplusplus
 }
