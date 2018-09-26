@@ -32,7 +32,6 @@
 
 volatile int64_t _rtcSec = 0;
 
-
 /* Initializes the RTC with a 32768 Hz input clock source. The resolution of the
  * RTC module is therefore 30.5 uS. The RTC interrupt is set to trigger an
  * overflow once a second which serves to wake the processor. */
@@ -72,22 +71,22 @@ void disableRTC()
 int64_t stepsRTC()
 {
     uint16_t count;
-    int ovf = 0;
-    count = RTC->MODE1.COUNT.reg; 
+    int      ovf = 0;
+    count = RTC->MODE1.COUNT.reg;
     // COUNT is a synchronized variable which may be stale. If it is
     // stale _rtcSec might already been incremented, but COUNT not yet
     // wrapped. We wait to the next increment of COUNT so we have a
     // current value.
-    if (count > RTC_STEPS_PER_SEC - 8) {
-        for (uint16_t ncount = count; ncount == count;) {
+    if( count > RTC_STEPS_PER_SEC - 8 ) {
+        for( uint16_t ncount = count; ncount == count; ) {
             int prim = __get_PRIMASK();
             __disable_irq();
             count = RTC->MODE1.COUNT.reg;
             ovf = RTC->MODE1.INTFLAG.bit.OVF != 0;
-            if (!prim) __enable_irq();
+            if( !prim ) __enable_irq();
         }
     }
-    return ((_rtcSec + ovf) << 15 ) | count;
+    return ( ( _rtcSec + ovf ) << 15 ) | count;
 }
 
 int64_t secondsRTC()

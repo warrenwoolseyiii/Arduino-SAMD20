@@ -28,19 +28,21 @@ class EEEPROM
     EEEPROM();
     void     begin();
     uint16_t getSize();
-    void     write( uint16_t addr, uint8_t value) {
-        write(addr, &value, 1);
+    void     write( uint16_t addr, uint8_t value )
+    {
+        write( addr, &value, 1 );
     }
-        
-    void     write( uint16_t addr, void *data, uint16_t size );
-    void     read( uint16_t addr, void *data, uint16_t size );
-    uint8_t  read( uint16_t addr ) {
+
+    void    write( uint16_t addr, void *data, uint16_t size );
+    void    read( uint16_t addr, void *data, uint16_t size );
+    uint8_t read( uint16_t addr )
+    {
         uint8_t byte;
         read( addr, &byte, 1 );
         return byte;
     }
-        
-    void     erase( uint16_t addr, uint16_t size );
+
+    void erase( uint16_t addr, uint16_t size );
 
   private:
     uint16_t _minFlashPageSize, _effectivePageSize;
