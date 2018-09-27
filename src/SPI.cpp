@@ -26,13 +26,11 @@
 #define SPI_IMODE_EXTINT 1
 #define SPI_IMODE_GLOBAL 2
 
-const SPISettings DEFAULT_SPI_SETTINGS = SPISettings();
-
 SPIClass::SPIClass( SERCOM *p_sercom, uint8_t uc_pinMISO, uint8_t uc_pinSCK,
                     uint8_t uc_pinMOSI, SercomSpiTXPad PadTx,
                     SercomRXPad PadRx )
 {
-    initialized = false;
+    _initialized = false;
     assert( p_sercom != NULL );
     _p_sercom = p_sercom;
 
@@ -44,21 +42,28 @@ SPIClass::SPIClass( SERCOM *p_sercom, uint8_t uc_pinMISO, uint8_t uc_pinSCK,
     // SERCOM pads
     _padTx = PadTx;
     _padRx = PadRx;
+
+    // Default setup
+    _clock = 4000000;
+    _bitOrder = MSBFIRST;
+    _dataMode = SPI_MODE0;
+    _settingsInternal = SPISettings( _clock, _bitOrder, _dataMode );
 }
 
 void SPIClass::begin()
 {
     init();
-    config( DEFAULT_SPI_SETTINGS );
+    _settingsInternal.init_AlwaysInline( _clock, _bitOrder, _dataMode );
+    config( _settingsInternal );
 }
 
 void SPIClass::init()
 {
-    if( initialized ) return;
-    interruptMode = SPI_IMODE_NONE;
-    interruptSave = 0;
-    interruptMask = 0;
-    initialized = true;
+    if( _initialized ) return;
+    _interruptMode = SPI_IMODE_NONE;
+    _interruptSave = 0;
+    _interruptMask = 0;
+    _initialized = true;
 }
 
 void SPIClass::config( SPISettings settings )
@@ -77,10 +82,10 @@ void SPIClass::config( SPISettings settings )
 
 void SPIClass::end()
 {
-    if( initialized ) {
+    if( _initialized ) {
         _p_sercom->resetSPI();
         _p_sercom->endSPI();
-        initialized = false;
+        _initialized = false;
     }
 
     pinMode( _uc_pinMiso, OUTPUT );
@@ -113,10 +118,10 @@ void SPIClass::usingInterrupt( int interruptNumber )
     noInterrupts();
 
     if( interruptNumber >= EXTERNAL_NUM_INTERRUPTS )
-        interruptMode = SPI_IMODE_GLOBAL;
+        _interruptMode = SPI_IMODE_GLOBAL;
     else {
-        interruptMode |= SPI_IMODE_EXTINT;
-        interruptMask |= ( 1 << interruptNumber );
+        _interruptMode |= SPI_IMODE_EXTINT;
+        _interruptMask |= ( 1 << interruptNumber );
     }
 
     if( irestore ) interrupts();
@@ -128,28 +133,28 @@ void SPIClass::notUsingInterrupt( int interruptNumber )
         ( interruptNumber == EXTERNAL_INT_NMI ) )
         return;
 
-    if( interruptMode & SPI_IMODE_GLOBAL )
+    if( _interruptMode & SPI_IMODE_GLOBAL )
         return; // can't go back, as there is no reference count
 
     uint8_t irestore = interruptsStatus();
     noInterrupts();
 
-    interruptMask &= ~( 1 << interruptNumber );
+    _interruptMask &= ~( 1 << interruptNumber );
 
-    if( interruptMask == 0 ) interruptMode = SPI_IMODE_NONE;
+    if( _interruptMask == 0 ) _interruptMode = SPI_IMODE_NONE;
 
     if( irestore ) interrupts();
 }
 
 void SPIClass::beginTransaction( SPISettings settings )
 {
-    if( interruptMode != SPI_IMODE_NONE ) {
-        if( interruptMode & SPI_IMODE_GLOBAL ) {
-            interruptSave = interruptsStatus();
+    if( _interruptMode != SPI_IMODE_NONE ) {
+        if( _interruptMode & SPI_IMODE_GLOBAL ) {
+            _interruptSave = interruptsStatus();
             noInterrupts();
         }
-        else if( interruptMode & SPI_IMODE_EXTINT )
-            EIC->INTENCLR.reg = EIC_INTENCLR_EXTINT( interruptMask );
+        else if( _interruptMode & SPI_IMODE_EXTINT )
+            EIC->INTENCLR.reg = EIC_INTENCLR_EXTINT( _interruptMask );
     }
 
     config( settings );
@@ -157,43 +162,28 @@ void SPIClass::beginTransaction( SPISettings settings )
 
 void SPIClass::endTransaction( void )
 {
-    if( interruptMode != SPI_IMODE_NONE ) {
-        if( interruptMode & SPI_IMODE_GLOBAL ) {
-            if( interruptSave ) interrupts();
+    if( _interruptMode != SPI_IMODE_NONE ) {
+        if( _interruptMode & SPI_IMODE_GLOBAL ) {
+            if( _interruptSave ) interrupts();
         }
-        else if( interruptMode & SPI_IMODE_EXTINT )
-            EIC->INTENSET.reg = EIC_INTENSET_EXTINT( interruptMask );
+        else if( _interruptMode & SPI_IMODE_EXTINT )
+            EIC->INTENSET.reg = EIC_INTENSET_EXTINT( _interruptMask );
     }
 }
 
 void SPIClass::setBitOrder( BitOrder order )
 {
-    if( order == LSBFIRST ) {
-        _p_sercom->setDataOrderSPI( LSB_FIRST );
-    }
-    else {
-        _p_sercom->setDataOrderSPI( MSB_FIRST );
-    }
+    _bitOrder = order;
 }
 
 void SPIClass::setDataMode( uint8_t mode )
 {
-    switch( mode ) {
-        case SPI_MODE0: _p_sercom->setClockModeSPI( SERCOM_SPI_MODE_0 ); break;
-
-        case SPI_MODE1: _p_sercom->setClockModeSPI( SERCOM_SPI_MODE_1 ); break;
-
-        case SPI_MODE2: _p_sercom->setClockModeSPI( SERCOM_SPI_MODE_2 ); break;
-
-        case SPI_MODE3: _p_sercom->setClockModeSPI( SERCOM_SPI_MODE_3 ); break;
-
-        default: break;
-    }
+    _dataMode = mode;
 }
 
 void SPIClass::setClockDivider( uint8_t div )
 {
-    _p_sercom->setBaudrateSPI( div );
+    _clock = SystemCoreClock / div;
 }
 
 byte SPIClass::transfer( uint8_t data )

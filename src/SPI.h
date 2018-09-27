@@ -126,10 +126,16 @@ class SPIClass
     SercomSpiTXPad _padTx;
     SercomRXPad    _padRx;
 
-    bool     initialized;
-    uint8_t  interruptMode;
-    char     interruptSave;
-    uint32_t interruptMask;
+    bool     _initialized;
+    uint8_t  _interruptMode;
+    char     _interruptSave;
+    uint32_t _interruptMask;
+
+    // Legacy setup support
+    SPISettings _settingsInternal;
+    uint32_t    _clock;
+    BitOrder    _bitOrder;
+    uint8_t     _dataMode;
 };
 
 #if SPI_INTERFACES_COUNT > 0
@@ -153,24 +159,12 @@ extern SPIClass SPI5;
 
 // For compatibility with sketches designed for AVR @ 16 MHz
 // New programs should use SPI.beginTransaction to set the SPI clock
-#if F_CPU == 48000000
-#define SPI_CLOCK_DIV2 6
-#define SPI_CLOCK_DIV4 12
-#define SPI_CLOCK_DIV8 24
-#define SPI_CLOCK_DIV16 48
-#define SPI_CLOCK_DIV32 96
-#define SPI_CLOCK_DIV64 192
-#define SPI_CLOCK_DIV128 255
-#endif
+#define SPI_CLOCK_DIV2 2
+#define SPI_CLOCK_DIV4 4
+#define SPI_CLOCK_DIV8 8
+#define SPI_CLOCK_DIV16 16
+#define SPI_CLOCK_DIV32 32
+#define SPI_CLOCK_DIV64 64
+#define SPI_CLOCK_DIV128 128
 
-#if F_CPU == 8000000
-#define SPI_CLOCK_DIV2 1
-#define SPI_CLOCK_DIV4 2
-#define SPI_CLOCK_DIV8 4
-#define SPI_CLOCK_DIV16 8
-#define SPI_CLOCK_DIV32 16
-#define SPI_CLOCK_DIV64 32
-#define SPI_CLOCK_DIV128 64
-#endif
-
-#endif
+#endif /* _SPI_H_INCLUDED */
