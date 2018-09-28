@@ -20,6 +20,7 @@
 #include "RTC.h"
 #include "clocks.h"
 #include "micros.h"
+#include "sleep.h"
 
 #define RTC_MAX_STEPS 0x40000000000
 #define RTC_WAIT_SYNC while( RTC->MODE1.STATUS.bit.SYNCBUSY )
@@ -94,11 +95,18 @@ int64_t secondsRTC()
     return _rtcSec;
 }
 
-void delayRTCSteps( int64_t steps )
+void delayRTCSteps( volatile int64_t steps )
 {
     int64_t start = stepsRTC();
-    while( ( stepsRTC() - start ) < steps )
-        ;
+	int64_t nSteps = steps;
+	int64_t remaining = ( RTC_STEPS_PER_SEC - ( stepsRTC() & 0x7FFF ) );
+	do {
+		if( remaining < nSteps ) {
+			nSteps -= remaining;
+			sleepCPU( PM_SLEEP_STANDBY_Val );
+			remaining = ( RTC_STEPS_PER_SEC - ( stepsRTC() & 0x7FFF ) );
+		}
+	} while( ( stepsRTC() - start ) < steps );
 }
 
 void RTC_IRQHandler()
