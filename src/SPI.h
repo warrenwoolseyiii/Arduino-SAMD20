@@ -57,7 +57,6 @@ class SPISettings
         init_AlwaysInline( 4000000, MSBFIRST, SPI_MODE0 );
     }
 
-  private:
     void init_MightInline( uint32_t clock, BitOrder bitOrder, uint8_t dataMode )
     {
         init_AlwaysInline( clock, bitOrder, dataMode );
@@ -80,6 +79,7 @@ class SPISettings
         }
     }
 
+  private:
     uint32_t           clockFreq;
     SercomSpiClockMode dataMode;
     SercomDataOrder    bitOrder;
