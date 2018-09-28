@@ -95,15 +95,23 @@ int64_t secondsRTC()
     return _rtcSec;
 }
 
-void delayRTCSteps( volatile int64_t steps )
+void delayRTCSteps( int64_t steps )
 {
     int64_t start = stepsRTC();
-	int64_t nSteps = steps;
+	int64_t rSteps = steps;
 	int64_t remaining = ( RTC_STEPS_PER_SEC - ( stepsRTC() & 0x7FFF ) );
 	do {
-		if( remaining < nSteps ) {
-			nSteps -= remaining;
-			sleepCPU( PM_SLEEP_STANDBY_Val );
+		// If we will be waiting long enough for an overflow interrupt to occur
+		// go to sleep.
+		if( remaining < rSteps ) {
+			rSteps -= remaining;
+			// If Serial is enabled sleep in Idle mode otherwise go into Standby.
+#if defined( __SAMD20E18__ )
+			if( SERCOM3->USART.CTRLA.bit.ENABLE )
+				sleepCPU( PM_SLEEP_IDLE_CPU_Val );
+			else
+				sleepCPU( PM_SLEEP_STANDBY_Val );
+#endif /* __SAMD20E18__ */
 			remaining = ( RTC_STEPS_PER_SEC - ( stepsRTC() & 0x7FFF ) );
 		}
 	} while( ( stepsRTC() - start ) < steps );
