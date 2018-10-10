@@ -43,11 +43,12 @@ uint64_t getCPUTicks()
 	// We cannot have the counter register underflow while reading the overflow value, 
 	// so if we are very close to an underflow, wait for the interrupt request to trigger
 	// then perform the calculation.
-	//if( SysTick->VAL < 32 ) {
-		//SysTick->CTRL &= ~SysTick_CTRL_TICKINT_Msk;
-		//while( !( SCB->ICSR & SCB_ICSR_PENDSTSET_Msk ) );
-		//SysTick->CTRL |= SysTick_CTRL_TICKINT_Msk;
-	//}
+	if( SysTick->VAL < 64 ) {
+		uint32_t prim = __get_PRIMASK();
+		__disable_irq();
+		while( !( SCB->ICSR & SCB_ICSR_PENDSTSET_Msk ) );
+		if( !prim ) __enable_irq();
+	}
 	return ( (uint64_t)( _sysTickUnderFlows << 24 ) | ( SYS_TICK_UNDERFLOW - SysTick->VAL ) );
 }
 
