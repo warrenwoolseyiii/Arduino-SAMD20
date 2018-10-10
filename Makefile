@@ -25,7 +25,7 @@ endif
 #################################### Paths #####################################
 CMSIS_DIR := $(SDK_ROOT)/devicePack/arm/cmsis/5.0.1/CMSIS/Include
 ATMEL_DFP := $(SDK_ROOT)/devicePack/atmel/SAMD20_DFP/1.2.91/samd20/include
-TOOLCHAIN_BINS := $(SDK_ROOT)/toolchain/bin
+TOOLCHAIN_BINS ?= $(SDK_ROOT)/toolchain/bin
 
 OUTPUT_FILE_PATH :=$(BUILD_DIR)/libArduinoCore.a
 OUTPUT_FILE_PATH_AS_ARGS :=$(BUILD_DIR)/libArduinoCore.a
@@ -45,9 +45,12 @@ PREPROCESSING_SRCS :=
 # Add inputs and outputs from these tool invocations to the build variables
 CSRCS = $(wildcard src/*.c)
 
+# Add inputs and outputs from these tool invocations to the build variables
+CPPSRCS = $(wildcard src/*.cpp)
+
 # PREPROCESSING_SRCS += $(PROJ_ROOT)/pulse_asm.S
 
-OBJS = $(CSRCS:src/%.c=$(BUILD_DIR)/%.o)
+OBJS = $(CSRCS:src/%.c=$(BUILD_DIR)/%.o) $(CPPSRCS:src/%.cpp=$(BUILD_DIR)/%.o)
 C_DEPS = $(CSRCS:src/%.c=$(BUILD_DIR)/%.d)
 
 OBJS_AS_ARGS := $(OBJS)
