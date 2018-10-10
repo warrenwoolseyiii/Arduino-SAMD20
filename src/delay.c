@@ -32,11 +32,11 @@ void delay( uint32_t ms )
 
 uint64_t micros()
 {
-	return ( getCPUTicks() / ( SystemCoreClock / 1000000 ) );
+    return ( getCPUTicks() / ( SystemCoreClock / 1000000 ) );
 }
 
 void delayMicroseconds( uint32_t us )
 {
-	uint64_t duration = us;
-	delayCPUTicks( ( duration * ( SystemCoreClock / 1000000 ) ) );
+    uint64_t duration = us;
+    delayCPUTicks( ( duration * ( SystemCoreClock / 1000000 ) ) );
 }

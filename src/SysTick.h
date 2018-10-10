@@ -25,9 +25,10 @@
 extern "C" {
 #endif
 
-void initSysTick();
+void     initSysTick();
+void     disableSysTick();
 uint64_t getCPUTicks();
-void delayCPUTicks( uint64_t tix );
+void     delayCPUTicks( uint64_t tix );
 
 #ifdef __cplusplus
 }

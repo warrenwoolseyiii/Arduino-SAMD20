@@ -209,13 +209,13 @@ void Reset_Handler( void )
 }
 
 extern void SysTick_IRQHandler();
-void SysTick_Handler( void )
+void        SysTick_Handler( void )
 {
-	SysTick_IRQHandler();
+    SysTick_IRQHandler();
 }
 
 extern void RTC_IRQHandler();
-void RTC_Handler( void )
+void        RTC_Handler( void )
 {
     RTC_IRQHandler();
 }

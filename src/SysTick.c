@@ -24,36 +24,47 @@ volatile uint32_t _sysTickUnderFlows = 0;
 
 void SysTick_IRQHandler()
 {
-	uint32_t cnt = SysTick->CTRL & SysTick_CTRL_COUNTFLAG_Msk;
-	_sysTickUnderFlows++;
+    uint32_t cnt = SysTick->CTRL & SysTick_CTRL_COUNTFLAG_Msk;
+    _sysTickUnderFlows++;
 }
 
 void initSysTick()
 {
-	SysTick->CTRL = 0;
-	NVIC_DisableIRQ( SysTick_IRQn );
-	NVIC_ClearPendingIRQ( SysTick_IRQn );
-	SysTick_Config( SYS_TICK_UNDERFLOW );	// Max value is 2^24 ticks
-	NVIC_EnableIRQ( SysTick_IRQn );
-	_sysTickUnderFlows = 0;
+    SysTick->CTRL = 0;
+    SCB->ICSR |= SCB_ICSR_PENDSTCLR_Msk;
+    SysTick_Config( SYS_TICK_UNDERFLOW ); // Max value is 2^24 ticks
+    _sysTickUnderFlows = 0;
 }
 
+void disableSysTick()
+{
+    SysTick->CTRL = 0;
+    SCB->ICSR |= SCB_ICSR_PENDSTCLR_Msk;
+}
+
+// WARNING: In the deepest sleep mode (STANDBY) the CPU is disabled and the
+// SysTick counter is disabled. Upon waking the CPU ticks counter will be
+// completely restarted. If you wish to use a timing mechanism that persists
+// through STANDBY sleep mode use the stepsRTC() functionality.
 uint64_t getCPUTicks()
-{	
-	// We cannot have the counter register underflow while reading the overflow value, 
-	// so if we are very close to an underflow, wait for the interrupt request to trigger
-	// then perform the calculation.
-	if( SysTick->VAL < 64 ) {
-		uint32_t prim = __get_PRIMASK();
-		__disable_irq();
-		while( !( SCB->ICSR & SCB_ICSR_PENDSTSET_Msk ) );
-		if( !prim ) __enable_irq();
-	}
-	return ( (uint64_t)( _sysTickUnderFlows << 24 ) | ( SYS_TICK_UNDERFLOW - SysTick->VAL ) );
+{
+    // We cannot have the counter register underflow while reading the overflow
+    // value, so if we are very close to an underflow, wait for the interrupt
+    // request to trigger then perform the calculation.
+    if( SysTick->VAL < 64 ) {
+        uint32_t prim = __get_PRIMASK();
+        __disable_irq();
+        while( !( SCB->ICSR & SCB_ICSR_PENDSTSET_Msk ) )
+            ;
+        if( !prim ) __enable_irq();
+    }
+    return ( ( uint64_t )( _sysTickUnderFlows << 24 ) |
+             ( SYS_TICK_UNDERFLOW - SysTick->VAL ) );
 }
 
 void delayCPUTicks( uint64_t tix )
 {
-	uint64_t start = getCPUTicks();
-	while( ( getCPUTicks() - start ) < tix );
+    uint64_t start = getCPUTicks();
+    while( ( getCPUTicks() - start ) < tix )
+        ;
 }
