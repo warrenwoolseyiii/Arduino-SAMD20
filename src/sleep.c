@@ -16,9 +16,11 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include "sam.h"
-#include <Arduino.h>
-#include <core_cm0plus.h>
+#include <sam.h>
+#include "sleep.h"
+#include "clocks.h"
+#include "variant.h"
+#include "SysTick.h"
 
 void sleepCPU( uint32_t level )
 {
@@ -53,7 +55,6 @@ void changeCPUClk( CPUClkSrc_t src )
         disableOSC8M();
     }
 
-    // If we change the clock frequency the micro timer will need to be adjusted
-    // initMicros();
-    // syncMicrosToRTC( 1 );
+    // If we change the clock frequency the SysTick timer will need to be restarted
+	initSysTick();
 }

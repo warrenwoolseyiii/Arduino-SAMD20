@@ -87,7 +87,7 @@ void loop( void ) ;
 #include "WDT.h"
 #include "NVM.h"
 #include "sleep.h"
-#include "micros.h"
+#include "SysTick.h"
 #ifdef __cplusplus
 #include "Uart.h"
 #endif

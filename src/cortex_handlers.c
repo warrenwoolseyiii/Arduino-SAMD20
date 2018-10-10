@@ -79,7 +79,7 @@ void TCC1_Handler( void ) __attribute__( ( weak, alias( "Dummy_Handler" ) ) );
 void TCC2_Handler( void ) __attribute__( ( weak, alias( "Dummy_Handler" ) ) );
 #else
 #if( defined( __SAMD20E18__ ) || defined( __SAMD20J18__ ) )
-void TC0_Handler( void );
+void TC0_Handler( void ) __attribute__( ( weak, alias( "Dummy_Handler" ) ) );
 void TC1_Handler( void ) __attribute__( ( weak, alias( "Dummy_Handler" ) ) );
 void TC2_Handler( void ) __attribute__( ( weak, alias( "Dummy_Handler" ) ) );
 #endif // __SAMD20E18__ || __SAMD20J18__
@@ -208,20 +208,14 @@ void Reset_Handler( void )
         ;
 }
 
+extern void SysTick_IRQHandler();
 void SysTick_Handler( void )
-{}
+{
+	SysTick_IRQHandler();
+}
 
-/* Default RTC handler */
-extern void RTC_IRQHandler( void );
-
+extern void RTC_IRQHandler();
 void RTC_Handler( void )
 {
     RTC_IRQHandler();
-}
-
-extern void micros_IRQHandler( void );
-
-void TC0_Handler( void )
-{
-    micros_IRQHandler();
 }

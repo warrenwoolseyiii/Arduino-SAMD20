@@ -16,23 +16,21 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef MICROS_H_
-#define MICROS_H_
+#ifndef SYSTICK_H_
+#define SYSTICK_H_
+
+#include <sam.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-int8_t  initMicros();
-void    endMicros();
-void    pauseMicrosForSleep();
-void    resumeMicrosFromSleep();
-void    syncMicrosToRTC( uint8_t overFlow );
-int64_t micros();
-void    delayMicroseconds( uint32_t us );
+void initSysTick();
+uint64_t getCPUTicks();
+void delayCPUTicks( uint64_t tix );
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* MICROS_H_ */
+#endif /* SYSTICK_H_ */
