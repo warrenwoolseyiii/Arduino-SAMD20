@@ -28,6 +28,7 @@ static uint32_t    ISRlist[EXTERNAL_NUM_INTERRUPTS];
 
 uint32_t _numRegisteredISRs;
 uint8_t  _enabled = 0;
+uint8_t  _lowPowerModeActive = 0;
 
 static void __initialize( uint8_t lowPower )
 {
@@ -58,6 +59,7 @@ static void __initialize( uint8_t lowPower )
     EIC_WAIT_SYNC;
 
     _enabled = 1;
+    _lowPowerModeActive = 0;
 }
 
 void disableExternalInterrupts()
@@ -81,29 +83,30 @@ void disableExternalInterrupts()
 void interruptlowPowerMode( uint8_t en )
 {
     if( _enabled ) {
-        // Disable and kill any pending IRQs
-        EIC->CTRL.bit.ENABLE = 0;
-        EIC_WAIT_SYNC;
-        NVIC_DisableIRQ( EIC_IRQn );
-        NVIC_ClearPendingIRQ( EIC_IRQn );
+        if( en != _lowPowerModeActive ) {
+            // Disable
+            EIC->CTRL.bit.ENABLE = 0;
+            EIC_WAIT_SYNC;
+            NVIC_DisableIRQ( EIC_IRQn );
 
-        // Switch clock sources
-        if( en ) {
-            enableAPBAClk( PM_APBAMASK_EIC, 1 );
-            initGenericClk( GCLK_CLKCTRL_GEN_GCLK1_Val,
-                            GCLK_CLKCTRL_ID_EIC_Val );
-        }
-        else {
-            enableAPBAClk( PM_APBAMASK_EIC, 1 );
-            initGenericClk( GCLK_CLKCTRL_GEN_GCLK0_Val,
-                            GCLK_CLKCTRL_ID_EIC_Val );
-        }
+            // Switch clock sources
+            if( en ) {
+                enableAPBAClk( PM_APBAMASK_EIC, 1 );
+                initGenericClk( GCLK_CLKCTRL_GEN_GCLK1_Val,
+                                GCLK_CLKCTRL_ID_EIC_Val );
+            }
+            else {
+                enableAPBAClk( PM_APBAMASK_EIC, 1 );
+                initGenericClk( GCLK_CLKCTRL_GEN_GCLK0_Val,
+                                GCLK_CLKCTRL_ID_EIC_Val );
+            }
 
-        // Enable and reset IRQs
-        NVIC_SetPriority( EIC_IRQn, 0 );
-        NVIC_EnableIRQ( EIC_IRQn );
-        EIC->CTRL.bit.ENABLE = 1;
-        EIC_WAIT_SYNC;
+            // Enable and reset IRQs
+            NVIC_SetPriority( EIC_IRQn, 0 );
+            NVIC_EnableIRQ( EIC_IRQn );
+            EIC->CTRL.bit.ENABLE = 1;
+            EIC_WAIT_SYNC;
+        }
     }
     else {
         if( en )
@@ -111,6 +114,8 @@ void interruptlowPowerMode( uint8_t en )
         else
             __initialize( 0 );
     }
+
+    _lowPowerModeActive = en;
 }
 
 // Sets the pin up for external interrupt mode, registers the callback function
