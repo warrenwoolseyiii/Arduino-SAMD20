@@ -24,10 +24,10 @@
 
 void sleepCPU( uint32_t level )
 {
-	uint8_t restartSysTick = 0;
+    uint8_t restartSysTick = 0;
     if( level > PM_SLEEP_IDLE_APB_Val ) {
-		restartSysTick = 1;
-		disableSysTick();
+        restartSysTick = 1;
+        disableSysTick();
         SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;
     }
     else {
@@ -36,13 +36,13 @@ void sleepCPU( uint32_t level )
     }
 
     __WFI();
-	if( restartSysTick ) initSysTick();
+    if( restartSysTick ) initSysTick();
 }
 
 void changeCPUClk( CPUClkSrc_t src )
 {
-	disableSysTick();
-	
+    disableSysTick();
+
     if( src < cpu_clk_dfll48 ) {
         initOSC8M( src );
         initClkGenerator( GCLK_GENCTRL_SRC_OSC8M_Val, GCLK_GENDIV_ID_GCLK0_Val,
@@ -61,6 +61,7 @@ void changeCPUClk( CPUClkSrc_t src )
         disableOSC8M();
     }
 
-    // If we change the clock frequency the SysTick timer will need to be restarted
-	initSysTick();
+    // If we change the clock frequency the SysTick timer will need to be
+    // restarted
+    initSysTick();
 }
