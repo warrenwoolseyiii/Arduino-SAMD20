@@ -19,7 +19,6 @@
 #include <sam.h>
 #include "RTC.h"
 #include "clocks.h"
-#include "micros.h"
 #include "sleep.h"
 
 #define RTC_MAX_STEPS 0x40000000000
