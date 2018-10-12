@@ -26,8 +26,8 @@
 #include <string.h>
 #include <math.h>
 
-typedef bool boolean;
-typedef uint8_t byte;
+typedef bool     boolean;
+typedef uint8_t  byte;
 typedef uint16_t word;
 
 // some libraries and sketches depend on this AVR stuff,
@@ -41,7 +41,7 @@ typedef uint16_t word;
 #include "itoa.h"
 
 #ifdef __cplusplus
-extern "C"{
+extern "C" {
 #endif // __cplusplus
 
 // Include Atmel headers
@@ -50,18 +50,20 @@ extern "C"{
 #include "wiring_constants.h"
 
 #define clockCyclesPerMicrosecond() ( SystemCoreClock / 1000000L )
-#define clockCyclesToMicroseconds(a) ( ((a) * 1000L) / (SystemCoreClock / 1000L) )
-#define microsecondsToClockCycles(a) ( (a) * (SystemCoreClock / 1000000L) )
+#define clockCyclesToMicroseconds( a ) \
+    ( ( (a)*1000L ) / ( SystemCoreClock / 1000L ) )
+#define microsecondsToClockCycles( a ) \
+    ( ( a ) * ( SystemCoreClock / 1000000L ) )
 
-void yield( void ) ;
+void yield( void );
 
 /* system functions */
-int main( void );
+int  main( void );
 void init( void );
 
 /* sketch */
-void setup( void ) ;
-void loop( void ) ;
+void setup( void );
+void loop( void );
 
 #include "WVariant.h"
 
@@ -87,7 +89,7 @@ void loop( void ) ;
 #include "WDT.h"
 #include "NVM.h"
 #include "sleep.h"
-#include "micros.h"
+#include "SysTick.h"
 #ifdef __cplusplus
 #include "Uart.h"
 #endif
@@ -105,31 +107,34 @@ void loop( void ) ;
 #undef abs
 #endif // abs
 
-#define min(a,b) ((a)<(b)?(a):(b))
-#define max(a,b) ((a)>(b)?(a):(b))
-#define abs(x) ((x)>0?(x):-(x))
-#define constrain(amt,low,high) ((amt)<(low)?(low):((amt)>(high)?(high):(amt)))
-#define round(x)     ((x)>=0?(long)((x)+0.5):(long)((x)-0.5))
-#define radians(deg) ((deg)*DEG_TO_RAD)
-#define degrees(rad) ((rad)*RAD_TO_DEG)
-#define sq(x) ((x)*(x))
+#define min( a, b ) ( ( a ) < ( b ) ? ( a ) : ( b ) )
+#define max( a, b ) ( ( a ) > ( b ) ? ( a ) : ( b ) )
+#define abs( x ) ( ( x ) > 0 ? ( x ) : -( x ) )
+#define constrain( amt, low, high ) \
+    ( ( amt ) < ( low ) ? ( low )   \
+                        : ( ( amt ) > ( high ) ? ( high ) : ( amt ) ) )
+#define round( x ) ( ( x ) >= 0 ? (long)( ( x ) + 0.5 ) : (long)( (x)-0.5 ) )
+#define radians( deg ) ( (deg)*DEG_TO_RAD )
+#define degrees( rad ) ( (rad)*RAD_TO_DEG )
+#define sq( x ) ( ( x ) * ( x ) )
 
 #define interrupts() __enable_irq()
 #define noInterrupts() __disable_irq()
 
-#define lowByte(w) ((uint8_t) ((w) & 0xff))
-#define highByte(w) ((uint8_t) ((w) >> 8))
+#define lowByte( w ) ( ( uint8_t )( (w)&0xff ) )
+#define highByte( w ) ( ( uint8_t )( ( w ) >> 8 ) )
 
-#define bitRead(value, bit) (((value) >> (bit)) & 0x01)
-#define bitSet(value, bit) ((value) |= (1UL << (bit)))
-#define bitClear(value, bit) ((value) &= ~(1UL << (bit)))
-#define bitWrite(value, bit, bitvalue) (bitvalue ? bitSet(value, bit) : bitClear(value, bit))
+#define bitRead( value, bit ) ( ( ( value ) >> ( bit ) ) & 0x01 )
+#define bitSet( value, bit ) ( ( value ) |= ( 1UL << ( bit ) ) )
+#define bitClear( value, bit ) ( ( value ) &= ~( 1UL << ( bit ) ) )
+#define bitWrite( value, bit, bitvalue ) \
+    ( bitvalue ? bitSet( value, bit ) : bitClear( value, bit ) )
 
-#define bit(b) (1UL << (b))
+#define bit( b ) ( 1UL << ( b ) )
 
-#if (ARDUINO_SAMD_VARIANT_COMPLIANCE >= 10606)
+#if( ARDUINO_SAMD_VARIANT_COMPLIANCE >= 10606 )
 // Interrupts
-#define digitalPinToInterrupt(P)   ( P )
+#define digitalPinToInterrupt( P ) ( P )
 #endif
 
 #endif // Arduino_h

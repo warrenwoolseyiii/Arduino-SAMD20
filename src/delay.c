@@ -18,6 +18,7 @@
 
 #include "delay.h"
 #include "RTC.h"
+#include "SysTick.h"
 
 uint64_t millis()
 {
@@ -27,4 +28,15 @@ uint64_t millis()
 void delay( uint32_t ms )
 {
     delayRTCSteps( RTC_EXACT_MILLIS_TO_STEPS( ms ) );
+}
+
+uint64_t micros()
+{
+    return ( getCPUTicks() / ( SystemCoreClock / 1000000 ) );
+}
+
+void delayMicroseconds( uint32_t us )
+{
+    uint64_t duration = us;
+    delayCPUTicks( ( duration * ( SystemCoreClock / 1000000 ) ) );
 }
