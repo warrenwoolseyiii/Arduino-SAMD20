@@ -88,19 +88,12 @@ void enableADC()
     ADC->AVGCTRL.reg = ADC_AVGCTRL_SAMPLENUM_1 | ADC_AVGCTRL_ADJRES( 0 );
 }
 
-uint32_t performConversion()
+uint32_t performConversion( uint32_t numSamples )
 {
-    uint32_t val = 0;
+    uint32_t val;
+    uint32_t accum;
 
-    // Start conversion
-    ADC->SWTRIG.bit.START = 1;
-    ADC_WAIT_SYNC;
-
-    // Clear the Data Ready flag
-    ADC->INTFLAG.reg = ADC_INTFLAG_RESRDY;
-
-    // Start conversion again, since The first conversion after the reference is
-    // changed must not be used.
+    // The first conversion after the reference is changed must not be used.
     ADC->SWTRIG.bit.START = 1;
     ADC_WAIT_SYNC;
 
@@ -112,11 +105,21 @@ uint32_t performConversion()
     ADC_WAIT_SYNC;
     val = ADC->RESULT.reg;
 
-    // Disable ADC
-    ADC->CTRLA.bit.ENABLE = 0;
-    ADC_WAIT_SYNC;
+    val = 0;
+    for( accum = 0; accum < numSamples; accum++ ) {
+        ADC->SWTRIG.bit.START = 1;
+        ADC_WAIT_SYNC;
 
-    return val;
+        // Waiting for conversion to complete
+        while( !ADC->INTFLAG.bit.RESRDY )
+            ;
+
+        // Grab the value
+        ADC_WAIT_SYNC;
+        val += ADC->RESULT.reg;
+    }
+
+    return ( val / accum );
 }
 
 void analogReadResolution( int res )
@@ -154,13 +157,6 @@ static inline uint32_t mapResolution( uint32_t value, uint32_t from,
     return value << ( to - from );
 }
 
-/*
- * Internal Reference is at 1.0v
- * External Reference should be between 1v and VDDANA-0.6v=2.7v
- *
- * Warning : On Arduino Zero board the input/output voltage for SAMD21G18 is 3.3
- * volts maximum
- */
 void analogReference( eAnalogReference mode )
 {
     _inputCtrl &= ~ADC_INPUTCTRL_GAIN_Msk;
@@ -168,8 +164,7 @@ void analogReference( eAnalogReference mode )
         case AR_INTERNAL:
         case AR_INTERNAL2V23:
             _inputCtrl |= ADC_INPUTCTRL_GAIN_1X;
-            _ref = ADC_REFCTRL_REFSEL_INTVCC0_Val; // 1/1.48 VDDANA = 1/1.48*
-                                                   // 3V3 = 2.2297
+            _ref = ADC_REFCTRL_REFSEL_INTVCC0_Val; // 1/1.48 VDDANA
             break;
 
         case AR_EXTERNAL:
@@ -185,37 +180,36 @@ void analogReference( eAnalogReference mode )
         case AR_INTERNAL1V65:
             _inputCtrl |= ADC_INPUTCTRL_GAIN_1X;
             _ref =
-                ADC_REFCTRL_REFSEL_INTVCC1_Val; // 1/2 VDDANA = 0.5* 3V3 = 1.65V
+                ADC_REFCTRL_REFSEL_INTVCC1_Val; // 1/2 VDDANA
             break;
 
         case AR_DEFAULT:
         default:
             _inputCtrl |= ADC_INPUTCTRL_GAIN_DIV2;
             _ref =
-                ADC_REFCTRL_REFSEL_INTVCC1_Val; // 1/2 VDDANA = 0.5* 3V3 = 1.65V
+                ADC_REFCTRL_REFSEL_INTVCC1_Val; // 1/2 VDDANA
             break;
     }
 }
 
-/* Reads the band gap voltage from the internal VREF component. The band gap
- * voltage can be re-directed to an ADC input, see Data Sheet section 16.6.9.1.
- * For more information on band gap voltage and reverse calculating to VCC see
- * https://en.wikipedia.org/wiki/Bandgap_voltage_reference.
- * Returns extrapolated measurement of VCC in mV.
- */
+// Reads the band gap voltage from the internal VREF component. The band gap
+// voltage can be re-directed to an ADC input, see Data Sheet section 16.6.9.1.
+// For more information on band gap voltage and reverse calculating to VCC see
+// https://en.wikipedia.org/wiki/Bandgap_voltage_reference. Returns extrapolated
+// measurement of VCC in mV.
 uint32_t analogReadVcc()
 {
-    uint32_t read = 0;
+    uint32_t read;
     uint32_t vccMv = 0;
 
-    analogReference( AR_EXTERNAL );
+    analogReference( AR_INTERNAL1V65 );
     analogReadResolution( 12 );
 
     SYSCTRL->VREF.bit.BGOUTEN = 1;
 
     enableADC();
 
-    // Selection for the positive ADC input is bandgap
+    // Selection for the positive ADC input is band gap
     _inputCtrl &= ~( ADC_INPUTCTRL_MUXNEG_Msk | ADC_INPUTCTRL_MUXPOS_Msk );
     _inputCtrl |= ADC_INPUTCTRL_MUXPOS( ADC_INPUTCTRL_MUXPOS_BANDGAP_Val );
     _inputCtrl |= ADC_INPUTCTRL_MUXNEG_GND;
@@ -226,14 +220,18 @@ uint32_t analogReadVcc()
     ADC->CTRLA.bit.ENABLE = 1;
     ADC_WAIT_SYNC;
 
-    read = performConversion();
+    read = performConversion( 10 );
+
+    // Disable ADC
+    ADC->CTRLA.bit.ENABLE = 0;
+    ADC_WAIT_SYNC;
 
     disableGenericClk( GCLK_CLKCTRL_ID_ADC_Val );
     enableAPBCClk( PM_APBCMASK_ADC, 0 );
 
     SYSCTRL->VREF.bit.BGOUTEN = 0;
 
-    vccMv = ( BAND_GAP_MV * 4095 ) / read;
+    vccMv = ( ( BAND_GAP_MV * 4095 ) / read ) * 2;
     return vccMv;
 }
 
@@ -267,7 +265,11 @@ uint32_t analogRead( uint32_t pin )
     ADC->CTRLA.bit.ENABLE = 1;
     ADC_WAIT_SYNC;
 
-    read = performConversion();
+    read = performConversion( 1 );
+
+    // Disable ADC
+    ADC->CTRLA.bit.ENABLE = 0;
+    ADC_WAIT_SYNC;
 
     disableGenericClk( GCLK_CLKCTRL_ID_ADC_Val );
     enableAPBCClk( PM_APBCMASK_ADC, 0 );
