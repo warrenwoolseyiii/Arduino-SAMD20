@@ -20,19 +20,20 @@
 #include "RTC.h"
 #include "SysTick.h"
 
-uint64_t millis()
+uint32_t millis()
 {
-    return RTC_EXACT_STEPS_TO_MILLIS( stepsRTC() );
+    return ( uint32_t )( RTC_EXACT_STEPS_TO_MILLIS( stepsRTC() ) & 0xFFFFFFFF );
 }
 
 void delay( uint32_t ms )
 {
-    delayRTCSteps( RTC_EXACT_MILLIS_TO_STEPS( ms ) );
+    delayRTCSteps( RTC_EXACT_MILLIS_TO_STEPS( (int64_t)ms ) );
 }
 
-uint64_t micros()
+uint32_t micros()
 {
-    return ( getCPUTicks() / ( SystemCoreClock / 1000000 ) );
+    return ( uint32_t )( ( getCPUTicks() / ( SystemCoreClock / 1000000 ) ) &
+                         0xFFFFFFFF );
 }
 
 void delayMicroseconds( uint32_t us )

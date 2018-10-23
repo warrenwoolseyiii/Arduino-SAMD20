@@ -19,13 +19,14 @@
 #include "SysTick.h"
 
 #define SYS_TICK_UNDERFLOW 0xFFFFFF
+#define SYS_TICK_MAXUNDERFLOWS 0xFFFFFFFFFF
 
-volatile uint32_t _sysTickUnderFlows = 0;
+volatile uint64_t _sysTickUnderFlows = 0;
 
 void SysTick_IRQHandler()
 {
     uint32_t cnt = SysTick->CTRL & SysTick_CTRL_COUNTFLAG_Msk;
-    _sysTickUnderFlows++;
+    if( ( _sysTickUnderFlows++ ) > 0xFFFFFFFFFF ) _sysTickUnderFlows = 0;
 }
 
 void initSysTick()
@@ -58,7 +59,7 @@ uint64_t getCPUTicks()
             ;
         if( !prim ) __enable_irq();
     }
-    return ( ( uint64_t )( _sysTickUnderFlows << 24 ) |
+    return ( ( _sysTickUnderFlows << 24 ) |
              ( SYS_TICK_UNDERFLOW - SysTick->VAL ) );
 }
 
