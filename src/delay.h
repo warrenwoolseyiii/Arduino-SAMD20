@@ -16,8 +16,8 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef _DELAY_
-#define _DELAY_
+#ifndef DELAY_H_
+#define DELAY_H_
 
 #include <stdint.h>
 #include "variant.h"
@@ -26,11 +26,13 @@
 extern "C" {
 #endif
 
-uint64_t millis();
+uint32_t millis();
 void     delay( uint32_t ms );
+uint32_t micros();
+void     delayMicroseconds( uint32_t us );
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* _DELAY_ */
+#endif /* DELAY_H_ */

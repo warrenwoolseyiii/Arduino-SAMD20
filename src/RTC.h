@@ -20,13 +20,12 @@
 
 #include <stdint.h>
 
-#define RTC_STEPS_PER_SEC 32768ul
+#define RTC_STEPS_PER_SEC 0x8000
+#define RTC_STEPS_OVERFLOW ( RTC_STEPS_PER_SEC - 0x1 )
 
 // Rough operations a faster but less accurate
 #define RTC_ROUGH_STEPS_TO_MILLIS( x ) ( x >> 5 )
 #define RTC_ROUGH_MILLIS_TO_STEPS( x ) ( x << 5 )
-#define RTC_ROUGH_STEPS_TO_MICROS( x ) ( x << 5 )
-#define RTC_ROUGH_MICROS_TO_STEPS( x ) ( x >> 5 )
 
 // Exact operations are slower but more accurate
 #define RTC_EXACT_STEPS_TO_MILLIS( x ) ( ( x * 1000 ) >> 15 )
@@ -36,11 +35,12 @@
 extern "C" {
 #endif
 
-void    initRTC();
-void    disableRTC();
-int64_t stepsRTC();
-int64_t secondsRTC();
-void    delayRTCSteps( int64_t steps );
+void     initRTC();
+void     disableRTC();
+uint64_t stepsRTC();
+uint64_t secondsRTC();
+void     delayRTCSteps( uint64_t steps );
+
 #ifdef __cplusplus
 }
 #endif

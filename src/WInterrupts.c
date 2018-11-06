@@ -25,17 +25,18 @@
 
 static voidFuncPtr ISRcallback[EXTERNAL_NUM_INTERRUPTS];
 static uint32_t    ISRlist[EXTERNAL_NUM_INTERRUPTS];
-static uint32_t    nints; // Stores total number of attached interrupts
-static int         enabled = 0;
 
-/* Configure I/O interrupt sources */
+uint32_t _numRegisteredISRs;
+uint8_t  _enabled = 0;
+uint8_t  _lowPowerModeActive = 0;
+
 static void __initialize( uint8_t lowPower )
 {
     uint32_t clkSrc = GCLK_CLKCTRL_GEN_GCLK0_Val;
 
     memset( ISRlist, 0, sizeof( ISRlist ) );
     memset( ISRcallback, 0, sizeof( ISRcallback ) );
-    nints = 0;
+    _numRegisteredISRs = 0;
 
     NVIC_DisableIRQ( EIC_IRQn );
     NVIC_ClearPendingIRQ( EIC_IRQn );
@@ -57,17 +58,18 @@ static void __initialize( uint8_t lowPower )
     EIC->CTRL.bit.ENABLE = 1;
     EIC_WAIT_SYNC;
 
-    enabled = 1;
+    _enabled = 1;
+    _lowPowerModeActive = 0;
 }
 
 void disableExternalInterrupts()
 {
-    if( enabled ) {
+    if( _enabled ) {
         // Do a software reset on EIC
         EIC->CTRL.bit.SWRST = 1;
         while( ( EIC->CTRL.bit.SWRST ) && ( EIC->STATUS.bit.SYNCBUSY ) )
             ;
-        enabled = 0;
+        _enabled = 0;
     }
 
     NVIC_DisableIRQ( EIC_IRQn );
@@ -76,23 +78,49 @@ void disableExternalInterrupts()
     enableAPBAClk( PM_APBAMASK_EIC, 0 );
 }
 
-/* Changes the clock source of the EIC from the main CPU clock to the
- * External 32 kHz clock
- */
-void interruptlowPowerMode( bool en )
+// Selects the clock source for the EIC, low power mode enabled == 32kHz clock
+// low power mode disabled == SystemCoreClock
+void interruptlowPowerMode( uint8_t en )
 {
-    disableExternalInterrupts();
-    if( en )
-        __initialize( 1 );
-    else
-        __initialize( 0 );
+    if( _enabled ) {
+        if( en != _lowPowerModeActive ) {
+            // Disable
+            EIC->CTRL.bit.ENABLE = 0;
+            EIC_WAIT_SYNC;
+            NVIC_DisableIRQ( EIC_IRQn );
+
+            // Switch clock sources
+            if( en ) {
+                enableAPBAClk( PM_APBAMASK_EIC, 1 );
+                initGenericClk( GCLK_CLKCTRL_GEN_GCLK1_Val,
+                                GCLK_CLKCTRL_ID_EIC_Val );
+            }
+            else {
+                enableAPBAClk( PM_APBAMASK_EIC, 1 );
+                initGenericClk( GCLK_CLKCTRL_GEN_GCLK0_Val,
+                                GCLK_CLKCTRL_ID_EIC_Val );
+            }
+
+            // Enable and reset IRQs
+            NVIC_SetPriority( EIC_IRQn, 0 );
+            NVIC_EnableIRQ( EIC_IRQn );
+            EIC->CTRL.bit.ENABLE = 1;
+            EIC_WAIT_SYNC;
+        }
+    }
+    else {
+        if( en )
+            __initialize( 1 );
+        else
+            __initialize( 0 );
+    }
+
+    _lowPowerModeActive = en;
 }
 
-/*
- * \brief Specifies a named Interrupt Service Routine (ISR) to call when an
- * interrupt occurs. Replaces any previous function that was attached to the
- * interrupt.
- */
+// Sets the pin up for external interrupt mode, registers the callback function
+// with that interrupt vector if the callback is not null. Will overwrite
+// previous callback function if there was one.
 void attachInterrupt( uint32_t pin, voidFuncPtr callback, uint32_t mode )
 {
     uint32_t config;
@@ -105,7 +133,7 @@ void attachInterrupt( uint32_t pin, voidFuncPtr callback, uint32_t mode )
 #endif
     if( in == NOT_AN_INTERRUPT || in == EXTERNAL_INT_NMI ) return;
 
-    if( !enabled ) __initialize( 0 );
+    if( !_enabled ) __initialize( 0 );
 
     // Enable wakeup capability on pin in case being used during sleep
     uint32_t inMask = 1 << in;
@@ -124,14 +152,14 @@ void attachInterrupt( uint32_t pin, voidFuncPtr callback, uint32_t mode )
         uint32_t current = 0;
 
         // Check if we already have this interrupt
-        for( current = 0; current < nints; current++ ) {
+        for( current = 0; current < _numRegisteredISRs; current++ ) {
             if( ISRlist[current] == inMask ) {
                 break;
             }
         }
-        if( current == nints ) {
+        if( current == _numRegisteredISRs ) {
             // Need to make a new entry
-            nints++;
+            _numRegisteredISRs++;
         }
         ISRlist[current] =
             inMask; // List of interrupt in order of when they were attached
@@ -156,19 +184,15 @@ void attachInterrupt( uint32_t pin, voidFuncPtr callback, uint32_t mode )
             case LOW:
                 EIC->CONFIG[config].reg |= EIC_CONFIG_SENSE0_LOW_Val << pos;
                 break;
-
             case HIGH:
                 EIC->CONFIG[config].reg |= EIC_CONFIG_SENSE0_HIGH_Val << pos;
                 break;
-
             case CHANGE:
                 EIC->CONFIG[config].reg |= EIC_CONFIG_SENSE0_BOTH_Val << pos;
                 break;
-
             case FALLING:
                 EIC->CONFIG[config].reg |= EIC_CONFIG_SENSE0_FALL_Val << pos;
                 break;
-
             case RISING:
                 EIC->CONFIG[config].reg |= EIC_CONFIG_SENSE0_RISE_Val << pos;
                 break;
@@ -178,9 +202,8 @@ void attachInterrupt( uint32_t pin, voidFuncPtr callback, uint32_t mode )
     EIC->INTENSET.reg = EIC_INTENSET_EXTINT( inMask );
 }
 
-/*
- * \brief Turns off the given interrupt.
- */
+// Disables the selected pin from external interrupt control and removes
+// the callback associated with that pin.
 void detachInterrupt( uint32_t pin )
 {
 #if( ARDUINO_SAMD_VARIANT_COMPLIANCE >= 10606 )
@@ -198,34 +221,28 @@ void detachInterrupt( uint32_t pin )
 
     // Remove callback from the ISR list
     uint32_t current;
-    for( current = 0; current < nints; current++ ) {
+    for( current = 0; current < _numRegisteredISRs; current++ ) {
         if( ISRlist[current] == inMask ) {
             break;
         }
     }
-    if( current == nints ) return; // We didn't have it
+    if( current == _numRegisteredISRs ) return; // We didn't have it
 
     // Shift the reminder down
-    for( ; current < nints - 1; current++ ) {
+    for( ; current < _numRegisteredISRs - 1; current++ ) {
         ISRlist[current] = ISRlist[current + 1];
         ISRcallback[current] = ISRcallback[current + 1];
     }
-    nints--;
+    _numRegisteredISRs--;
 }
 
-/*
- * External Interrupt Controller NVIC Interrupt Handler
- */
-void EIC_Handler( void )
+void EIC_Handler()
 {
-    // Re-synchronize micros
-    // syncMicrosToRTC( 0 );
-
     // Calling the routine directly from -here- takes about 1us
     // Depending on where you are in the list it will take longer
 
     // Loop over all enabled interrupts in the list
-    for( uint32_t i = 0; i < nints; i++ ) {
+    for( uint32_t i = 0; i < _numRegisteredISRs; i++ ) {
         if( ( EIC->INTFLAG.reg & ISRlist[i] ) != 0 ) {
             // Call the callback function
             ISRcallback[i]();

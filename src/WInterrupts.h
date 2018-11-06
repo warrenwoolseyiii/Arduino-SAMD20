@@ -25,8 +25,6 @@
 extern "C" {
 #endif
 
-//      LOW 0
-//      HIGH 1
 #define CHANGE 2
 #define FALLING 3
 #define RISING 4
@@ -37,7 +35,7 @@ extern "C" {
 typedef void ( *voidFuncPtr )( void );
 
 void disableExternalInterrupts();
-void interruptlowPowerMode( bool enable );
+void interruptlowPowerMode( uint8_t enable );
 void attachInterrupt( uint32_t pin, voidFuncPtr callback, uint32_t mode );
 void detachInterrupt( uint32_t pin );
 

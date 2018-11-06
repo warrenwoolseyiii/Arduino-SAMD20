@@ -16,13 +16,18 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include "sam.h"
-#include <Arduino.h>
-#include <core_cm0plus.h>
+#include <sam.h>
+#include "sleep.h"
+#include "clocks.h"
+#include "variant.h"
+#include "SysTick.h"
 
 void sleepCPU( uint32_t level )
 {
+    uint8_t restartSysTick = 0;
     if( level > PM_SLEEP_IDLE_APB_Val ) {
+        restartSysTick = 1;
+        disableSysTick();
         SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;
     }
     else {
@@ -31,10 +36,13 @@ void sleepCPU( uint32_t level )
     }
 
     __WFI();
+    if( restartSysTick ) initSysTick();
 }
 
 void changeCPUClk( CPUClkSrc_t src )
 {
+    disableSysTick();
+
     if( src < cpu_clk_dfll48 ) {
         initOSC8M( src );
         initClkGenerator( GCLK_GENCTRL_SRC_OSC8M_Val, GCLK_GENDIV_ID_GCLK0_Val,
@@ -53,7 +61,7 @@ void changeCPUClk( CPUClkSrc_t src )
         disableOSC8M();
     }
 
-    // If we change the clock frequency the micro timer will need to be adjusted
-    // initMicros();
-    // syncMicrosToRTC( 1 );
+    // If we change the clock frequency the SysTick timer will need to be
+    // restarted
+    initSysTick();
 }

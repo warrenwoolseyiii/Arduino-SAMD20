@@ -19,10 +19,9 @@
 #include <sam.h>
 #include "RTC.h"
 #include "clocks.h"
-#include "micros.h"
 #include "sleep.h"
 
-#define RTC_MAX_STEPS 0x40000000000
+#define RTC_MAX_STEPS 0x1FFFFFFFFFFFF
 #define RTC_WAIT_SYNC while( RTC->MODE1.STATUS.bit.SYNCBUSY )
 #define RTC_SET_READS                     \
     {                                     \
@@ -31,7 +30,7 @@
         RTC_WAIT_SYNC;                    \
     }
 
-volatile int64_t _rtcSec = 0;
+volatile uint64_t _rtcSec = 0;
 
 /* Initializes the RTC with a 32768 Hz input clock source. The resolution of the
  * RTC module is therefore 30.5 uS. The RTC interrupt is set to trigger an
@@ -69,10 +68,10 @@ void disableRTC()
     _rtcSec = 0;
 }
 
-int64_t stepsRTC()
+uint64_t stepsRTC()
 {
     uint16_t count;
-    int      ovf = 0;
+    uint32_t ovf = 0;
     count = RTC->MODE1.COUNT.reg;
     // COUNT is a synchronized variable which may be stale. If it is
     // stale _rtcSec might already been incremented, but COUNT not yet
@@ -90,16 +89,17 @@ int64_t stepsRTC()
     return ( ( _rtcSec + ovf ) << 15 ) | count;
 }
 
-int64_t secondsRTC()
+uint64_t secondsRTC()
 {
     return _rtcSec;
 }
 
-void delayRTCSteps( int64_t steps )
+void delayRTCSteps( uint64_t steps )
 {
-    int64_t start = stepsRTC();
-    int64_t rSteps = steps;
-    int64_t remaining = ( RTC_STEPS_PER_SEC - ( stepsRTC() & 0x7FFF ) );
+    uint64_t start = stepsRTC();
+    uint64_t rSteps = steps;
+    uint64_t remaining =
+        ( RTC_STEPS_PER_SEC - ( stepsRTC() & RTC_STEPS_OVERFLOW ) );
     do {
         // If we will be waiting long enough for an overflow interrupt to occur
         // go to sleep.
@@ -120,6 +120,6 @@ void delayRTCSteps( int64_t steps )
 
 void RTC_IRQHandler()
 {
-    if( ( ++_rtcSec ) & RTC_MAX_STEPS ) _rtcSec = 0;
+    if( ( ++_rtcSec ) > RTC_MAX_STEPS ) _rtcSec = 0;
     RTC->MODE1.INTFLAG.bit.OVF = 1;
 }
