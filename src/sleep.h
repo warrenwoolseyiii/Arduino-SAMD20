@@ -36,6 +36,8 @@ extern "C" {
 
 void sleepCPU( uint32_t level );
 void changeCPUClk( CPUClkSrc_t src );
+void disableSleep();
+void enableSleep();
 
 #ifdef __cplusplus
 }

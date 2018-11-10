@@ -22,21 +22,35 @@
 #include "variant.h"
 #include "SysTick.h"
 
+uint8_t _sleepEn = 1;
+
+void disableSleep()
+{
+    _sleepEn = 0;
+}
+
+void enableSleep()
+{
+    _sleepEn = 1;
+}
+
 void sleepCPU( uint32_t level )
 {
     uint8_t restartSysTick = 0;
-    if( level > PM_SLEEP_IDLE_APB_Val ) {
-        restartSysTick = 1;
-        disableSysTick();
-        SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;
-    }
-    else {
-        SCB->SCR &= ~( SCB_SCR_SLEEPDEEP_Msk );
-        PM->SLEEP.reg = PM_SLEEP_IDLE( level );
-    }
+    if( _sleepEn ) {
+        if( level > PM_SLEEP_IDLE_APB_Val ) {
+            restartSysTick = 1;
+            disableSysTick();
+            SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;
+        }
+        else {
+            SCB->SCR &= ~( SCB_SCR_SLEEPDEEP_Msk );
+            PM->SLEEP.reg = PM_SLEEP_IDLE( level );
+        }
 
-    __WFI();
-    if( restartSysTick ) initSysTick();
+        __WFI();
+        if( restartSysTick ) initSysTick();
+    }
 }
 
 void changeCPUClk( CPUClkSrc_t src )
