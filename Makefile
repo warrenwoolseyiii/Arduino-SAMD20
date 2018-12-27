@@ -83,11 +83,6 @@ CCFLAGS += \
 	-DDEBUG \
 	-DARDUINO_SAMD_E \
 	-DARDUINO_ARCH_SAMD \
-	-DUSB_VID=0x2341 \
-	-DUSB_PID=0x804f \
-	-DUSB_PRODUCT="Arduino MKRZero" \
-	-DUSB_MANUFACTURER="Arduino LLC" \
-	-DSAMD_SERIES \
 	-DSAMD20
 
 CFLAGS += -Og -ffunction-sections -mlong-calls -g3 -Wall -std=gnu99
