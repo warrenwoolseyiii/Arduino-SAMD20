@@ -1,0 +1,13 @@
+*.*~
+.local/
+build/*.o
+build/*.a
+build/*.d
+
+# Atmel Studio Files
+.vs/
+Debug/
+Release/
+*.atsln
+*.xml
+*.cppproj
