@@ -148,8 +148,6 @@ class SPIClass
 
     bool               _busConfigured;
     SPIInterruptMode_t _interruptMode;
-    uint32_t           _interruptSave;
-    uint32_t           _interruptMask;
 
     // Legacy setup support
     SPISettings _settingsInternal;

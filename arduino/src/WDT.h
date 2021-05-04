@@ -25,6 +25,12 @@
 extern "C" {
 #endif
 
+typedef struct
+{
+    uint8_t  ok;
+    uint32_t caller, sysTime;
+} WDT_Debug_t;
+
 typedef enum
 {
     wdt_8_ms = WDT_CONFIG_PER_8_Val,
@@ -41,12 +47,15 @@ typedef enum
     wdt_16_s = WDT_CONFIG_PER_16K_Val
 } WDTPeriod_t;
 
-void initWDT( WDTPeriod_t wdtPeriod );
-void endWDT();
-void enableWDT();
-void disableWDT();
-void clearWDT();
-void resetCPU();
+void    initWDT( WDTPeriod_t wdtPeriod );
+void    endWDT();
+void    enableWDT();
+void    disableWDT();
+uint8_t clearWDT();
+void    resetCPU();
+void    registerEarlyWarningISR( void ( *ISRFunc )( uint32_t ) );
+void    registerHardFaultISR( void ( *ISRFunc )( uint32_t ) );
+void    getWDTDebugInfo( WDT_Debug_t *wdt );
 
 #ifdef __cplusplus
 }

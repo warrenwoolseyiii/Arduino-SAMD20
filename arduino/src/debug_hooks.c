@@ -15,41 +15,15 @@
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+#include "debug_hooks.h"
+#include "atomic.h"
 
-#ifndef SYSTICK_H_
-#define SYSTICK_H_
-
-#include "sam.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#define SYS_TICK_MSB 0x800000
-#define SYS_TICK_UNDERFLOW 0xFFFFFF
-#define SYS_TICK_MAXUNDERFLOWS 0xFFFFFFFFFF
-
-typedef struct
+void getCoreDebugInfo( Core_Debug_t *dbg )
 {
-    uint8_t  hadToInit, usedUpdatedCount, insideGet, inside;
-    uint64_t tixReturned;
-} CPUTix_Debug_t;
-
-typedef struct
-{
-    uint8_t  hadToInit, inside;
-    uint64_t start, cnt, tix;
-} DelayCPUTix_Debug_t;
-
-void     initSysTick();
-void     disableSysTick();
-uint64_t getCPUTicks();
-void     delayCPUTicks( uint64_t tix );
-void     getCPUTixDebugInfo( CPUTix_Debug_t *tix, DelayCPUTix_Debug_t *dTix,
-                             uint8_t *init );
-
-#ifdef __cplusplus
+    startAtomicOperation();
+    getMicrosDebugInfo( &( dbg->mic ), &( dbg->dMic ) );
+    getWDTDebugInfo( &( dbg->wdt ) );
+    getRTCDebugInfo( &( dbg->rtc ), &( dbg->dRtc ), &( dbg->rtcIrq ) );
+    getCPUTixDebugInfo( &( dbg->tix ), &( dbg->dTix ), &( dbg->tixInit ) );
+    endAtomicOperation();
 }
-#endif
-
-#endif /* SYSTICK_H_ */

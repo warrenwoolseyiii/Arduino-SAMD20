@@ -1,7 +1,9 @@
-toolchain/*
-devicepack/*
 !*/.gitkeep
-dl/
 .*.extracted
 .*.built
 .local/*
+toolchain
+toolchain/*
+devicepack
+devicepack/*
+dl/

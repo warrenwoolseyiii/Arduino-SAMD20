@@ -22,40 +22,75 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define EEEPROM_RAM_CACHE_SIZE 2048
+#define EEEPROM_NUM_FLASH_BANKS 4
+
+#define EEEPROM_KEY_LEN 2
+#define EEEPROM_KEY_LOC ( EEEPROM_CHECK_SUM_LOC - EEEPROM_KEY_LEN )
+#define EEEPROM_KEY 0xEA72
+#define EEEPROM_CHECK_SUM_LEN 4
+#define EEEPROM_CHECK_SUM_LOC ( EEEPROM_RAM_CACHE_SIZE - EEEPROM_CHECK_SUM_LEN )
+
+#define EEEPROM_ERR_OK 0
+#define EEEPROM_ERR_INVALID_CACHE_ADDR -1
+#define EEEPROM_ERR_NULL_PTR -2
+#define EEEPROM_ERR_FLASH_NOT_INIT -3
+#define EEEPROM_ERR_FLASH_READ_FAIL -4
+#define EEEPROM_ERR_FLASH_WRITE_FAIL -5
+#define EEEPROM_ERR_FLASH_ERASE_FAIL -6
+#define EEEPROM_ERR_CANT_FIND_BANK -7
+
+typedef struct
+{
+    int eeepromBaseFlashAddress, pageSize;
+    int ( *flashWrite )( int addr, uint8_t *data, int len );
+    int ( *flashRead )( int addr, uint8_t *data, int len );
+    int ( *flashErase )( int addr, int len );
+    int ( *flashInvalidate )( int addr, int len );
+} FlashMemoryInterface_t;
+
 class EEEPROM
 {
   public:
     EEEPROM();
-    void     begin();
+    EEEPROM( FlashMemoryInterface_t *f );
+    int      begin();
     uint16_t getSize();
-    void     write( uint16_t addr, uint8_t value )
+    int      setFlashMemoryInterface( FlashMemoryInterface_t *f );
+    bool     hasChange();
+
+    int commit();
+    int clearFlash();
+    int write( int addr, void *data, int size );
+    int write( int addr, uint8_t value )
     {
-        write( addr, &value, 1 );
+        return write( addr, &value, 1 );
     }
 
-    void    write( uint16_t addr, void *data, uint16_t size );
-    void    read( uint16_t addr, void *data, uint16_t size );
-    uint8_t read( uint16_t addr )
+    int     read( int addr, void *data, int size );
+    uint8_t read( int addr )
     {
         uint8_t byte;
-        read( addr, &byte, 1 );
+        if( read( addr, &byte, 1 ) != EEEPROM_ERR_OK ) byte = 0;
         return byte;
     }
 
-    void erase( uint16_t addr, uint16_t size );
+    int  erase( int addr, int size );
     void end();
 
   private:
-    uint16_t _minFlashPageSize, _effectivePageSize;
-    uint16_t _useableMemSize, _EEEPROMSize;
-    uint8_t  _numUsableBanks, _nextBankUp;
-    uint8_t *_bankStatus;
-    bool     _bankUpToDate;
-    uint32_t _flashEEEPROMStartAddr;
+    FlashMemoryInterface_t _flashInterface;
 
-    void     retrieveBankStatus();
-    uint32_t getNextEmptyBankAddr();
-    uint32_t getFlashAddr( uint16_t eeepromAddr );
+    bool    _flashInterfaceInit, _hasChange;
+    uint8_t _eepromRAMCache[EEEPROM_RAM_CACHE_SIZE];
+    int     _flashPageNdx;
+
+    uint32_t crc32();
+
+    int validateCacheAddr( int addr );
+    int _write( int addr, uint8_t *data, int size );
+    int _read( int addr, uint8_t *data, int size );
+    int _erase( int addr, int size );
 };
 
 #endif /* EEPROM_H_ */

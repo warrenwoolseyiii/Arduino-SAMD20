@@ -1,13 +1,15 @@
 #include "Analog.h"
 #include "clocks.h"
 #include "GPIO.h"
+#include "atomic.h"
 
 #define BAND_GAP_MV 1100
 
 int32_t _ctrlB;
 
-// Wait for the ADC to synchronize
-#define ADC_WAIT_SYNC while( ADC->STATUS.bit.SYNCBUSY )
+// ADC register synchronization macros
+#define ADC_SYNC_BUSY ( ADC->STATUS.bit.SYNCBUSY )
+#define ADC_WAIT_SYNC while( ADC_SYNC_BUSY )
 
 // Sets the internal voltage reference for the ADC
 #define ADC_SET_REF( x )                         \
@@ -48,20 +50,26 @@ int32_t _ctrlB;
     initGenericClk( GCLK_CLKCTRL_GEN_GCLK0_Val, GCLK_CLKCTRL_ID_ADC_Val ); \
     _ctrlB = 0;                                                            \
     if( ADC->CTRLA.bit.ENABLE ) {                                          \
-        ADC->CTRLA.bit.SWRST = 1;                                          \
-        while( ADC->CTRLA.bit.SWRST && ADC->STATUS.bit.SYNCBUSY )          \
+        ATOMIC_OPERATION( {                                                \
+            if( ADC_SYNC_BUSY ) ADC_WAIT_SYNC;                             \
+            ADC->CTRLA.bit.SWRST = 1;                                      \
+        } )                                                                \
+        while( ADC->CTRLA.bit.SWRST )                                      \
             ;                                                              \
     }
 
 // Take down ADC
 #define TAKE_DOWN_ADC                             \
-    ADC->CTRLA.bit.ENABLE = 0;                    \
-    ADC_WAIT_SYNC;                                \
+    ATOMIC_OPERATION( {                           \
+        if( ADC_SYNC_BUSY ) ADC_WAIT_SYNC;        \
+        ADC->CTRLA.bit.ENABLE = 0;                \
+    } );                                          \
     disableGenericClk( GCLK_CLKCTRL_ID_ADC_Val ); \
     enableAPBCClk( PM_APBCMASK_ADC, 0 );
 
-// Wait for the DAC to synchronize
-#define DAC_WAIT_SYNC while( DAC->STATUS.bit.SYNCBUSY )
+// DAC register synchronization macros
+#define DAC_SYNC_BUSY ( DAC->STATUS.bit.SYNCBUSY )
+#define DAC_WAIT_SYNC while( DAC_SYNC_BUSY )
 
 int16_t singleShotConversion()
 {
@@ -69,16 +77,20 @@ int16_t singleShotConversion()
     int16_t val;
     for( uint8_t i = 0; i < 2; i++ ) {
         // Start the next conversion
-        ADC->SWTRIG.bit.START = 1;
-        ADC_WAIT_SYNC;
+        ATOMIC_OPERATION( {
+            if( ADC_SYNC_BUSY ) ADC_WAIT_SYNC;
+            ADC->SWTRIG.bit.START = 1;
+        } )
 
         // Waiting for conversion to complete
         while( !ADC->INTFLAG.bit.RESRDY )
             ;
 
         // Grab the value
-        ADC_WAIT_SYNC;
-        val = ADC->RESULT.reg;
+        ATOMIC_OPERATION( {
+            if( ADC_SYNC_BUSY ) ADC_WAIT_SYNC;
+            val = ADC->RESULT.reg;
+        } )
     }
 
     return val;
@@ -105,18 +117,25 @@ int16_t Analog::readSingle()
     ADC_SET_RESOLUTION( _settings._resolution );
     ADC_SET_PRESCALER( _settings._preScaler );
     ADC_SET_SAMPLE_ACCUM( _settings._accum );
-    ADC->CTRLB.reg = _ctrlB;
-    ADC_WAIT_SYNC;
+    ATOMIC_OPERATION( {
+        if( ADC_SYNC_BUSY ) ADC_WAIT_SYNC;
+        ADC->CTRLB.reg = _ctrlB;
+    } )
 
     // Configure the gain, sample length (fixed), and the input channels
     ADC->SAMPCTRL.reg = ADC_SAMPCTRL_MASK; // 64 ADC clock cycles
-    ADC->INPUTCTRL.reg = _settings._gain | ADC_INPUTCTRL_MUXPOS( _posChannel ) |
-                         ADC_INPUTCTRL_MUXNEG( _negChannel );
-    ADC_WAIT_SYNC;
+    ATOMIC_OPERATION( {
+        if( ADC_SYNC_BUSY ) ADC_WAIT_SYNC;
+        ADC->INPUTCTRL.reg = _settings._gain |
+                             ADC_INPUTCTRL_MUXPOS( _posChannel ) |
+                             ADC_INPUTCTRL_MUXNEG( _negChannel );
+    } )
 
     // Enable the ADC
-    ADC->CTRLA.bit.ENABLE = 1;
-    ADC_WAIT_SYNC;
+    ATOMIC_OPERATION( {
+        if( ADC_SYNC_BUSY ) ADC_WAIT_SYNC;
+        ADC->CTRLA.bit.ENABLE = 1;
+    } )
 
     int16_t val = singleShotConversion();
 
@@ -144,17 +163,27 @@ void Analog::writeSingle( int16_t val, bool outputInternal )
 
     // SWRST
     if( !( DAC->CTRLA.reg & DAC_CTRLA_ENABLE ) ) {
-        DAC->CTRLA.reg |= DAC_CTRLA_SWRST;
-        while( DAC->CTRLA.bit.SWRST || DAC->STATUS.bit.SYNCBUSY )
+        ATOMIC_OPERATION( {
+            if( DAC_SYNC_BUSY ) DAC_WAIT_SYNC;
+            DAC->CTRLA.reg |= DAC_CTRLA_SWRST;
+        } )
+        while( DAC->CTRLA.bit.SWRST )
             ;
 
-        DAC->CTRLB.reg = DAC_CTRLB_REFSEL_AVCC | DAC_CTRLB_EOEN;
-        DAC->CTRLA.reg |= DAC_CTRLA_ENABLE;
-        DAC_WAIT_SYNC;
+        ATOMIC_OPERATION( {
+            if( DAC_SYNC_BUSY ) DAC_WAIT_SYNC;
+            DAC->CTRLB.reg = DAC_CTRLB_REFSEL_AVCC | DAC_CTRLB_EOEN;
+        } )
+        ATOMIC_OPERATION( {
+            if( DAC_SYNC_BUSY ) DAC_WAIT_SYNC;
+            DAC->CTRLA.reg |= DAC_CTRLA_ENABLE;
+        } )
     }
 
-    DAC->DATA.reg = val & 0x3FF;
-    DAC_WAIT_SYNC;
+    ATOMIC_OPERATION( {
+        if( DAC_SYNC_BUSY ) DAC_WAIT_SYNC;
+        DAC->DATA.reg = val & 0x3FF;
+    } )
 }
 
 int16_t Analog::readVCC()
@@ -169,18 +198,25 @@ int16_t Analog::readVCC()
     ADC_SET_RESOLUTION( ana_resolution_12bit );
     ADC_SET_PRESCALER( ana_clk_div_8 );
     ADC_SET_SAMPLE_ACCUM( ana_accum_64 );
-    ADC->CTRLB.reg = _ctrlB;
-    ADC_WAIT_SYNC;
+    ATOMIC_OPERATION( {
+        if( ADC_SYNC_BUSY ) ADC_WAIT_SYNC;
+        ADC->CTRLB.reg = _ctrlB;
+    } )
 
     // Configure the gain, sample length (fixed), and the input channels
     ADC->SAMPCTRL.reg = ADC_SAMPCTRL_MASK; // 64 ADC clock cycles
-    ADC->INPUTCTRL.reg = ADC_INPUTCTRL_GAIN_1X | ADC_INPUTCTRL_MUXPOS_BANDGAP |
-                         ADC_INPUTCTRL_MUXNEG_GND;
-    ADC_WAIT_SYNC;
+    ATOMIC_OPERATION( {
+        if( ADC_SYNC_BUSY ) ADC_WAIT_SYNC;
+        ADC->INPUTCTRL.reg = ADC_INPUTCTRL_GAIN_1X |
+                             ADC_INPUTCTRL_MUXPOS_BANDGAP |
+                             ADC_INPUTCTRL_MUXNEG_GND;
+    } )
 
     // Enable the ADC
-    ADC->CTRLA.bit.ENABLE = 1;
-    ADC_WAIT_SYNC;
+    ATOMIC_OPERATION( {
+        if( ADC_SYNC_BUSY ) ADC_WAIT_SYNC;
+        ADC->CTRLA.bit.ENABLE = 1;
+    } )
 
     int16_t val = singleShotConversion();
 
@@ -222,18 +258,24 @@ int16_t Analog::readTemperature()
     ADC_SET_RESOLUTION( ana_resolution_12bit );
     ADC_SET_PRESCALER( ana_clk_div_8 );
     ADC_SET_SAMPLE_ACCUM( ana_accum_64 );
-    ADC->CTRLB.reg = _ctrlB;
-    ADC_WAIT_SYNC;
+    ATOMIC_OPERATION( {
+        if( ADC_SYNC_BUSY ) ADC_WAIT_SYNC;
+        ADC->CTRLB.reg = _ctrlB;
+    } )
 
     // Configure the gain, sample length (fixed), and the input channels
     ADC->SAMPCTRL.reg = ADC_SAMPCTRL_MASK; // 64 ADC clock cycles
-    ADC->INPUTCTRL.reg = ADC_INPUTCTRL_GAIN_1X | ADC_INPUTCTRL_MUXPOS_TEMP |
-                         ADC_INPUTCTRL_MUXNEG_GND;
-    ADC_WAIT_SYNC;
+    ATOMIC_OPERATION( {
+        if( ADC_SYNC_BUSY ) ADC_WAIT_SYNC;
+        ADC->INPUTCTRL.reg = ADC_INPUTCTRL_GAIN_1X | ADC_INPUTCTRL_MUXPOS_TEMP |
+                             ADC_INPUTCTRL_MUXNEG_GND;
+    } )
 
     // Enable the ADC
-    ADC->CTRLA.bit.ENABLE = 1;
-    ADC_WAIT_SYNC;
+    ATOMIC_OPERATION( {
+        if( ADC_SYNC_BUSY ) ADC_WAIT_SYNC;
+        ADC->CTRLA.bit.ENABLE = 1;
+    } )
 
     int16_t val = singleShotConversion();
 

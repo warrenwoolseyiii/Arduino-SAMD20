@@ -19,9 +19,11 @@
 #include "external_interrupts.h"
 #include "Arduino.h"
 #include "sam.h"
+#include "sleep.h"
 #include <string.h>
 
-#define EIC_WAIT_SYNC while( EIC->STATUS.bit.SYNCBUSY )
+#define EIC_SYNC_BUSY ( EIC->STATUS.bit.SYNCBUSY )
+#define EIC_WAIT_SYNC while( EIC_SYNC_BUSY )
 
 // Callback pointers for each of the external interrupts, plus an extra for the
 // non-maskable interrupt
@@ -48,13 +50,18 @@ static void __initialize( uint8_t lowPower )
     NVIC_EnableIRQ( EIC_IRQn );
 
     // Do a software reset on EIC
-    EIC->CTRL.bit.SWRST = 1;
-    while( ( EIC->CTRL.bit.SWRST ) && ( EIC->STATUS.bit.SYNCBUSY ) )
+    ATOMIC_OPERATION( {
+        if( EIC_SYNC_BUSY ) EIC_WAIT_SYNC;
+        EIC->CTRL.bit.SWRST = 1;
+    } )
+    while( EIC->CTRL.bit.SWRST )
         ;
 
     // Enable EIC
-    EIC->CTRL.bit.ENABLE = 1;
-    EIC_WAIT_SYNC;
+    ATOMIC_OPERATION( {
+        if( EIC_SYNC_BUSY ) EIC_WAIT_SYNC;
+        EIC->CTRL.bit.ENABLE = 1;
+    } )
 
     _enabled = 1;
     _lowPowerModeActive = 0;
@@ -64,8 +71,11 @@ void disableExternalInterrupts()
 {
     if( _enabled ) {
         // Do a software reset on EIC
-        EIC->CTRL.bit.SWRST = 1;
-        while( ( EIC->CTRL.bit.SWRST ) && ( EIC->STATUS.bit.SYNCBUSY ) )
+        ATOMIC_OPERATION( {
+            if( EIC_SYNC_BUSY ) EIC_WAIT_SYNC;
+            EIC->CTRL.bit.SWRST = 1;
+        } )
+        while( EIC->CTRL.bit.SWRST )
             ;
         _enabled = 0;
     }
@@ -83,8 +93,10 @@ void interruptlowPowerMode( uint8_t en )
     if( _enabled ) {
         if( en != _lowPowerModeActive ) {
             // Disable
-            EIC->CTRL.bit.ENABLE = 0;
-            EIC_WAIT_SYNC;
+            ATOMIC_OPERATION( {
+                if( EIC_SYNC_BUSY ) EIC_WAIT_SYNC;
+                EIC->CTRL.bit.ENABLE = 0;
+            } )
             NVIC_DisableIRQ( EIC_IRQn );
 
             // Switch clock sources
@@ -102,8 +114,10 @@ void interruptlowPowerMode( uint8_t en )
             // Enable and reset IRQs
             NVIC_SetPriority( EIC_IRQn, 0 );
             NVIC_EnableIRQ( EIC_IRQn );
-            EIC->CTRL.bit.ENABLE = 1;
-            EIC_WAIT_SYNC;
+            ATOMIC_OPERATION( {
+                if( EIC_SYNC_BUSY ) EIC_WAIT_SYNC;
+                EIC->CTRL.bit.ENABLE = 1;
+            } )
         }
     }
     else {
@@ -264,8 +278,9 @@ void detachInterrupt( uint32_t pin )
 void EIC_Handler()
 {
     uint32_t flags = ( EIC->INTFLAG.reg & EIC->INTENSET.reg );
-    EIC->INTFLAG.reg = flags;
+    exitSleep();
 
+EIC_RE_SERVICE:
     // For each flag (starting highest to lowest priority) call the
     // corresponding function if it is not null
     for( uint32_t ptrNdx = 0; ptrNdx < NUM_EXT_INTS; ptrNdx++ ) {
@@ -273,11 +288,16 @@ void EIC_Handler()
             if( ISRcallback[ptrNdx] != 0 ) {
                 ISRcallback[ptrNdx]();
             }
+
+            EIC->INTFLAG.reg = ( 0x1UL << ptrNdx );
         }
     }
+
+    flags = ( EIC->INTFLAG.reg & EIC->INTENSET.reg );
+    if( flags ) goto EIC_RE_SERVICE;
 }
 
-void NMI_Handler()
+void NonMaskableInt_Handler()
 {
     EIC->NMIFLAG.reg = EIC_NMIFLAG_NMI;
     ISRcallback[NUM_EXT_INTS]();

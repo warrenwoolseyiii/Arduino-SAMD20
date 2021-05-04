@@ -22,6 +22,8 @@
 #include "SERCOM.h"
 #include "RingBuffer.h"
 
+#define SERIAL_BUFFER_SIZE 512
+
 #include <cstddef>
 
 class Uart : public Stream
@@ -39,6 +41,7 @@ class Uart : public Stream
     int    peek();
     int    read();
     void   flush();
+    size_t write( const uint8_t *data, size_t size );
     size_t write( const uint8_t data );
     using Print::write; // pull in write(str) and write(buf, size) from Print
 
@@ -50,9 +53,9 @@ class Uart : public Stream
     }
 
   private:
-    SERCOM *   sercom;
-    RingBuffer rxBuffer;
-    RingBuffer txBuffer;
+    SERCOM *                                 sercom;
+    RingBufferN<uint8_t, SERIAL_BUFFER_SIZE> _rxBuffer;
+    RingBufferN<uint8_t, SERIAL_BUFFER_SIZE> _txBuffer;
 
     uint8_t            uc_pinRX;
     uint8_t            uc_pinTX;

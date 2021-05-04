@@ -26,6 +26,20 @@
 extern "C" {
 #endif
 
+typedef struct
+{
+    uint64_t tix;
+    uint32_t rtnMicros;
+    uint8_t  inside;
+} Micros_Debug_t;
+
+typedef struct
+{
+    uint64_t mic;
+    uint8_t  inside;
+} DelayMicros_Debug_t;
+
+void     getMicrosDebugInfo( Micros_Debug_t *mic, DelayMicros_Debug_t *dMic );
 uint32_t millis();
 void     delay( uint32_t ms );
 uint32_t micros();

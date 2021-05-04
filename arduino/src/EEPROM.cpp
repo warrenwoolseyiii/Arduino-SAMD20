@@ -16,177 +16,246 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-// Emulated EEPROM (EEEPROM) is a software layer of EEPROM that utilizes
-// Flash memory as the underlying storage mechanism. This is NOT an EEPROM
-// driver, it is instead an abstraction layer that lets the user treat a
-// particular portion of Flash memory as EEPROM. Each Flash memory page is laid
-// out in the following manner:
-// Byte[0]                        -> BankID
-// Bytes[1 - _minFlashPageSize]   -> Data
-// Each Flash memory page is treated as a "bank", and a range of EEEPROM
-// addressable space is associated with a bank. For example, if
-// _minFlashPageSize == 256, than EEEPROM addresses 0 to 254 are located
-// in bank 0. Banks are not consecutive in memory and are moved when writes
-// occur with in the bank. This is done in an effort to reduce the write
-// and erase load on each individual Flash memory page.
-
 #include "EEPROM.h"
-#include "NVM.h"
+#include "atomic.h"
 
 EEEPROM::EEEPROM()
 {
-    _EEEPROMSize = 0;
-    _bankStatus = NULL;
+    _flashInterfaceInit = false;
+    _hasChange = false;
+    _flashPageNdx = 0;
+    memset( _eepromRAMCache, 0xFF, EEEPROM_RAM_CACHE_SIZE );
 }
 
-void EEEPROM::begin()
+EEEPROM::EEEPROM( FlashMemoryInterface_t *f )
 {
-    // Do not launch another session of emulated EEPROM, which will cause
-    // _bankStatus to become corrupted if it has already been allocated
-    if( _EEEPROMSize == 0 && _bankStatus == NULL ) {
-        NVMParams_t params = getNVMParams();
+    _flashPageNdx = 0;
+    _hasChange = false;
+    _flashInterfaceInit = ( setFlashMemoryInterface( f ) == EEEPROM_ERR_OK );
+    memset( _eepromRAMCache, 0xFF, EEEPROM_RAM_CACHE_SIZE );
+}
 
-        // Flash page characteristics
-        _minFlashPageSize = params.rowSize;
-        _effectivePageSize = _minFlashPageSize - 1;
-        _flashEEEPROMStartAddr = params.nvmTotalSize - params.eepromSize;
+int EEEPROM::begin()
+{
+    if( !_flashInterfaceInit ) return EEEPROM_ERR_FLASH_NOT_INIT;
 
-        // Usable memory space
-        _useableMemSize = params.eepromSize;
-        _numUsableBanks = _useableMemSize / _minFlashPageSize;
-        _EEEPROMSize = ( _numUsableBanks / 2 ) * _effectivePageSize;
+    // Load the cache from flash memory until we get the active page
+    for( _flashPageNdx = 0; _flashPageNdx < EEEPROM_NUM_FLASH_BANKS;
+         _flashPageNdx++ ) {
 
-        // Flash bank status indicators
-        _bankStatus = (uint8_t *)malloc( _numUsableBanks );
-        _bankUpToDate = false;
-        _nextBankUp = 0;
+        // Make the address and read from flash memory
+        int addr = _flashInterface.eeepromBaseFlashAddress +
+                   ( _flashPageNdx * EEEPROM_RAM_CACHE_SIZE );
+        if( _flashInterface.flashRead( addr, _eepromRAMCache,
+                                       EEEPROM_RAM_CACHE_SIZE ) !=
+            EEEPROM_RAM_CACHE_SIZE ) {
+            return EEEPROM_ERR_FLASH_READ_FAIL;
+        }
+
+        // Check for the key
+        uint16_t key = ( _eepromRAMCache[EEEPROM_KEY_LOC] << 8 ) |
+                       _eepromRAMCache[EEEPROM_KEY_LOC + 1];
+        if( key == EEEPROM_KEY ) {
+
+            // If the key is good, look at the checksum
+            uint32_t crcRead =
+                ( _eepromRAMCache[EEEPROM_CHECK_SUM_LOC] << 24 ) |
+                ( _eepromRAMCache[EEEPROM_CHECK_SUM_LOC + 1] << 16 ) |
+                ( _eepromRAMCache[EEEPROM_CHECK_SUM_LOC + 2] << 8 ) |
+                _eepromRAMCache[EEEPROM_CHECK_SUM_LOC + 3];
+
+            if( crcRead == crc32() ) return EEEPROM_ERR_OK;
+        }
     }
+
+    return EEEPROM_ERR_CANT_FIND_BANK;
 }
 
 uint16_t EEEPROM::getSize()
 {
-    return _EEEPROMSize;
+    return EEEPROM_RAM_CACHE_SIZE - ( EEEPROM_KEY_LEN + EEEPROM_CHECK_SUM_LEN );
 }
 
-void EEEPROM::write( uint16_t addr, void *data, uint16_t size )
+int EEEPROM::setFlashMemoryInterface( FlashMemoryInterface_t *f )
 {
-    if( addr + size > _EEEPROMSize ) return;
-
-    // Cache the full page associated with the address, set the ID
-    // in case the cached page is an empty bank.
-    uint8_t *cache = (uint8_t *)malloc( _minFlashPageSize );
-    if( cache == NULL ) return;
-    read( ( addr - ( addr % _effectivePageSize ) ), &cache[1],
-          _effectivePageSize );
-    cache[0] = addr / _effectivePageSize;
-
-    // Determine if the write will extend past the existing bank, if it does we
-    // will need to recursively call write() until the write request has been
-    // fulfilled.
-    uint16_t remainingBankSize =
-        _effectivePageSize - ( addr % _effectivePageSize );
-    uint16_t writeSize =
-        ( remainingBankSize < size ? remainingBankSize : size );
-
-    // Update the cached page with the write data.
-    uint16_t cacheOffset = ( addr % _effectivePageSize ) + 1;
-    memcpy( &cache[cacheOffset], data, writeSize );
-
-    // Write the updated cache to the next bank and erase the current bank.
-    uint32_t flashWriteAddr, flashEraseAddr;
-    flashWriteAddr = getNextEmptyBankAddr();
-    flashEraseAddr = getFlashAddr( addr );
-    eraseRow( flashEraseAddr );
-    writeFlash( (void *)flashWriteAddr, cache, _minFlashPageSize );
-
-    // Free the cache and continue the write if necessary.
-    free( cache );
-    _bankUpToDate = false;
-    if( remainingBankSize < size )
-        write( addr + writeSize, (uint8_t *)data + writeSize,
-               size - writeSize );
+    if( f == NULL ) return EEEPROM_ERR_NULL_PTR;
+    memcpy( &_flashInterface, f, sizeof( FlashMemoryInterface_t ) );
+    _flashInterfaceInit = true;
+    return EEEPROM_ERR_OK;
 }
 
-void EEEPROM::read( uint16_t addr, void *data, uint16_t size )
+bool EEEPROM::hasChange()
 {
-    if( addr + size > _EEEPROMSize ) return;
-
-    // Determine if the read will extend past the end of the flash bank, if
-    // it does then we need to update the EEEPROM address and recursively call
-    // read() until we have fulfilled the request.
-    uint16_t remainingBankSize =
-        _effectivePageSize - ( addr % _effectivePageSize );
-    uint16_t readSize = ( remainingBankSize < size ? remainingBankSize : size );
-
-    // Perform the read and continue if necessary
-    uint32_t flashAddr = getFlashAddr( addr );
-    readFlash( (void *)flashAddr, data, readSize );
-    if( remainingBankSize < size )
-        read( addr + readSize, (uint8_t *)data + readSize, size - readSize );
+    return _hasChange;
 }
 
-void EEEPROM::erase( uint16_t addr, uint16_t size )
+int EEEPROM::commit()
 {
-    uint8_t *data = (uint8_t *)malloc( size );
-    if( data == NULL ) return;
-    memset( data, 0xFF, size );
-    write( addr, data, size );
-    free( data );
-}
+    // Make the next address
+    int prevNdx = _flashPageNdx;
+    _flashPageNdx = ( _flashPageNdx + 1 ) % EEEPROM_NUM_FLASH_BANKS;
+    int addr = _flashInterface.eeepromBaseFlashAddress +
+               ( _flashPageNdx * EEEPROM_RAM_CACHE_SIZE );
 
-void EEEPROM::retrieveBankStatus()
-{
-    for( uint8_t i = 0; i < _numUsableBanks; i++ ) {
-        readFlash(
-            (void *)( _flashEEEPROMStartAddr + ( i * _minFlashPageSize ) ),
-            &_bankStatus[i], 1 );
+    // Check if we need to erase the previous page when we are done
+    bool erasePreviousPage = false;
+    if( addr % _flashInterface.pageSize == 0 ) erasePreviousPage = true;
+
+    // Make the new check sum, add the key, save to flash
+    uint32_t crc = crc32();
+    uint16_t key = EEEPROM_KEY;
+    _eepromRAMCache[EEEPROM_KEY_LOC] = ( key >> 8 ) & 0xFF;
+    _eepromRAMCache[EEEPROM_KEY_LOC + 1] = key & 0xFF;
+    _eepromRAMCache[EEEPROM_CHECK_SUM_LOC] = ( crc >> 24 ) & 0xFF;
+    _eepromRAMCache[EEEPROM_CHECK_SUM_LOC + 1] = ( crc >> 16 ) & 0xFF;
+    _eepromRAMCache[EEEPROM_CHECK_SUM_LOC + 2] = ( crc >> 8 ) & 0xFF;
+    _eepromRAMCache[EEEPROM_CHECK_SUM_LOC + 3] = crc & 0xFF;
+    if( _flashInterface.flashWrite( addr, _eepromRAMCache,
+                                    EEEPROM_RAM_CACHE_SIZE ) !=
+        EEEPROM_RAM_CACHE_SIZE ) {
+        return EEEPROM_ERR_FLASH_WRITE_FAIL;
     }
 
-    _bankUpToDate = true;
-}
-
-uint32_t EEEPROM::getNextEmptyBankAddr()
-{
-    uint32_t addr = _flashEEEPROMStartAddr;
-
-    // Iterate through all banks until we find the next empty bank. This helps
-    // with load balancing the various flash banks for a more balanced
-    // distribution of writes to the various banks
-    if( !_bankUpToDate ) retrieveBankStatus();
-    while( _bankStatus[_nextBankUp] != 0xFF ) {
-        if( ++_nextBankUp >= _numUsableBanks ) _nextBankUp = 0;
+    // Erase if we need to
+    if( erasePreviousPage ) {
+        addr = _flashInterface.eeepromBaseFlashAddress +
+               ( prevNdx * EEEPROM_RAM_CACHE_SIZE );
+        if( _flashInterface.flashErase( addr, _flashInterface.pageSize ) !=
+            _flashInterface.pageSize ) {
+            return EEEPROM_ERR_FLASH_ERASE_FAIL;
+        }
     }
+    else {
+        // Wipe the previous header
+        addr = _flashInterface.eeepromBaseFlashAddress +
+               ( prevNdx * EEEPROM_RAM_CACHE_SIZE );
 
-    addr += _nextBankUp * _minFlashPageSize;
-    return addr;
-}
-
-uint32_t EEEPROM::getFlashAddr( uint16_t eeepromAddr )
-{
-    uint8_t  bankId = eeepromAddr / _effectivePageSize;
-    uint32_t addr = _flashEEEPROMStartAddr;
-
-    // Index through the bank status array, if we get a match use that bank
-    // otherwise just use the last empty bank we find.
-    if( !_bankUpToDate ) retrieveBankStatus();
-    for( uint8_t i = 0; i < _numUsableBanks; i++ ) {
-        if( _bankStatus[i] == bankId || _bankStatus[i] == 0xFF ) {
-            addr = _flashEEEPROMStartAddr + ( i * _minFlashPageSize ) + 1 +
-                   ( eeepromAddr % _effectivePageSize );
-            if( _bankStatus[i] == bankId ) break;
+        if( _flashInterface.flashInvalidate(
+                addr + ( EEEPROM_RAM_CACHE_SIZE -
+                         ( EEEPROM_CHECK_SUM_LEN + EEEPROM_KEY_LEN ) ),
+                ( EEEPROM_CHECK_SUM_LEN + EEEPROM_KEY_LEN ) ) !=
+            ( EEEPROM_CHECK_SUM_LEN + EEEPROM_KEY_LEN ) ) {
+            return EEEPROM_ERR_FLASH_WRITE_FAIL;
         }
     }
 
-    return addr;
+    _hasChange = false;
+    return EEEPROM_ERR_OK;
+}
+
+int EEEPROM::clearFlash()
+{
+    // Loop through all the banks and erase them
+    for( int i = 0; i < EEEPROM_NUM_FLASH_BANKS; i++ ) {
+
+        // Make a new address and erase the underlying page if we are on a new
+        // page
+        int addr = _flashInterface.eeepromBaseFlashAddress +
+                   ( i * EEEPROM_RAM_CACHE_SIZE );
+        if( ( addr % _flashInterface.pageSize ) == 0 ) {
+            if( _flashInterface.flashErase( addr, _flashInterface.pageSize ) !=
+                _flashInterface.pageSize ) {
+                return EEEPROM_ERR_FLASH_ERASE_FAIL;
+            }
+        }
+    }
+
+    _flashPageNdx = 0;
+    return EEEPROM_ERR_OK;
+}
+
+int EEEPROM::write( int addr, void *data, int size )
+{
+    // Wrap the write operation in a blocking statement so we don't get
+    // interrupted mid write
+    int code;
+    ATOMIC_OPERATION( code = _write( addr, (uint8_t *)data, size ); )
+    return code;
+}
+
+int EEEPROM::read( int addr, void *data, int size )
+{
+    // Wrap the read operation in a blocking statement so we don't get
+    // interrupted mid read
+    int code;
+    ATOMIC_OPERATION( code = _read( addr, (uint8_t *)data, size ); )
+    return code;
+}
+
+int EEEPROM::erase( int addr, int size )
+{
+    // Wrap the erase operation in a blocking statement so we don't get
+    // interrupted mid erase
+    int code;
+    ATOMIC_OPERATION( code = _erase( addr, size ); )
+    return code;
+}
+
+// CRC32 using the Castagnoli polynomial (same one as used by the Intel crc32
+// instruction) CRC-32C (iSCSI) polynomial in reversed bit order.
+#define POLY 0x82f63b78
+uint32_t EEEPROM::crc32()
+{
+    int k;
+
+    uint32_t crc = 0;
+    for( int i = 0; i < EEEPROM_CHECK_SUM_LOC; i++ ) {
+        crc ^= _eepromRAMCache[i];
+        for( k = 0; k < 8; k++ ) crc = crc & 1 ? ( crc >> 1 ) ^ POLY : crc >> 1;
+    }
+    return ~crc;
+}
+
+int EEEPROM::validateCacheAddr( int addr )
+{
+    if( addr > ( EEEPROM_RAM_CACHE_SIZE -
+                 ( EEEPROM_CHECK_SUM_LEN + EEEPROM_KEY_LEN ) ) ||
+        EEEPROM_RAM_CACHE_SIZE < 0 ) {
+        return EEEPROM_ERR_INVALID_CACHE_ADDR;
+    }
+    return EEEPROM_ERR_OK;
+}
+
+int EEEPROM::_write( int addr, uint8_t *data, int size )
+{
+    // Always check the cache address!
+    if( validateCacheAddr( addr + size ) != EEEPROM_ERR_OK )
+        return EEEPROM_ERR_INVALID_CACHE_ADDR;
+
+    // NULL check
+    if( data == NULL ) return EEEPROM_ERR_NULL_PTR;
+
+    //  Cache write
+    for( int i = 0; i < size; i++ ) _eepromRAMCache[addr + i] = data[i];
+    _hasChange = true;
+    return size;
+}
+
+int EEEPROM::_read( int addr, uint8_t *data, int size )
+{
+    // Always check the cache address!
+    if( validateCacheAddr( addr + size ) != EEEPROM_ERR_OK )
+        return EEEPROM_ERR_INVALID_CACHE_ADDR;
+
+    // NULL check
+    if( data == NULL ) return EEEPROM_ERR_NULL_PTR;
+
+    //  Cache read
+    for( int i = 0; i < size; i++ ) data[i] = _eepromRAMCache[addr + i];
+    return size;
+}
+
+int EEEPROM::_erase( int addr, int size )
+{
+    // Always check the cache address!
+    if( validateCacheAddr( addr ) != EEEPROM_ERR_OK )
+        return EEEPROM_ERR_INVALID_CACHE_ADDR;
+
+    //  Cache write
+    for( int i = 0; i < size; i++ ) _eepromRAMCache[addr + i] = 0xFF;
+    _hasChange = true;
+    return size;
 }
 
 void EEEPROM::end()
-{
-    // Take down everything
-    free( _bankStatus );
-    _bankStatus = NULL;
-
-    _bankUpToDate = false;
-    _nextBankUp = 0;
-    _EEEPROMSize = 0;
-}
+{}

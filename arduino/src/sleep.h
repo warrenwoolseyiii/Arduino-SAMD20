@@ -43,10 +43,12 @@ typedef enum
 extern "C" {
 #endif
 
-void sleepCPU( SleepLevel_t level );
-void changeCPUClk( CPUClkSrc_t src );
-void disableSleep();
-void enableSleep();
+void     sleepCPU( SleepLevel_t level );
+void     changeCPUClk( CPUClkSrc_t src );
+void     disableSleep();
+void     enableSleep();
+void     exitSleep();
+uint32_t getSysUpTime();
 
 #ifdef __cplusplus
 }

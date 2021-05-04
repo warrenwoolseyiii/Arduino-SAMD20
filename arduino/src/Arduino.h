@@ -85,12 +85,14 @@ void loop( void );
 #include "Analog.h"
 #endif /* __cplusplus */
 #include "delay.h"
+#include "debug_hooks.h"
 #include "clocks.h"
 #include "RTC.h"
 #include "WDT.h"
 #include "NVM.h"
 #include "sleep.h"
 #include "SysTick.h"
+#include "atomic.h"
 #ifdef __cplusplus
 #include "Uart.h"
 #endif

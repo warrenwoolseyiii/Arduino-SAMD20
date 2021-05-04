@@ -9,47 +9,73 @@ ATPACK_BASE_URL := "http://packs.download.atmel.com/"
 
 SHELL := /bin/bash
 
-# NOTE: Choose one
-# TC_PLATFORM ?= osx
-TC_PLATFORM ?= linux
+HOST = $(shell hostname -s)
 
-all: .dfp.extracted .toolchain.extracted .arduino.built
+ifeq ($(HOST),deploy)
+include ci.mk
+endif
+include config.mk
+include checks.mk
+
+.PHONY: relink arduino help
+
+all: .cmsis.$(CMSIS_VER).extracted .dfp.$(SAMD20_DFP_VER).extracted .toolchain.$(TC_VER).extracted relink arduino
 	@echo "Done"
 
-.dfp.extracted:
-	@$(SHELL) scripts/getpack.sh "$(ATPACK_BASE_URL)" "Atmel" "SAMD20_DFP" "1.2.91"
-	@$(SHELL) scripts/getpack.sh "$(ATPACK_BASE_URL)" "ARM" "CMSIS" "5.0.1"
+.dfp.$(SAMD20_DFP_VER).extracted:
+	($(SHELL) scripts/getpack.sh "$(ATPACK_BASE_URL)" "Atmel" "SAMD20_DFP" "$(SAMD20_DFP_VER)" "$(DL_DIR)" || exit 1);
 	@touch $@
 
-.toolchain.extracted:
-	@$(SHELL) scripts/gettoolchain.sh "$(TC_PLATFORM)"
+.cmsis.$(CMSIS_VER).extracted:
+	($(SHELL) scripts/getpack.sh "$(ATPACK_BASE_URL)" "ARM" "CMSIS" "$(CMSIS_VER)" "$(DL_DIR)" || exit 1);
 	@touch $@
 
-.arduino.built:
+.toolchain.$(TC_VER).extracted:
+	@echo "USING TC_VER=$(TC_VER)"
+	($(SHELL) scripts/gettoolchain.sh "$(TC_VER)" "$(TC_PLATFORM)" "$(DL_DIR)" || exit 1);
+	@touch $@
+
+relink:
+	($(SHELL) scripts/relink.sh "$(TC_VER)" "$(DL_DIR)" || exit 1);
+
+arduino:
 	@rm -f lib/libArduinoCore.a
 	$(MAKE) clean -C arduino
 	$(MAKE) -C arduino
 	cp arduino/build/libArduinoCore.a lib/libArduinoCore.a
-	@touch $@
-
-# Remove all downloads
-dl-clean:
-	@echo "Removing downloads"
-	rm -rf dl
 
 # Remove extracted toolchain components
-toolchain-clean:
-	@echo "Removing extracted devicepacks and toolchain"
-	rm -rf devicepack/ARM devicepack/Atmel
-	rm -rf toolchain/arm-none-eabi toolchain/bin toolchain/lib toolchain/share
-	rm -f .*.extracted
+clean-cur-toolchain:
+	@echo "Removing toolchain $(TC_VER), CMSIS $(CMSIS_VER), DFP $(SAMD20_DFP_VER)"
+	rm -rf toolchains/$(TC_VER)
+	($(SHELL) -c "[[ -L toolchain ]] && unlink toolchain || exit 0");
+	rm -rf devicepack/ARM/CMSIS/$(CMSIS_VER) devicepack/Atmel/SAMD20_DFP/$(SAMD20_DFP_VER)
+	rm -f .cmsis.$(CMSIS_VER).*
+	rm -f .dfp.$(SAMD20_DFP_VER).*
+	rm -f .toolchain.$(TC_VER).*
+
+clean-all-toolchains:
+	@echo "Removing all extracted toolchain components"
+	rm -rf toolchains
+	rm -f .toolchain.*
+	rm -f .cmsis.*
+	rm -f .dfp.*
+	($(SHELL) -c "[[ -L toolchain ]] && unlink toolchain || exit 0");
 
 clean:
 	@echo "Cleaning arduino build"
 	@rm -f lib/libArduinoCore.a
 	$(MAKE) clean -C arduino
-	rm -f .arduino.built
 
-distclean: clean toolchain-clean
+distclean: clean clean-all-toolchains
 
-reallyclean: distclean dl-clean
+help:
+	@echo ""
+	@echo "Run \"make\" to collect toolchains, device packs (set in config.mk), then build arduino"
+	@echo "Once toolchain is set up, running make again just rebuilds arduino"
+	@echo ""
+	@echo "Other targets"
+	@echo "clean:                clean arduino build"
+	@echo "clean-cur-toolchain:  remove the current toolchain components (set by config.mk)"
+	@echo "clean-all-toolchains: remove all extracted toolchain components"
+	@echo "distclean:            clean + clean-all-toolchains"

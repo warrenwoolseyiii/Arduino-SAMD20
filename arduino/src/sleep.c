@@ -21,8 +21,14 @@
 #include "clocks.h"
 #include "variant.h"
 #include "SysTick.h"
+#include "delay.h"
 
-uint8_t _sleepEn = 1;
+uint8_t  _sleepEn = 1;
+uint32_t _sysUpTimeAccum = 0;
+
+volatile uint8_t  _needExitSleep = 0;
+volatile uint8_t  _exitLock = 0;
+volatile uint32_t _sysExitSleepTime = 0;
 
 void disableSleep()
 {
@@ -34,12 +40,29 @@ void enableSleep()
     _sleepEn = 1;
 }
 
+void exitSleep()
+{
+    if( _exitLock ) return;
+    _exitLock = 1;
+
+    if( _needExitSleep ) {
+        initSysTick();
+        _sysExitSleepTime = micros();
+
+        _needExitSleep = 0;
+    }
+
+    _exitLock = 0;
+}
+
 void sleepCPU( SleepLevel_t level )
 {
-    uint8_t restartSysTick = 0;
+    _sysUpTimeAccum += micros() - _sysExitSleepTime;
+
     if( _sleepEn ) {
+
+        _needExitSleep = 1;
         if( level > PM_SLEEP_IDLE_APB_Val ) {
-            restartSysTick = 1;
             disableSysTick();
             SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;
         }
@@ -49,7 +72,8 @@ void sleepCPU( SleepLevel_t level )
         }
 
         __WFI();
-        if( restartSysTick ) initSysTick();
+
+        exitSleep();
     }
 }
 
@@ -78,4 +102,9 @@ void changeCPUClk( CPUClkSrc_t src )
     // If we change the clock frequency the SysTick timer will need to be
     // restarted
     initSysTick();
+}
+
+uint32_t getSysUpTime()
+{
+    return _sysUpTimeAccum;
 }

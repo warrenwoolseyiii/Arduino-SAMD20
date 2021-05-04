@@ -89,38 +89,66 @@ void Uart::end()
     digitalWrite( uc_pinRX, HIGH );
     digitalWrite( uc_pinTX, HIGH );
 
-    rxBuffer.clear();
-    txBuffer.clear();
+    _rxBuffer.Flush();
+    _txBuffer.Flush();
 }
 
 void Uart::flush()
 {
-    while( txBuffer.available() )
-        ; // wait until TX buffer is empty
+    if( _txBuffer.GetNumObjStored() ) {
 
-    sercom->flushUART();
+        // If interrupts are not enabled then force the bytes out in a loop
+        if( !sercom->sercomIRQEN() ) {
+            while( _txBuffer.GetNumObjStored() ) {
+                while( !sercom->isDataRegisterEmptyUART() )
+                    ;
+                uint8_t data = 0;
+                _txBuffer.DeQueue( &data );
+                sercom->writeDataUART( data );
+            }
+        }
+        else {
+
+            // Otherwise just sit here until everything gets flushed
+            uint32_t n;
+            do {
+                startAtomicOperation();
+                n = _txBuffer.GetNumObjStored();
+                endAtomicOperation();
+            } while( n );
+        }
+    }
 }
 
 void Uart::IrqHandler()
 {
+    // Handle frame error
+    if( sercom->isFrameErrorUART() ) {
+        sercom->readDataUART();
+        sercom->clearFrameErrorUART();
+    }
+
+    // Read bytes
     if( sercom->availableDataUART() ) {
-        rxBuffer.store_char( sercom->readDataUART() );
+        _rxBuffer.Queue( sercom->readDataUART() );
 
         if( uc_pinRTS != NO_RTS_PIN ) {
             // RX buffer space is below the threshold, de-assert RTS
-            if( rxBuffer.availableForStore() < RTS_RX_THRESHOLD ) {
+            if( _rxBuffer.GetAvailableSpace() < RTS_RX_THRESHOLD ) {
                 *pul_outsetRTS = ul_pinMaskRTS;
             }
         }
     }
 
+    // Send bytes
     if( sercom->isDataRegisterEmptyUART() ) {
-        if( txBuffer.available() ) {
-            uint8_t data = txBuffer.read_char();
-
+        if( _txBuffer.GetNumObjStored() ) {
+            uint8_t data;
+            _txBuffer.DeQueue( &data );
             sercom->writeDataUART( data );
         }
         else {
+            // Disable this interrupt if empty
             sercom->disableDataRegisterEmptyInterruptUART();
         }
     }
@@ -128,7 +156,6 @@ void Uart::IrqHandler()
     if( sercom->isUARTError() ) {
         sercom->acknowledgeUARTError();
         // TODO: if (sercom->isBufferOverflowErrorUART()) ....
-        // TODO: if (sercom->isFrameErrorUART()) ....
         // TODO: if (sercom->isParityErrorUART()) ....
         sercom->clearStatusUART();
     }
@@ -136,26 +163,32 @@ void Uart::IrqHandler()
 
 int Uart::available()
 {
-    return rxBuffer.available();
+    return _rxBuffer.GetNumObjStored();
 }
 
 int Uart::availableForWrite()
 {
-    return txBuffer.availableForStore();
+    return _txBuffer.GetAvailableSpace();
 }
 
 int Uart::peek()
 {
-    return rxBuffer.peek();
+    uint8_t *data = _rxBuffer.AccessElement( 1 );
+    int      rtn = -1;
+    if( data != NULL ) rtn = *data;
+    return rtn;
 }
 
 int Uart::read()
 {
-    int c = rxBuffer.read_char();
+    int c = -1;
+    startAtomicOperation();
+    _rxBuffer.DeQueue( (uint8_t *)&c );
+    endAtomicOperation();
 
     if( uc_pinRTS != NO_RTS_PIN ) {
-        // if there is enough space in the RX buffer, assert RTS
-        if( rxBuffer.availableForStore() > RTS_RX_THRESHOLD ) {
+        // If there is enough space in the RX buffer, assert RTS
+        if( _rxBuffer.GetAvailableSpace() > RTS_RX_THRESHOLD ) {
             *pul_outclrRTS = ul_pinMaskRTS;
         }
     }
@@ -163,43 +196,18 @@ int Uart::read()
     return c;
 }
 
+size_t Uart::write( const uint8_t *data, size_t size )
+{
+    startAtomicOperation();
+    int rtn = _txBuffer.Queue( (uint8_t *)data, size );
+    endAtomicOperation();
+    sercom->enableDataRegisterEmptyInterruptUART();
+    return rtn;
+}
+
 size_t Uart::write( const uint8_t data )
 {
-    if( sercom->isDataRegisterEmptyUART() && txBuffer.available() == 0 ) {
-        sercom->writeDataUART( data );
-    }
-    else {
-        // spin lock until a spot opens up in the buffer
-        while( txBuffer.isFull() ) {
-            uint8_t interruptsEnabled = ( ( __get_PRIMASK() & 0x1 ) == 0 );
-
-            if( interruptsEnabled ) {
-                uint32_t exceptionNumber =
-                    ( SCB->ICSR & SCB_ICSR_VECTACTIVE_Msk );
-
-                if( exceptionNumber == 0 ||
-                    NVIC_GetPriority( ( IRQn_Type )( exceptionNumber - 16 ) ) >
-                        SERCOM_NVIC_PRIORITY ) {
-                    // no exception or called from an ISR with lower priority,
-                    // wait for free buffer spot via IRQ
-                    continue;
-                }
-            }
-
-            // interrupts are disabled or called from ISR with higher or equal
-            // priority than the SERCOM IRQ manually call the UART IRQ handler
-            // when the data register is empty
-            if( sercom->isDataRegisterEmptyUART() ) {
-                IrqHandler();
-            }
-        }
-
-        txBuffer.store_char( data );
-
-        sercom->enableDataRegisterEmptyInterruptUART();
-    }
-
-    return 1;
+    return write( &data, 1 );
 }
 
 SercomNumberStopBit Uart::extractNbStopBit( uint16_t config )

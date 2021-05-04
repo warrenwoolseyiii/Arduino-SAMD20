@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include <system_samd20.h>
 #include "variant.h"
+#include "debug_hooks.h"
 
 /* RTOS Hooks */
 extern void svcHook( void );
@@ -37,11 +38,11 @@ void Dummy_Handler( void )
 }
 
 /* Cortex-M0+ core handlers */
-void HardFault_Handler( void )
-    __attribute__( ( weak, alias( "Dummy_Handler" ) ) );
+void HardFault_Handler( void );
 void Reset_Handler( void );
-void NMI_Handler( void ) __attribute__( ( weak, alias( "Dummy_Handler" ) ) );
-void SVC_Handler( void ) __attribute__( ( weak, alias( "Dummy_Handler" ) ) );
+void NonMaskableInt_Handler( void )
+    __attribute__( ( weak, alias( "Dummy_Handler" ) ) );
+void SVCall_Handler( void ) __attribute__( ( weak, alias( "Dummy_Handler" ) ) );
 void PendSV_Handler( void ) __attribute__( ( weak, alias( "Dummy_Handler" ) ) );
 void SysTick_Handler( void );
 
@@ -49,7 +50,7 @@ void SysTick_Handler( void );
 void PM_Handler( void ) __attribute__( ( weak, alias( "Dummy_Handler" ) ) );
 void SYSCTRL_Handler( void )
     __attribute__( ( weak, alias( "Dummy_Handler" ) ) );
-void WDT_Handler( void ) __attribute__( ( weak, alias( "Dummy_Handler" ) ) );
+void WDT_Handler( void );
 void RTC_Handler( void );
 void EIC_Handler( void ) __attribute__( ( weak, alias( "Dummy_Handler" ) ) );
 void NVMCTRL_Handler( void )
@@ -113,16 +114,16 @@ const DeviceVectors exception_table = {
     /* Configure Initial Stack Pointer, using linker-generated symbols */
     (void *)( &__StackTop ),
 
-    (void *)Reset_Handler, (void *)NMI_Handler, (void *)HardFault_Handler,
-    (void *)( 0UL ),                      /* Reserved */
-    (void *)( 0UL ),                      /* Reserved */
-    (void *)( 0UL ),                      /* Reserved */
-    (void *)( 0UL ),                      /* Reserved */
-    (void *)( 0UL ),                      /* Reserved */
-    (void *)( 0UL ),                      /* Reserved */
-    (void *)( 0UL ),                      /* Reserved */
-    (void *)SVC_Handler, (void *)( 0UL ), /* Reserved */
-    (void *)( 0UL ),                      /* Reserved */
+    (void *)Reset_Handler, (void *)NonMaskableInt_Handler,
+    (void *)HardFault_Handler, (void *)( 0UL ), /* Reserved */
+    (void *)( 0UL ),                            /* Reserved */
+    (void *)( 0UL ),                            /* Reserved */
+    (void *)( 0UL ),                            /* Reserved */
+    (void *)( 0UL ),                            /* Reserved */
+    (void *)( 0UL ),                            /* Reserved */
+    (void *)( 0UL ),                            /* Reserved */
+    (void *)SVCall_Handler, (void *)( 0UL ),    /* Reserved */
+    (void *)( 0UL ),                            /* Reserved */
     (void *)PendSV_Handler, (void *)SysTick_Handler,
 
     /* Configurable interrupts */
@@ -202,6 +203,8 @@ void Reset_Handler( void )
     gRCause = PM->RCAUSE.reg;
     LowPowerSysInit();
 
+    NVIC_EnableIRQ( HardFault_IRQn );
+
     main();
 
     while( 1 )
@@ -218,4 +221,18 @@ extern void RTC_IRQHandler();
 void        RTC_Handler( void )
 {
     RTC_IRQHandler();
+}
+
+extern void WDT_IRQHandler();
+void        WDT_Handler( void )
+{
+    volatile uint32_t *rtnAddr = (uint32_t *)( __get_MSP() );
+    WDT_IRQHandler( *( rtnAddr + 8 ) );
+}
+
+extern void HardFault_IRQHandler();
+void        HardFault_Handler( void )
+{
+    volatile uint32_t *rtnAddr = (uint32_t *)( __get_MSP() );
+    HardFault_IRQHandler( *( rtnAddr + 8 ) );
 }

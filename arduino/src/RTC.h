@@ -32,41 +32,40 @@
 #define RTC_EXACT_STEPS_TO_MILLIS( x ) ( ( x * 1000 ) >> 15 )
 #define RTC_EXACT_MILLIS_TO_STEPS( x ) ( ( x << 15 ) / 1000 )
 
-extern volatile uint64_t _rtcOverFlows;
-#define GET_RTC_STEPS( x )                          \
-    {                                               \
-                                                    \
-        do {                                        \
-            x = RTC->MODE1.COUNT.reg;               \
-        } while( x >= ( RTC_STEPS_OVERFLOW - 6 ) ); \
-        x |= ( _rtcOverFlows << 15 );               \
-    }
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#if defined( _DEBUG_RTC_ )
 typedef struct
 {
-    uint64_t start, delta, end;
-    uint32_t isrFlags[128];
-    uint32_t enFlags[128];
-    uint32_t ovfStepStart[128];
-    uint32_t compStepStart[128];
-    uint32_t ovfStepEnd[128];
-    uint32_t compStepEnd[128];
-    uint8_t  ovfNdx, compNdx;
-    uint8_t  comp, ovf, isrNdx, enNdx;
-} RTCDebugStuff_t;
-#endif /* _DEBUG_RTC_ */
+    uint8_t  overFlowCalled, inside;
+    uint32_t rtcFlags, countReg;
+    uint64_t rtnSteps;
+} RTCSteps_Debug_t;
+
+typedef struct
+{
+    uint64_t steps, start, cnt;
+    int64_t  internalDelay;
+    uint8_t  sleepCounter, inside;
+} DelayRTCSteps_Debug_t;
+
+typedef struct
+{
+    uint32_t irqFlags;
+    uint8_t  userISRCalled, maxOVF, inside;
+} RTCIRQ_Debug_t;
 
 void     initRTC();
 void     disableRTC();
 uint64_t stepsRTC();
 uint64_t secondsRTC();
 void     delayRTCSteps( uint64_t steps );
+void     delayRTCStepsIdle( uint64_t steps, void ( *idleFunc )() );
 void     registerOverflowISR( void ( *ISRFunc )() );
+void     registerIdleTaskHasWork( int ( *Func )() );
+void getRTCDebugInfo( RTCSteps_Debug_t *steps, DelayRTCSteps_Debug_t *dSteps,
+                      RTCIRQ_Debug_t *irqSteps );
 
 #ifdef __cplusplus
 }

@@ -23,105 +23,133 @@
 
 #include <stdint.h>
 
-// Define constants and variables for buffering incoming serial data.  We're
-// using a ring buffer (I think), in which head is the index of the location
-// to which to write the next incoming character and tail is the index of the
-// location from which to read.
-#define SERIAL_BUFFER_SIZE 64
-
-template <int N> class RingBufferN
+template <class T, int N> class RingBufferN
 {
-  public:
-    uint8_t      _aucBuffer[N];
-    volatile int _iHead;
-    volatile int _iTail;
-
-  public:
-    RingBufferN( void );
-    void store_char( uint8_t c );
-    void clear();
-    int  read_char();
-    int  available();
-    int  availableForStore();
-    int  peek();
-    bool isFull();
-
   private:
-    int nextIndex( int index );
-};
+    T        _buff[N];
+    uint32_t _size = N;
+    uint32_t _head, _tail;
+    uint32_t _hNdx, _tNdx;
 
-typedef RingBufferN<SERIAL_BUFFER_SIZE> RingBuffer;
-
-template <int N> RingBufferN<N>::RingBufferN( void )
-{
-    memset( _aucBuffer, 0, N );
-    clear();
-}
-
-template <int N> void RingBufferN<N>::store_char( uint8_t c )
-{
-    int i = nextIndex( _iHead );
-
-    // if we should be storing the received character into the location
-    // just before the tail (meaning that the head would advance to the
-    // current location of the tail), we're about to overflow the buffer
-    // and so we don't write the character or advance the head.
-    if( i != _iTail ) {
-        _aucBuffer[_iHead] = c;
-        _iHead = i;
+  public:
+    RingBufferN()
+    {
+        _head = _tail = 0;
+        _hNdx = _tNdx = 0;
     }
-}
 
-template <int N> void RingBufferN<N>::clear()
-{
-    _iHead = 0;
-    _iTail = 0;
-}
+    uint32_t GetSize()
+    {
+        return _size;
+    }
 
-template <int N> int RingBufferN<N>::read_char()
-{
-    if( _iTail == _iHead ) return -1;
+    uint32_t GetNumObjStored()
+    {
+        return _head - _tail;
+    }
 
-    uint8_t value = _aucBuffer[_iTail];
-    _iTail = nextIndex( _iTail );
+    uint32_t GetAvailableSpace()
+    {
+        return _size - GetNumObjStored();
+    }
 
-    return value;
-}
+    uint32_t Queue( T obj )
+    {
+        // Overall length check
+        if( GetAvailableSpace() < 1 ) return 0;
 
-template <int N> int RingBufferN<N>::available()
-{
-    int delta = _iHead - _iTail;
+        // Add the bytes
+        _buff[_hNdx++] = obj;
+        _head++;
+        if( _hNdx >= _size ) _hNdx = 0;
 
-    if( delta < 0 )
-        return N + delta;
-    else
-        return delta;
-}
+        return 1;
+    }
 
-template <int N> int RingBufferN<N>::availableForStore()
-{
-    if( _iHead >= _iTail )
-        return N - 1 - _iHead + _iTail;
-    else
-        return _iTail - _iHead - 1;
-}
+    uint32_t Queue( T *obj, uint32_t len )
+    {
+        // Null check
+        if( obj == NULL ) return 0;
 
-template <int N> int RingBufferN<N>::peek()
-{
-    if( _iTail == _iHead ) return -1;
+        // Overall length check
+        if( GetAvailableSpace() < len ) return 0;
 
-    return _aucBuffer[_iTail];
-}
+        // Overflow check
+        uint32_t wLen = len;
+        uint32_t tLen = ( ( _size - _hNdx ) < len ) ? ( _size - _hNdx ) : len;
 
-template <int N> int RingBufferN<N>::nextIndex( int index )
-{
-    return ( uint32_t )( index + 1 ) % N;
-}
+        // Write to the buffer
+        uint32_t i = 0;
+        do {
+            memcpy( &_buff[_hNdx], &obj[i], sizeof( T ) * tLen );
+            _hNdx += tLen;
+            _head += tLen;
+            i += tLen;
+            len -= tLen;
+            if( _hNdx >= _size ) _hNdx = 0;
+            tLen = ( ( _size - _hNdx ) < len ) ? ( _size - _hNdx ) : len;
+        } while( len > 0 );
 
-template <int N> bool RingBufferN<N>::isFull()
-{
-    return ( nextIndex( _iHead ) == _iTail );
-}
+        return wLen;
+    }
+
+    uint32_t DeQueue( T *obj, uint32_t len = 1 )
+    {
+        // Null check
+        if( obj == NULL ) return 0;
+
+        // Overall length check
+        if( GetNumObjStored() < len ) return 0;
+
+        // If length is one make it easy
+        if( len == 1 ) {
+            *obj = _buff[_tNdx++];
+            _tail++;
+            if( _tNdx >= _size ) _tNdx = 0;
+            return 1;
+        }
+
+        // Overflow check
+        uint32_t rLen = len;
+        uint32_t tLen = ( ( _size - _tNdx ) < len ) ? ( _size - _tNdx ) : len;
+
+        // Read from the buffer
+        uint32_t i = 0;
+        do {
+            memcpy( &obj[i], &_buff[_tNdx], sizeof( T ) * tLen );
+            _tNdx += tLen;
+            _tail += tLen;
+            i += tLen;
+            len -= tLen;
+            if( _tNdx >= _size ) _tNdx = 0;
+            tLen = ( ( _size - _tNdx ) < len ) ? ( _size - _tNdx ) : len;
+        } while( len > 0 );
+
+        return rLen;
+    }
+
+    T *AccessElement( uint32_t position )
+    {
+        if( position > GetNumObjStored() ) return NULL;
+        uint32_t index = _tNdx + position;
+        if( index >= _size ) index -= _size;
+        return &_buff[index];
+    }
+
+    void Flush( uint32_t len = 0 )
+    {
+        if( len == 0 ) {
+            _tail = _head;
+            _tNdx = _hNdx;
+        }
+        else {
+            if( len > GetNumObjStored() ) len = GetNumObjStored();
+            _tail += len;
+            _tNdx += len;
+            if( _tNdx >= _size ) _tNdx -= _size;
+        }
+    }
+};
 
 #endif /* _RING_BUFFER_ */
 

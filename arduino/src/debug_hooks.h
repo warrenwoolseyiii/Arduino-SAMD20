@@ -15,41 +15,43 @@
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-
-#ifndef SYSTICK_H_
-#define SYSTICK_H_
+#ifndef DEBUG_HOOKS_H_
+#define DEBUG_HOOKS_H_
 
 #include "sam.h"
+#include "delay.h"
+#include "WDT.h"
+#include "RTC.h"
+#include "SysTick.h"
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define SYS_TICK_MSB 0x800000
-#define SYS_TICK_UNDERFLOW 0xFFFFFF
-#define SYS_TICK_MAXUNDERFLOWS 0xFFFFFFFFFF
-
 typedef struct
 {
-    uint8_t  hadToInit, usedUpdatedCount, insideGet, inside;
-    uint64_t tixReturned;
-} CPUTix_Debug_t;
+    Micros_Debug_t        mic;
+    DelayMicros_Debug_t   dMic;
+    WDT_Debug_t           wdt;
+    RTCSteps_Debug_t      rtc;
+    DelayRTCSteps_Debug_t dRtc;
+    RTCIRQ_Debug_t        rtcIrq;
+    CPUTix_Debug_t        tix;
+    DelayCPUTix_Debug_t   dTix;
+    uint8_t               tixInit;
+} Core_Debug_t;
 
-typedef struct
+__STATIC_INLINE uint32_t __get_LR( void )
 {
-    uint8_t  hadToInit, inside;
-    uint64_t start, cnt, tix;
-} DelayCPUTix_Debug_t;
+    register uint32_t __regLinkRegister __ASM( "lr" );
+    return ( __regLinkRegister );
+}
 
-void     initSysTick();
-void     disableSysTick();
-uint64_t getCPUTicks();
-void     delayCPUTicks( uint64_t tix );
-void     getCPUTixDebugInfo( CPUTix_Debug_t *tix, DelayCPUTix_Debug_t *dTix,
-                             uint8_t *init );
+void getCoreDebugInfo( Core_Debug_t *dbg );
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* SYSTICK_H_ */
+#endif /* DEBUG_HOOKS_H_ */

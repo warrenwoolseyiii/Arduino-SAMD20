@@ -18,8 +18,11 @@
 
 #include "sam.h"
 #include "clocks.h"
+#include "atomic.h"
 
-#define GCLK_WAIT_SYNC while( GCLK->STATUS.bit.SYNCBUSY )
+#define GCLK_SYNC_BUSY GCLK->STATUS.bit.SYNCBUSY
+#define GCLK_WAIT_SYNC while( GCLK_SYNC_BUSY )
+
 #define SYSCTRL_DFLL_WAIT_SYNC while( !SYSCTRL->PCLKSR.bit.DFLLRDY )
 #define SYSCTRL_OSC8M_WAIT_SYNC            \
     while( !SYSCTRL->PCLKSR.bit.OSC8MRDY ) \
@@ -28,9 +31,13 @@
 void resetGCLK()
 {
     PM->APBAMASK.reg |= PM_APBAMASK_GCLK;
-    GCLK->CTRL.reg = GCLK_CTRL_SWRST;
 
-    while( ( GCLK->CTRL.bit.SWRST ) && ( GCLK->STATUS.bit.SYNCBUSY ) )
+    ATOMIC_OPERATION( {
+        if( GCLK_SYNC_BUSY ) GCLK_WAIT_SYNC;
+        GCLK->CTRL.reg = GCLK_CTRL_SWRST;
+    } )
+
+    while( GCLK->CTRL.bit.SWRST )
         ;
 }
 
@@ -45,8 +52,10 @@ int8_t initClkGenerator( uint32_t clkSrc, uint32_t id, uint32_t div,
     if( id > GCLK_GENDIV_ID_GCLK7_Val ) return -1;
 
     genDivReg = GCLK_GENDIV_ID( id ) | GCLK_GENDIV_DIV( div );
-    GCLK->GENDIV.reg = genDivReg;
-    GCLK_WAIT_SYNC;
+    ATOMIC_OPERATION( {
+        if( GCLK_SYNC_BUSY ) GCLK_WAIT_SYNC;
+        GCLK->GENDIV.reg = genDivReg;
+    } )
 
     genCtrlReg = GCLK_GENCTRL_ID( id ) | GCLK_GENCTRL_SRC( clkSrc ) |
                  GCLK_GENCTRL_IDC | GCLK_GENCTRL_GENEN;
@@ -64,8 +73,10 @@ int8_t initClkGenerator( uint32_t clkSrc, uint32_t id, uint32_t div,
 #endif /* SAMD20E18 */
     }
 
-    GCLK->GENCTRL.reg = genCtrlReg;
-    GCLK_WAIT_SYNC;
+    ATOMIC_OPERATION( {
+        if( GCLK_SYNC_BUSY ) GCLK_WAIT_SYNC;
+        GCLK->GENCTRL.reg = genCtrlReg;
+    } )
 
     return 0;
 }
@@ -73,8 +84,10 @@ int8_t initClkGenerator( uint32_t clkSrc, uint32_t id, uint32_t div,
 void disableClkGenerator( uint32_t id )
 {
     if( id <= GCLK_GENDIV_ID_GCLK7_Val ) {
-        GCLK->GENCTRL.reg = GCLK_GENCTRL_ID( id );
-        GCLK_WAIT_SYNC;
+        ATOMIC_OPERATION( {
+            if( GCLK_SYNC_BUSY ) GCLK_WAIT_SYNC;
+            GCLK->GENCTRL.reg = GCLK_GENCTRL_ID( id );
+        } )
     }
 
     return;
@@ -85,9 +98,11 @@ int8_t initGenericClk( uint32_t genClk, uint32_t id )
     if( genClk > GCLK_CLKCTRL_GEN_GCLK7_Val ) return -1;
     if( id > GCLK_CLKCTRL_ID_PTC_Val ) return -1;
 
-    GCLK->CLKCTRL.reg =
-        GCLK_CLKCTRL_ID( id ) | GCLK_CLKCTRL_GEN( genClk ) | GCLK_CLKCTRL_CLKEN;
-    GCLK_WAIT_SYNC;
+    ATOMIC_OPERATION( {
+        if( GCLK_SYNC_BUSY ) GCLK_WAIT_SYNC;
+        GCLK->CLKCTRL.reg = GCLK_CLKCTRL_ID( id ) | GCLK_CLKCTRL_GEN( genClk ) |
+                            GCLK_CLKCTRL_CLKEN;
+    } )
 
     return 0;
 }
@@ -95,8 +110,10 @@ int8_t initGenericClk( uint32_t genClk, uint32_t id )
 void disableGenericClk( uint32_t id )
 {
     if( id <= GCLK_CLKCTRL_ID_PTC_Val ) {
-        GCLK->CLKCTRL.reg = GCLK_CLKCTRL_ID( id );
-        GCLK_WAIT_SYNC;
+        ATOMIC_OPERATION( {
+            if( GCLK_SYNC_BUSY ) GCLK_WAIT_SYNC;
+            GCLK->CLKCTRL.reg = GCLK_CLKCTRL_ID( id );
+        } )
     }
 }
 

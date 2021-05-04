@@ -9,14 +9,17 @@ PROJ_ROOT := $(realpath .)
 HOST      := $(shell hostname)
 BUILD_DIR := build
 
+-include $(SDK_ROOT)/config.mk
+
 #################################### Paths #####################################
-CMSIS_DIR := $(SDK_ROOT)/devicepack/ARM/CMSIS/5.0.1/CMSIS/Include
-ATMEL_DFP := $(SDK_ROOT)/devicepack/Atmel/SAMD20_DFP/1.2.91/samd20/include
-TOOLCHAIN_BINS ?= $(SDK_ROOT)/toolchain/bin
+CMSIS_DIR := $(SDK_ROOT)/devicepack/ARM/CMSIS/$(CMSIS_VER)/$(CMSIS_CORE_INCLUDE)
+ATMEL_DFP := $(SDK_ROOT)/devicepack/Atmel/SAMD20_DFP/$(SAMD20_DFP_VER)/$(SAMD20_DFP_INCLUDE)
+ARMBIN    ?= $(SDK_ROOT)/toolchain/bin
 
 OUTPUT_FILE_PATH :=$(BUILD_DIR)/libArduinoCore.a
 OUTPUT_FILE_PATH_AS_ARGS :=$(BUILD_DIR)/libArduinoCore.a
 
+GCC_VER := $(shell $(ARMBIN)/arm-none-eabi-gcc -dumpversion)
 #################################### Files #####################################
 # O_SRCS :=
 OBJS :=
@@ -81,38 +84,38 @@ DEPENDS = -MD -MP -MF $(@:%.o=%.d) -MT$(@:%.o=%.d) -MT$(@:%.o=%.o)
 ################################### Targets ####################################
 $(BUILD_DIR)/%.o: $(PROJ_ROOT)/src/%.c
 	@echo Building file: $<
-	@echo Invoking: ARM/GNU C Compiler : 6.3.1
-	$(TOOLCHAIN_BINS)/arm-none-eabi-gcc $(COMPILER_DEFS) -x c $(CCFLAGS) $(CFLAGS) $(INCLUDES) -c $(CPU) $(DEPENDS) -o $@ $<
+	@echo Invoking: ARM/GNU C Compiler : $(GCC_VER)
+	$(ARMBIN)/arm-none-eabi-gcc $(COMPILER_DEFS) -x c $(CCFLAGS) $(CFLAGS) $(INCLUDES) -c $(CPU) $(DEPENDS) -o $@ $<
 	@echo Finished building: $<
 
 $(BUILD_DIR)/%.o: $(PROJ_ROOT)/src/%.cpp
 	@echo Building file: $<
-	@echo Invoking: ARM/GNU C Compiler : 6.3.1
-	$(TOOLCHAIN_BINS)/arm-none-eabi-g++ $(COMPILER_DEFS) $(CCFLAGS) $(CXXFLAGS) $(INCLUDES) -c $(CPU) $(DEPENDS) -o $@ $<
+	@echo Invoking: ARM/GNU C Compiler : $(GCC_VER)
+	$(ARMBIN)/arm-none-eabi-g++ $(COMPILER_DEFS) $(CCFLAGS) $(CXXFLAGS) $(INCLUDES) -c $(CPU) $(DEPENDS) -o $@ $<
 	@echo Finished building: $<
 
 $(BUILD_DIR)/%.o: $(PROJ_ROOT)/src/%.S
 	@echo Building file: $<
-	@echo Invoking: ARM/GNU Preprocessing Assembler : 6.3.1
-	$(TOOLCHAIN_BINS)/arm-none-eabi-gcc $(COMPILER_DEFS) -x assembler-with-cpp -c $(CPU) $(INCLUDES) $(DEPENDS) -Wa,-g -o $@ $<
+	@echo Invoking: ARM/GNU Preprocessing Assembler : $(GCC_VER)
+	$(ARMBIN)/arm-none-eabi-gcc $(COMPILER_DEFS) -x assembler-with-cpp -c $(CPU) $(INCLUDES) $(DEPENDS) -Wa,-g -o $@ $<
 	@echo Finished building: $<
 
 $(BUILD_DIR)/%.o: $(PROJ_ROOT)/src/%.x
 	@echo Building file: $<
-	@echo Invoking: ARM/GNU Preprocessing Assembler : 6.3.1
-	$(TOOLCHAIN_BINS)/arm-none-eabi-gcc $(COMPILER_DEFS) -x assembler-with-cpp -c $(CPU) $(INCLUDES) $(DEPENDS) -Wa,-g -o $@ $<
+	@echo Invoking: ARM/GNU Preprocessing Assembler : $(GCC_VER)
+	$(ARMBIN)/arm-none-eabi-gcc $(COMPILER_DEFS) -x assembler-with-cpp -c $(CPU) $(INCLUDES) $(DEPENDS) -Wa,-g -o $@ $<
 	@echo Finished building: $<
 
 $(BUILD_DIR)/%.o:: $(PROJ_ROOT)/src/%.X
 	@echo Building file: $<
-	@echo Invoking: ARM/GNU Preprocessing Assembler : 6.3.1
-	$(TOOLCHAIN_BINS)/arm-none-eabi-gcc $(COMPILER_DEFS) -x assembler-with-cpp -c $(CPU) $(INCLUDES) $(DEPENDS) -Wa,-g -o $@ $<
+	@echo Invoking: ARM/GNU Preprocessing Assembler : $(GCC_VER)
+	$(ARMBIN)/arm-none-eabi-gcc $(COMPILER_DEFS) -x assembler-with-cpp -c $(CPU) $(INCLUDES) $(DEPENDS) -Wa,-g -o $@ $<
 	@echo Finished building: $<
 
 $(BUILD_DIR)/%.o:: $(PROJ_ROOT)/src/%.sx
 	@echo Building file: $<
-	@echo Invoking: ARM/GNU Preprocessing Assembler : 6.3.1
-	$(TOOLCHAIN_BINS)/arm-none-eabi-gcc $(COMPILER_DEFS) -x assembler-with-cpp -c $(CPU) $(INCLUDES) $(DEPENDS) -Wa,-g -o $@ $<
+	@echo Invoking: ARM/GNU Preprocessing Assembler : $(GCC_VER)
+	$(ARMBIN)/arm-none-eabi-gcc $(COMPILER_DEFS) -x assembler-with-cpp -c $(CPU) $(INCLUDES) $(DEPENDS) -Wa,-g -o $@ $<
 	@echo Finished building: $<
 
 
@@ -132,8 +135,8 @@ prebuild:
 
 $(OUTPUT_FILE_PATH): $(OBJS)
 	@echo Building target: $@
-	@echo Invoking: ARM/GNU Archiver : 6.3.1
-	$(TOOLCHAIN_BINS)/arm-none-eabi-ar -r -o $(OUTPUT_FILE_PATH_AS_ARGS) $(OBJS_AS_ARGS)
+	@echo Invoking: ARM/GNU Archiver : $(GCC_VER)
+	$(ARMBIN)/arm-none-eabi-ar -r -o $(OUTPUT_FILE_PATH_AS_ARGS) $(OBJS_AS_ARGS)
 	@echo Finished building target: $@
 
 # Other Targets

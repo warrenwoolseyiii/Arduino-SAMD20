@@ -18,10 +18,17 @@
 #include "WDT.h"
 #include "sam.h"
 #include "clocks.h"
+#include "atomic.h"
+#include "debug_hooks.h"
+#include "delay.h"
 
-#define WDT_WAIT_SYNC while( WDT->STATUS.bit.SYNCBUSY )
+#define WDT_SYNC_BUSY WDT->STATUS.bit.SYNCBUSY
+#define WDT_WAIT_SYNC while( WDT_SYNC_BUSY )
 
 uint8_t _isInit = 0;
+void ( *userEarlyWarningISR )( uint32_t ) = 0;
+void ( *userHardFaultISR )( uint32_t ) = 0;
+volatile WDT_Debug_t _wdtDebug = {0, 0, 0};
 
 /* Note: The WDT runs off the 32768 Hz clock source divided by 32, giving the
  * WDT a 1024 Hz clock source. */
@@ -35,8 +42,10 @@ void initWDT( WDTPeriod_t wdtPeriod )
 
     // Reset the control reg
     disableWDT();
-    WDT->CTRL.reg = 0;
-    WDT_WAIT_SYNC;
+    ATOMIC_OPERATION( {
+        if( WDT_SYNC_BUSY ) WDT_WAIT_SYNC;
+        WDT->CTRL.reg = 0;
+    } )
 
     // Ensure all interrupts are cleared
     WDT->INTENCLR.bit.EW = 1;
@@ -45,6 +54,13 @@ void initWDT( WDTPeriod_t wdtPeriod )
     // Set the period
     if( wdtPeriod > WDT_CONFIG_PER_16K_Val ) wdtPeriod = WDT_CONFIG_PER_16K_Val;
     WDT->CONFIG.reg = WDT_CONFIG_PER( wdtPeriod );
+
+    if( wdtPeriod > WDT_CONFIG_PER_8_Val ) {
+        WDT->EWCTRL.reg = WDT_EWCTRL_EWOFFSET( ( wdtPeriod - 1 ) );
+        WDT->INTENSET.bit.EW = 1;
+
+        NVIC_EnableIRQ( WDT_IRQn );
+    }
 
     enableWDT();
 }
@@ -59,32 +75,78 @@ void endWDT()
 
 void enableWDT()
 {
-    WDT->CTRL.bit.ENABLE = 1;
-    WDT_WAIT_SYNC;
+    ATOMIC_OPERATION( {
+        if( WDT_SYNC_BUSY ) WDT_WAIT_SYNC;
+        WDT->CTRL.bit.ENABLE = 1;
+    } )
+
     _isInit = 1;
 }
 
 void disableWDT()
 {
-    WDT->CTRL.bit.ENABLE = 0;
-    WDT_WAIT_SYNC;
+    ATOMIC_OPERATION( {
+        if( WDT_SYNC_BUSY ) WDT_WAIT_SYNC;
+        WDT->CTRL.bit.ENABLE = 0;
+    } )
+
     _isInit = 0;
 }
 
-void clearWDT()
+uint8_t clearWDT()
 {
+    _wdtDebug.ok = 0;
+
     // Data sheet Section 17.8.8: Writing 0xA5 will reset the WDT counter
-    WDT->CLEAR.reg = 0xA5;
-    WDT_WAIT_SYNC;
+    ATOMIC_OPERATION( {
+        if( !WDT->STATUS.bit.SYNCBUSY ) {
+            WDT->CLEAR.reg = 0xA5;
+            _wdtDebug.ok = 1;
+        }
+    } )
+
+    _wdtDebug.caller = __get_LR();
+    _wdtDebug.sysTime = millis();
+
+    return _wdtDebug.ok;
 }
 
-/* Warning! Will not return from here. */
+// Warning! Will not return from here.
 void resetCPU()
 {
     if( !_isInit ) initWDT( WDT_CONFIG_PER_8_Val );
 
-    // Data sheet Section 17.8.8: Writing any value other than 0xA5 will reset
-    // the CPU immediately
-    WDT->CLEAR.reg = 0xFF;
-    WDT_WAIT_SYNC;
+    // Data sheet Section 17.8.8: Writing any value other than 0xA5 will
+    // reset the CPU immediately
+    ATOMIC_OPERATION( {
+        if( WDT_SYNC_BUSY ) WDT_WAIT_SYNC;
+        WDT->CLEAR.reg = 0xFF;
+    } )
+}
+
+void registerEarlyWarningISR( void ( *ISRFunc )( uint32_t ) )
+{
+    userEarlyWarningISR = ISRFunc;
+}
+
+void registerHardFaultISR( void ( *ISRFunc )( uint32_t ) )
+{
+    userHardFaultISR = ISRFunc;
+}
+
+void WDT_IRQHandler( uint32_t rtnAddr )
+{
+    if( userEarlyWarningISR != 0 ) userEarlyWarningISR( rtnAddr );
+}
+
+void HardFault_IRQHandler( uint32_t rtnAddr )
+{
+    if( userHardFaultISR != 0 ) userHardFaultISR( rtnAddr );
+}
+
+void getWDTDebugInfo( WDT_Debug_t *wdt )
+{
+    wdt->caller = _wdtDebug.caller;
+    wdt->ok = _wdtDebug.ok;
+    wdt->sysTime = _wdtDebug.sysTime;
 }

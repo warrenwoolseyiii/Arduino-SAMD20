@@ -18,14 +18,13 @@
  */
 
 #include "SPI.h"
-#include <assert.h>
 
 SPIClass::SPIClass( SERCOM *p_sercom, uint8_t uc_pinMISO, uint8_t uc_pinSCK,
                     uint8_t uc_pinMOSI, SercomSpiTXPad PadTx,
                     SercomRXPad PadRx )
 {
     _busConfigured = false;
-    assert( p_sercom != NULL );
+    if( p_sercom == NULL ) while ( 1 );
     _p_sercom = p_sercom;
 
     // pins
@@ -45,8 +44,6 @@ SPIClass::SPIClass( SERCOM *p_sercom, uint8_t uc_pinMISO, uint8_t uc_pinSCK,
 
     // Interrupts
     _interruptMode = spi_can_be_interrupted;
-    _interruptSave = 0;
-    _interruptMask = 0;
 
     // System clock setting
     _oldSystemClock = SystemCoreClock;
@@ -97,18 +94,12 @@ void SPIClass::end()
 
 void SPIClass::interruptMode( SPIInterruptMode_t intMode )
 {
-    uint32_t prim = __get_PRIMASK();
-    __disable_irq();
-    _interruptMode = intMode;
-    if( !prim ) __enable_irq();
+    ATOMIC_OPERATION( { _interruptMode = intMode; } )
 }
 
 void SPIClass::beginTransaction( SPISettings settings )
 {
-    if( _interruptMode == spi_blocking_transactions ) {
-        _interruptSave = __get_PRIMASK();
-        __disable_irq();
-    }
+    if( _interruptMode == spi_blocking_transactions ) startAtomicOperation();
 
     if( !( settings == _settingsInternal ) || !_busConfigured ||
         ( _oldSystemClock != SystemCoreClock ) ) {
@@ -120,9 +111,7 @@ void SPIClass::beginTransaction( SPISettings settings )
 
 void SPIClass::endTransaction( void )
 {
-    if( _interruptMode == spi_blocking_transactions ) {
-        if( !_interruptSave ) __enable_irq();
-    }
+    if( _interruptMode == spi_blocking_transactions ) endAtomicOperation();
 }
 
 void SPIClass::setBitOrder( BitOrder order )
