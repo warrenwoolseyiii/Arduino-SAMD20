@@ -24,7 +24,7 @@ SAMD20_DFP_VER ?= 1.3.124
 SAMD20_DFP_INCLUDE ?= samd20/include
 
 ### ARM CMSIS version and include path ###
-# CMSIS_VER      ?= 5.0.1
-# CMSIS_CORE_INCLUDE ?= CMSIS/Include
-CMSIS_VER      ?= 5.4.0
-CMSIS_CORE_INCLUDE ?= CMSIS/Core/Include
+CMSIS_VER      ?= 5.0.1
+CMSIS_CORE_INCLUDE ?= CMSIS/Include
+# CMSIS_VER      ?= 5.4.0
+# CMSIS_CORE_INCLUDE ?= CMSIS/Core/Include

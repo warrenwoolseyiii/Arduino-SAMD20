@@ -17,6 +17,12 @@ DL_DIR="${ARGS[4]}";
 DP_DIR=$(realpath $DL_DIR/devicepack);
 ZIP_NAME="$VENDOR.$DFP_NAME.$DFP_VER.atpack";
 
+# See if DL_DIR exists
+do_info "Checking for download directory: $DL_DIR";
+if [[ ! -d $DL_DIR ]]; then
+	mkdir $DL_DIR
+fi
+
 # See if target extract directory exists already
 do_info "Checking for device pack: $VENDOR.$DFP_NAME.$DFP_VER";
 if [[ -d $DP_DIR/$VENDOR/$DFP_NAME/$DFP_VER ]]; then
