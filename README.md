@@ -2,7 +2,7 @@
 This project was forked from the ArduinoCore-samd project which supports the Arduino core for the SAMD21 family of processors. The code has been refactored to support the SAMD20 family of processors, and has also been altered with low power projects in mind.
 
 # Dependencies for Ubuntu 18.04
-sudo apt install unzip
+`sudo apt install unzip`
 
 # How to build
 Run `make help` for all make options
