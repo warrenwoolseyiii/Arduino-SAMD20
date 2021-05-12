@@ -12,7 +12,7 @@ make distclean
 make
 ```
 
-**Note for Ubuntu 18.04** : `sudo` might have to issued with the make commands for it to work. If rebuilding, it is worth issuing `sudo make distclean` instead of just `sudo make clean` as one can face `core_cm0plus.h: No such file or directory` error
-
 # Rebuilding
 If you don't want to re-download the DFP and CMSIS distro, just run `make clean` and then `make` to rebuild from the arduino source files.
+
+**Note for Ubuntu 18.04** : `sudo` might have to issued with the make commands for it to work. If rebuilding, it is worth issuing `sudo make distclean` instead of just `sudo make clean` as one can face `core_cm0plus.h: No such file or directory` error
