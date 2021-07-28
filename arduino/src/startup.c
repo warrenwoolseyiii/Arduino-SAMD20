@@ -62,7 +62,6 @@ void loadADCFactoryCal()
  */
 void LowPowerSysInit()
 {
-    NVMCTRL->CTRLB.bit.RWS = NVMCTRL_CTRLB_RWS_HALF_Val;
     resetGCLK();
 
     /* ----------------------------------------------------------------------------------------------
@@ -141,6 +140,7 @@ void LowPowerSysInit()
     initClkGenerator( GCLK_GENCTRL_SRC_OSC8M_Val, GCLK_GENDIV_ID_GCLK0_Val, 0,
                       FALSE, FALSE );
     SystemCoreClock = 8000000ul;
+    NVMCTRL->CTRLB.bit.RWS = NVMCTRL_CTRLB_RWS_SINGLE_Val;
 
     /* ----------------------------------------------------------------------------------------------
      * 4) Load ADC factory calibration values

@@ -118,10 +118,12 @@ class SPIClass
     byte     transfer( uint8_t data );
     uint16_t transfer16( uint16_t data );
     void     transfer( void *buf, size_t count );
+    void     fastSend( const void *buf, size_t count );
 
     // Transaction Functions
     void interruptMode( SPIInterruptMode_t intMode );
     void beginTransaction( SPISettings settings );
+    void beginTransaction();
     void endTransaction( void );
 
     // SPI Configuration methods
@@ -129,6 +131,7 @@ class SPIClass
     void detachInterrupt();
 
     void begin();
+    void config( SPISettings settings );
     void end();
 
     void setBitOrder( BitOrder order );
@@ -136,8 +139,6 @@ class SPIClass
     void setClockDivider( uint8_t uc_div );
 
   private:
-    void config( SPISettings settings );
-
     SERCOM *_p_sercom;
     uint8_t _uc_pinMiso;
     uint8_t _uc_pinMosi;

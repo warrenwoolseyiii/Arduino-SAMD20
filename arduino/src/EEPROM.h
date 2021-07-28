@@ -71,7 +71,7 @@ class EEEPROM
     uint8_t read( int addr )
     {
         uint8_t byte;
-        if( read( addr, &byte, 1 ) != EEEPROM_ERR_OK ) byte = 0;
+        read( addr, &byte, 1 );
         return byte;
     }
 

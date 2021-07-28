@@ -24,7 +24,9 @@ SPIClass::SPIClass( SERCOM *p_sercom, uint8_t uc_pinMISO, uint8_t uc_pinSCK,
                     SercomRXPad PadRx )
 {
     _busConfigured = false;
-    if( p_sercom == NULL ) while ( 1 );
+    if( p_sercom == NULL )
+        while( 1 )
+            ;
     _p_sercom = p_sercom;
 
     // pins
@@ -109,6 +111,12 @@ void SPIClass::beginTransaction( SPISettings settings )
     }
 }
 
+void SPIClass::beginTransaction()
+{
+    if( _interruptMode == spi_blocking_transactions ) startAtomicOperation();
+    if( !_busConfigured ) begin();
+}
+
 void SPIClass::endTransaction( void )
 {
     if( _interruptMode == spi_blocking_transactions ) endAtomicOperation();
@@ -160,13 +168,15 @@ uint16_t SPIClass::transfer16( uint16_t data )
     return t.val;
 }
 
+void SPIClass::fastSend( const void *buf, size_t count )
+{
+    _p_sercom->fastWriteDataSPI( (uint8_t *)buf, count );
+//    _p_sercom->transferDataSPI( (uint8_t *)buf, count );
+}
+
 void SPIClass::transfer( void *buf, size_t count )
 {
-    uint8_t *buffer = reinterpret_cast<uint8_t *>( buf );
-    for( size_t i = 0; i < count; i++ ) {
-        *buffer = transfer( *buffer );
-        buffer++;
-    }
+    _p_sercom->transferDataSPI( (uint8_t *)buf, count );
 }
 
 void SPIClass::attachInterrupt()
