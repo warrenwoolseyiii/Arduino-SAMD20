@@ -123,23 +123,11 @@ typedef enum
 
 typedef enum
 {
-    WIRE_WRITE_FLAG = 0x0ul,
-    WIRE_READ_FLAG
-} SercomWireReadWriteFlag;
-
-typedef enum
-{
-    WIRE_MASTER_ACT_NO_ACTION = 0,
-    WIRE_MASTER_ACT_REPEAT_START,
-    WIRE_MASTER_ACT_READ,
-    WIRE_MASTER_ACT_STOP
+    WIRE_MASTER_ACK_NO_ACTION = 0,
+    WIRE_MASTER_ACK_REPEAT_START = 1,
+    WIRE_MASTER_ACK_READ = 2,
+    WIRE_MASTER_ACK_STOP = 3
 } SercomMasterCommandWire;
-
-typedef enum
-{
-    WIRE_MASTER_ACK_ACTION = 0,
-    WIRE_MASTER_NACK_ACTION
-} SercomMasterAckActionWire;
 
 typedef enum
 {
@@ -148,6 +136,13 @@ typedef enum
     MODE_SPI = 2,
     MODE_NONE = 3
 } SercomMode;
+
+#define I2CM_ERR_NONE 0
+#define I2CM_ERR_BUS_BUSY -1
+#define I2CM_ERR_CONDITION -2
+#define I2CM_ERR_LOW_TIMEOUT -3
+#define I2CM_ERR_RX_NACK -4
+#define I2CM_ERR_GENERAL -5
 
 class SERCOM
 {
@@ -194,38 +189,31 @@ class SERCOM
     SercomDataOrder getDataOrderSPI( void );
     void            setBaudrateSPI( uint8_t divider );
     void            setClockModeSPI( SercomSpiClockMode clockMode );
+    void            transferDataSPI( uint8_t *data, int len );
     uint8_t         transferDataSPI( uint8_t data );
-    bool            isBufferOverflowErrorSPI( void );
-    bool            isDataRegisterEmptySPI( void );
-    bool            isTransmitCompleteSPI( void );
-    bool            isReceiveCompleteSPI( void );
+    void            fastWriteDataSPI( uint8_t *data, int len );
+
+    bool isBufferOverflowErrorSPI( void );
+    bool isDataRegisterEmptySPI( void );
+    bool isTransmitCompleteSPI( void );
+    bool isReceiveCompleteSPI( void );
 
     /* ========== WIRE ========== */
-    void initSlaveWIRE( uint8_t address, bool enableGeneralCall = false );
-    void initMasterWIRE( uint32_t baudrate );
-
     void resetWIRE( void );
     void enableWIRE( void );
     void disableWIRE( void );
     void endWire( void );
-    void prepareNackBitWIRE( void );
-    void prepareAckBitWIRE( void );
-    void prepareCommandBitsWire( uint8_t cmd );
-    bool startTransmissionWIRE( uint8_t address, SercomWireReadWriteFlag flag );
-    bool sendDataMasterWIRE( uint8_t data );
-    bool sendDataSlaveWIRE( uint8_t data );
-    bool isMasterWIRE( void );
-    bool isSlaveWIRE( void );
-    bool isBusIdleWIRE( void );
-    bool isBusOwnerWIRE( void );
-    bool isDataReadyWIRE( void );
-    bool isStopDetectedWIRE( void );
-    bool isRestartDetectedWIRE( void );
-    bool isAddressMatch( void );
-    bool isMasterReadOperationWIRE( void );
-    bool isRXNackReceivedWIRE( void );
-    int  availableWIRE( void );
-    uint8_t readDataWIRE( void );
+    void initMasterWIRE( bool fastMode );
+    int  startTransmissionWIRE( uint8_t addr, bool isWrite );
+    int  parseMasterWireStatus();
+    int  waitForMBWire();
+    int  waitForSBWire();
+    void masterACKWire( bool ack );
+    void prepareMasterCommandWIRE( uint8_t cmd );
+    int  getStatusWIRE();
+    void writeStatusWire( int status );
+    int  sendDataMasterWIRE( uint8_t *data, int len, bool stop = false );
+    int  readDataMasterWire( uint8_t *data, int len, bool ack, bool stop );
 
   private:
     Sercom *   sercom;

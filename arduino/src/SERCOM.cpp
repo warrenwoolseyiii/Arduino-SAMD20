@@ -369,6 +369,63 @@ void SERCOM::setClockModeSPI( SercomSpiClockMode clockMode )
     enableSPI();
 }
 
+void SERCOM::fastWriteDataSPI( uint8_t *data, int len )
+{
+    Sercom * ser = sercom;
+    uint32_t ctrlb = ser->SPI.CTRLB.reg;
+    ser->SPI.CTRLB.bit.RXEN = 0;
+    volatile uint8_t *pDATA = (uint8_t *)&ser->SPI.DATA.reg;
+    volatile uint8_t *pflag = &ser->SPI.INTFLAG.reg;
+    uint8_t *         end = data + len;
+    while( data < end ) {
+        uint8_t d = *data++;
+        asm volatile( "l1: ldrb r2, [%2]\n\t"
+                      "lsl r2, r2, #31\n\t"
+                      "bpl l1\n\t"
+                      "strb %0, [%1]\n\t"
+                      :
+                      : "r"( d ), "r"( pDATA ), "r"( pflag )
+                      : "cc", "r2" );
+    }
+    while( !ser->SPI.INTFLAG.bit.TXC )
+        ;
+    ser->SPI.CTRLB.reg = ctrlb;
+}
+
+void SERCOM::transferDataSPI( uint8_t *data, int len )
+{
+    if( !len ) return;
+    volatile uint8_t *pDATA = (uint8_t *)&sercom->SPI.DATA.reg;
+    uint8_t *         end = data + len;
+    Sercom *          ser = sercom;
+    while( !ser->SPI.INTFLAG.bit.DRE )
+        ;
+    *pDATA = *data;
+    if( --len ) {
+        while( !ser->SPI.INTFLAG.bit.DRE )
+            ;
+        *pDATA = data[1];
+        uint8_t d;
+        if( data < end - 2 ) {
+            d = data[2];
+            while( data < end - 3 ) {
+                if( ser->SPI.INTFLAG.bit.DRE ) {
+                    *data++ = *pDATA;
+                    *pDATA = d;
+                    d = data[2];
+                }
+            }
+            while( !ser->SPI.INTFLAG.bit.DRE )
+                ;
+            *data++ = *pDATA;
+            *pDATA = d;
+        }
+    }
+    while( data < end ) {
+        if( ser->SPI.INTFLAG.bit.RXC ) *data++ = *pDATA;
+    }
+}
+
 uint8_t SERCOM::transferDataSPI( uint8_t data )
 {
     // Write data and wait for return data
@@ -443,7 +500,7 @@ void SERCOM::endWire()
     disableSERCOM();
 }
 
-void SERCOM::initSlaveWIRE( uint8_t ucAddress, bool enableGeneralCall )
+void SERCOM::initMasterWIRE( bool fastMode )
 {
     if( _mode < MODE_NONE ) takeDownMode();
     _mode = MODE_WIRE;
@@ -451,243 +508,155 @@ void SERCOM::initSlaveWIRE( uint8_t ucAddress, bool enableGeneralCall )
     enableSERCOM();
     resetWIRE();
 
-    // Set slave mode
-    sercom->I2CS.CTRLA.bit.MODE = I2C_SLAVE_OPERATION;
+    // Use SCL low timeout, standard 2 wire master mode
+    sercom->I2CM.CTRLA.reg =
+        SERCOM_I2CM_CTRLA_MODE( SERCOM_I2CM_CTRLA_MODE_I2C_MASTER_Val ) |
+        SERCOM_I2CM_CTRLA_LOWTOUT | SERCOM_I2CM_CTRLA_INACTOUT( 1 );
 
-    sercom->I2CS.ADDR.reg =
-        SERCOM_I2CS_ADDR_ADDR( ucAddress &
-                               0x7Ful ) |    // 0x7F, select only 7 bits
-        SERCOM_I2CS_ADDR_ADDRMASK( 0x00ul ); // 0x00, only match exact address
-    if( enableGeneralCall ) {
-        sercom->I2CS.ADDR.reg |=
-            SERCOM_I2CS_ADDR_GENCEN; // enable general call (address 0x00)
-    }
+    // Enable smart mode
+    sercom->I2CM.CTRLB.reg = SERCOM_I2CM_CTRLB_SMEN;
 
-    // Set the interrupt register
-    sercom->I2CS.INTENSET.reg = SERCOM_I2CS_INTENSET_PREC |   // Stop
-                                SERCOM_I2CS_INTENSET_AMATCH | // Address Match
-                                SERCOM_I2CS_INTENSET_DRDY;    // Data Ready
+    // Baud rate constants
+    const float i2c_fast = 0.00000125;
+    const float i2c_slow = 0.000005;
+    const float trise_2 = 0.000000125;
+
+    // Set the baud rate
+    uint8_t baud =
+        ( uint8_t )( SystemCoreClock * ( fastMode ? i2c_fast : i2c_slow ) -
+                     SystemCoreClock * trise_2 - 4 );
+    sercom->I2CM.BAUD.bit.BAUD = baud;
+
+    enableWIRE();
 }
 
-void SERCOM::initMasterWIRE( uint32_t baudrate )
-{
-    if( _mode < MODE_NONE ) takeDownMode();
-    _mode = MODE_WIRE;
-
-    enableSERCOM();
-    resetWIRE();
-
-    // Set master mode and enable SCL Clock Stretch mode (stretch after ACK
-    // bit)
-    sercom->I2CM.CTRLA.reg = SERCOM_I2CM_CTRLA_MODE( I2C_MASTER_OPERATION ) /* |
-                                                 SERCOM_I2CM_CTRLA_SCLSM*/
-        ;
-
-    // Enable Smart mode and Quick Command
-    // sercom->I2CM.CTRLB.reg =  SERCOM_I2CM_CTRLB_SMEN /*|
-    // SERCOM_I2CM_CTRLB_QCEN*/ ;
-
-    // Enable all interrupts
-    //  sercom->I2CM.INTENSET.reg = SERCOM_I2CM_INTENSET_MB |
-    //  SERCOM_I2CM_INTENSET_SB | SERCOM_I2CM_INTENSET_ERROR ;
-
-    // Synchronous arithmetic baudrate
-    sercom->I2CM.BAUD.bit.BAUD =
-        SystemCoreClock / ( 2 * baudrate ) - 5 -
-        ( ( ( SystemCoreClock / 1000000 ) * WIRE_RISE_TIME_NANOSECONDS ) /
-          ( 2 * 1000 ) );
-}
-
-void SERCOM::prepareNackBitWIRE( void )
-{
-    if( isMasterWIRE() ) {
-        // Send a NACK
-        sercom->I2CM.CTRLB.bit.ACKACT = 1;
-    }
-    else {
-        sercom->I2CS.CTRLB.bit.ACKACT = 1;
-    }
-}
-
-void SERCOM::prepareAckBitWIRE( void )
-{
-    if( isMasterWIRE() ) {
-        // Send an ACK
-        sercom->I2CM.CTRLB.bit.ACKACT = 0;
-    }
-    else {
-        sercom->I2CS.CTRLB.bit.ACKACT = 0;
-    }
-}
-
-void SERCOM::prepareCommandBitsWire( uint8_t cmd )
-{
-    if( isMasterWIRE() ) {
-        ATOMIC_OPERATION( {
-            if( I2CM_SYNC_BUSY ) I2CM_WAIT_SYNC;
-            sercom->I2CM.CTRLB.bit.CMD = cmd;
-        } )
-    }
-    else {
-        ATOMIC_OPERATION( {
-            if( I2CS_SYNC_BUSY ) I2CS_WAIT_SYNC;
-            sercom->I2CS.CTRLB.bit.CMD = cmd;
-        } )
-    }
-}
-
-bool SERCOM::startTransmissionWIRE( uint8_t                 address,
-                                    SercomWireReadWriteFlag flag )
+int SERCOM::startTransmissionWIRE( uint8_t addr, bool isWrite )
 {
     // 7-bits address + 1-bits R/W
-    address = ( address << 0x1ul ) | flag;
+    addr <<= 0x01;
+    if( !isWrite ) addr |= 0x01;
 
-    // Wait idle or owner bus mode
-    while( !isBusIdleWIRE() && !isBusOwnerWIRE() )
-        ;
+    // Don't try anything if the bus is busy
+    int status = parseMasterWireStatus();
+    if( status == I2CM_ERR_BUS_BUSY || status == I2CM_ERR_CONDITION )
+        return status;
 
     // Send start and address
-    sercom->I2CM.ADDR.bit.ADDR = address;
+    ATOMIC_OPERATION( {
+        if( I2CM_SYNC_BUSY ) I2CM_WAIT_SYNC;
+        sercom->I2CM.ADDR.bit.ADDR = addr;
+    } )
 
-    // Address Transmitted
-    if( flag == WIRE_WRITE_FLAG ) // Write mode
-    {
-        while( !sercom->I2CM.INTFLAG.bit.MB ) {
-            // Wait transmission complete
-        }
-    }
-    else // Read mode
-    {
-        while( !sercom->I2CM.INTFLAG.bit.SB ) {
-            // If the slave NACKS the address, the MB bit will be set.
-            // In that case, send a stop condition and return false.
-            if( sercom->I2CM.INTFLAG.bit.MB ) {
-                ATOMIC_OPERATION( {
-                    if( I2CM_SYNC_BUSY ) I2CM_WAIT_SYNC;
-                    sercom->I2CM.CTRLB.bit.CMD = 3; // Stop condition
-                } )
-                return false;
-            }
-            // Wait transmission complete
-        }
+    return I2CM_ERR_NONE;
+}
 
-        // Clean the 'Slave on Bus' flag, for further usage.
-        // sercom->I2CM.INTFLAG.bit.SB = 0x1ul;
+int SERCOM::parseMasterWireStatus()
+{
+    // Check in descending order according to figure 26-5 in the data sheet
+    int status = getStatusWIRE();
+
+    // Bus busy
+    if( ( status & SERCOM_I2CM_STATUS_BUSSTATE( 3 ) ) ==
+        SERCOM_I2CM_STATUS_BUSSTATE( 3 ) ) {
+        return I2CM_ERR_BUS_BUSY;
     }
 
-    // ACK received (0: ACK, 1: NACK)
-    if( sercom->I2CM.STATUS.bit.RXNACK ) {
-        return false;
+    // Error condition
+    if( status & ( SERCOM_I2CM_STATUS_BUSERR | SERCOM_I2CM_STATUS_ARBLOST ) )
+        return I2CM_ERR_CONDITION;
+
+    // Low time out
+    if( status & SERCOM_I2CM_STATUS_LOWTOUT ) return I2CM_ERR_LOW_TIMEOUT;
+
+    // RX NACK
+    if( status & SERCOM_I2CM_STATUS_RXNACK ) return I2CM_ERR_RX_NACK;
+
+    return I2CM_ERR_NONE;
+}
+
+int SERCOM::waitForMBWire()
+{
+    // Wait for MB to be set
+    while( !sercom->I2CM.INTFLAG.bit.MB )
+        ;
+    return parseMasterWireStatus();
+}
+
+int SERCOM::waitForSBWire()
+{
+    // Wait for SB to be set
+    while( !sercom->I2CM.INTFLAG.bit.SB ) {
+        // If the slave NACKS the address, the MB bit will be set
+        if( sercom->I2CM.INTFLAG.bit.MB ) parseMasterWireStatus();
     }
-    else {
-        return true;
+    return I2CM_ERR_NONE;
+}
+
+void SERCOM::masterACKWire( bool ack )
+{
+    sercom->I2CM.CTRLB.bit.ACKACT = ( ack ? 0 : 1 );
+}
+
+void SERCOM::prepareMasterCommandWIRE( uint8_t cmd )
+{
+    ATOMIC_OPERATION( {
+        if( I2CM_SYNC_BUSY ) I2CM_WAIT_SYNC;
+        sercom->I2CM.CTRLB.bit.CMD = cmd;
+    } )
+}
+
+int SERCOM::getStatusWIRE()
+{
+    return sercom->I2CM.STATUS.reg;
+}
+
+void SERCOM::writeStatusWire( int status )
+{
+    ATOMIC_OPERATION( {
+        if( I2CM_SYNC_BUSY ) I2CM_WAIT_SYNC;
+        sercom->I2CM.STATUS.reg = ( status & 0xFFFF );
+    } )
+}
+
+int SERCOM::sendDataMasterWIRE( uint8_t *data, int len, bool stop )
+{
+    // Wait for the address bits
+    int status = waitForMBWire();
+    if( status != I2CM_ERR_NONE ) return status;
+
+    for( int i = 0; i < len; i++ ) {
+        // Send data, wait for it to come out the SR
+        sercom->I2CM.DATA.bit.DATA = data[i];
+        status = waitForMBWire();
+        if( status != I2CM_ERR_NONE ) return status;
+
+        // Send a stop
+        if( stop && ( i == ( len - 1 ) ) )
+            prepareMasterCommandWIRE( WIRE_MASTER_ACK_STOP );
     }
+
+    return parseMasterWireStatus();
 }
 
-bool SERCOM::sendDataMasterWIRE( uint8_t data )
+int SERCOM::readDataMasterWire( uint8_t *data, int len, bool ack, bool stop )
 {
-    // Send data
-    sercom->I2CM.DATA.bit.DATA = data;
+    // Send an ACK
+    masterACKWire( ack );
 
-    // Wait transmission successful
-    while( !sercom->I2CM.INTFLAG.bit.MB ) {
+    for( int i = 0; i < len; i++ ) {
+        // Wait for the bits to clear
+        if( waitForSBWire() != I2CM_ERR_NONE ) break;
 
-        // If a bus error occurs, the MB bit may never be set.
-        // Check the bus error bit and bail if it's set.
-        if( sercom->I2CM.STATUS.bit.BUSERR ) {
-            return false;
-        }
-    }
-
-    // Problems on line? nack received?
-    if( sercom->I2CM.STATUS.bit.RXNACK )
-        return false;
-    else
-        return true;
-}
-
-bool SERCOM::sendDataSlaveWIRE( uint8_t data )
-{
-    // Send data
-    sercom->I2CS.DATA.bit.DATA = data;
-
-    // Problems on line? nack received?
-    if( !sercom->I2CS.INTFLAG.bit.DRDY || sercom->I2CS.STATUS.bit.RXNACK )
-        return false;
-    else
-        return true;
-}
-
-bool SERCOM::isMasterWIRE( void )
-{
-    return sercom->I2CS.CTRLA.bit.MODE == I2C_MASTER_OPERATION;
-}
-
-bool SERCOM::isSlaveWIRE( void )
-{
-    return sercom->I2CS.CTRLA.bit.MODE == I2C_SLAVE_OPERATION;
-}
-
-bool SERCOM::isBusIdleWIRE( void )
-{
-    return sercom->I2CM.STATUS.bit.BUSSTATE == WIRE_IDLE_STATE;
-}
-
-bool SERCOM::isBusOwnerWIRE( void )
-{
-    return sercom->I2CM.STATUS.bit.BUSSTATE == WIRE_OWNER_STATE;
-}
-
-bool SERCOM::isDataReadyWIRE( void )
-{
-    return sercom->I2CS.INTFLAG.bit.DRDY;
-}
-
-bool SERCOM::isStopDetectedWIRE( void )
-{
-    return sercom->I2CS.INTFLAG.bit.PREC;
-}
-
-bool SERCOM::isRestartDetectedWIRE( void )
-{
-    return sercom->I2CS.STATUS.bit.SR;
-}
-
-bool SERCOM::isAddressMatch( void )
-{
-    return sercom->I2CS.INTFLAG.bit.AMATCH;
-}
-
-bool SERCOM::isMasterReadOperationWIRE( void )
-{
-    return sercom->I2CS.STATUS.bit.DIR;
-}
-
-bool SERCOM::isRXNackReceivedWIRE( void )
-{
-    return sercom->I2CM.STATUS.bit.RXNACK;
-}
-
-int SERCOM::availableWIRE( void )
-{
-    if( isMasterWIRE() )
-        return sercom->I2CM.INTFLAG.bit.SB;
-    else
-        return sercom->I2CS.INTFLAG.bit.DRDY;
-}
-
-uint8_t SERCOM::readDataWIRE( void )
-{
-    if( isMasterWIRE() ) {
-        while( sercom->I2CM.INTFLAG.bit.SB == 0 ) {
-            // Waiting complete receive
+        // Send a stop
+        if( stop && ( i == ( len - 1 ) ) ) {
+            masterACKWire( false );
+            prepareMasterCommandWIRE( WIRE_MASTER_ACK_STOP );
         }
 
-        return sercom->I2CM.DATA.bit.DATA;
+        data[i] = sercom->I2CM.DATA.bit.DATA;
     }
-    else {
-        return sercom->I2CS.DATA.reg;
-    }
+
+    return parseMasterWireStatus();
 }
 
 void SERCOM::enableSERCOM()

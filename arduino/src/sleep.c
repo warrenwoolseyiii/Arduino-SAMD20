@@ -88,8 +88,16 @@ void changeCPUClk( CPUClkSrc_t src )
         SystemCoreClock = 8000000ul / ( 1 << src );
         disableDFLL48();
         disableGenericClk( GCLK_CLKCTRL_ID_DFLL48M_Val );
+
+        // Under 24 MHz at 2.7V & up requires 0 wait states, section 32.11 NVM
+        // Characteristics
+        NVMCTRL->CTRLB.bit.RWS = NVMCTRL_CTRLB_RWS_SINGLE_Val;
     }
     else {
+        // Transitioning to 48 MHz at 2.7V & up requires 1 wait state,
+        // section 32.11 NVM Characteristics
+        NVMCTRL->CTRLB.bit.RWS = NVMCTRL_CTRLB_RWS_HALF_Val;
+
         initGenericClk( GCLK_CLKCTRL_GEN_GCLK1_Val,
                         GCLK_CLKCTRL_ID_DFLL48M_Val );
         initDFLL48( VARIANT_MAINOSC );
